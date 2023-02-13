@@ -2,7 +2,7 @@ blueprint:
   name: YLYK01YL - Yeelight Remote Control
   description: Simple action mapper to the Bluetooth based Yeelight Remote Control
   domain: automation
-  # source_url: https://github.com/PiotrMachowski/Home-Assistant-custom-components-Xiaomi-Cloud-Map-Extractor/blob/master/blueprints/automation/disable_vacuum_camera_update_when_docked.yaml
+  source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/ylyk01yl_yeelight_remote_control.yaml
   input:
     remote_entity:
       name: YLYK01YL Yeelight Remote Control Entity
