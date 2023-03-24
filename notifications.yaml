@@ -1,0 +1,174 @@
+blueprint:
+  name: "🔔 Notification with Confirm, Dismiss and Timeout"
+  description: >
+    Notification script with `confirm`, `dismiss` and `timeout` options.
+
+    **Forked from Home Assistant's [Confirmable Notifications](https://github.com/home-assistant/core/blob/master/homeassistant/components/script/blueprints/confirmable_notification.yaml)**
+
+  domain: script
+  input:
+    notify_device:
+      name: "📲 Device to notify"
+      description: "Device needs to run the official Home Assistant app to receive notifications."
+      selector:
+        device:
+          integration: mobile_app
+    title:
+      name: "🏷️ Title"
+      description: "The title of the button shown in the notification."
+      default: ""
+      selector:
+        text:
+    message:
+      name: "💬 Message"
+      description: "The message body"
+      selector:
+        text:
+    confirm_text:
+      name: "✅ Confirmation Text"
+      description: "Text to show on the confirmation button"
+      default: "Confirm"
+      selector:
+        text:
+    confirm_action:
+      name: "✅ Confirmation Action"
+      description: "Action to run when notification is confirmed"
+      default: []
+      selector:
+        action:
+    dismiss_text:
+      name: "❌ Dismiss Text"
+      description: "Text to show on the dismiss button"
+      default: "Dismiss"
+      selector:
+        text:
+    dismiss_action:
+      name: "❌ Dismiss Action"
+      description: "Action to run when notification is dismissed"
+      default: []
+      selector:
+        action:
+    timeout:
+      name: "⌛️ Timeout Duration"
+      description: "Amount of time to wait for a confirm/dismiss response before firing timeout action."
+      selector:
+        duration:
+          enable_day: false
+    timeout_action:
+      name: "⌛️ Timeout Action"
+      description: "Action to run when notification response is timed out."
+      default: []
+      selector:
+        action:
+    tag:
+      name: "🔖 Tag"
+      description: "Used for unique identification of the notification."
+      selector:
+        text:
+    clear_on_timeout:
+      name: "🧹 Clear notification on timeout - ⚠️ Tag Required"
+      description: "Dismiss the notification after action selection times out."
+      default: "leave_notification"
+      selector:
+        select:
+          options:
+            - label: Clear Notification
+              value: clear_notification
+            - label: Leave Notification
+              value: leave_notification
+    persist:
+      name: "🚩 (Android Only) Persistent Notification - ⚠️ Tag Required"
+      description: "Ensures that notification cannot be dismissed by swiping away."
+      default: false
+      selector:
+        boolean:
+    channel:
+      name: "(Android Only) Notification Channel"
+      description: "Defines the channel, to be used with Importance. Relates to the importance of the notification."
+      default: "General"
+      selector:
+        text:
+    importance:
+      name: "❕ (Android Only) Notification Channel Importance"
+      description: https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance
+      default: default
+      selector:
+        select:
+          options:
+            - label: "Urgent (Makes a sound with heads-up notification)"
+              value: high
+            - label: "Default (Makes a sound)"
+              value: default
+            - label: "Silent (Makes no sound)"
+              value: low
+            - label: "Low (Makes no sound, doesn't appear in status bar)"
+              value: min
+    interruption_level:
+      name: "❕ (iOS Only) Interruption Level"
+      description: https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level
+      default: active
+      selector:
+        select:
+          options:
+            - label: "Silent (Makes no sound, does not wake screen)"
+              value: passive
+            - label: "Default"
+              value: active
+            - label: "Important (Overrides Focus)"
+              value: time-sensitive
+            - label: "Critical (Overrides Focus and Mute, restricted features)"
+              value: critical
+
+mode: restart
+
+sequence:
+  - alias: "Set up variables"
+    variables:
+      action_confirm: "{{ 'CONFIRM_' ~ context.id }}"
+      action_dismiss: "{{ 'DISMISS_' ~ context.id }}"
+      clear_on_timeout: !input clear_on_timeout
+  - alias: "Send notification"
+    domain: mobile_app
+    type: notify
+    device_id: !input notify_device
+    title: !input title
+    message: !input message
+    data:
+      actions:
+        - action: "{{ action_confirm }}"
+          title: !input confirm_text
+        - action: "{{ action_dismiss }}"
+          title: !input dismiss_text
+      tag: !input tag
+      persist: !input persist
+      channel: !input channel
+      importance: !input importance
+      push:
+        interruption-level: !input interruption_level
+  - alias: "Awaiting response"
+    wait_for_trigger:
+      - platform: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: "{{ action_confirm }}"
+      - platform: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: "{{ action_dismiss }}"
+    timeout: !input timeout
+    continue_on_timeout: true
+  - choose:
+      - conditions: "{{ wait.trigger.event.data.action == action_confirm }}"
+        sequence: !input confirm_action
+      - conditions: "{{ wait.trigger.event.data.action == action_dismiss }}"
+        sequence: !input dismiss_action
+      - conditions: "{{ wait.trigger == none }}"
+        sequence: !input timeout_action
+      - conditions: "{{ clear_on_timeout == 'clear_notification' }}"
+        sequence:
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            message: "clear_notification"
+            data:
+              tag: !input tag
