@@ -1,22 +1,29 @@
 blueprint:
   name: "🔔 Notification with Confirm, Dismiss and Timeout"
   description: >
+    ### [🔗 Github Link](https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml)
+
+    [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fsamuelthng%2Ft-house-blueprints%2Fblob%2Fmain%2Fnotifications.yaml)
+
+
+    ---
+
     ### Version: 1.0
 
     *Forked from Home Assistant's [Confirmable Notifications](https://github.com/home-assistant/core/blob/master/homeassistant/components/script/blueprints/confirmable_notification.yaml)*
 
-    
+
     ---
-    
+
     ## Features:
       - 📲 Sends a notification to a device with companion app installed.
       - ✅ Confirm button with custom label and action
       - ❌ Dismiss button with custom label and action
-      - ⌛️ Timeout option after custom time if no `confirm` and `dismiss` response received.
+      - ⌛️ Timeout options with custom duration if no `confirm` or `dismiss` response received.
       - 🧹 Automatically dismiss notification if no response received after timeout.
-    
+
     ---
-    
+
     ## Example usage:
       When the last user leaves home, send a notification to last user:
       - Title: `My Awesome Home`
@@ -28,7 +35,7 @@ blueprint:
       - Timeout Duration: `5 minutes`
       - Timeout Action: `Run turn off script`
       - Clear on Timeout: `Clear Notification`
-    
+
   domain: script
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   input:
