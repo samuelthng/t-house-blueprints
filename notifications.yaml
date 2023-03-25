@@ -8,7 +8,7 @@ blueprint:
 
     ---
 
-    ### Version: 1.0
+    ### Version: 1.1
 
     *Forked from Home Assistant's [Confirmable Notifications](https://github.com/home-assistant/core/blob/master/homeassistant/components/script/blueprints/confirmable_notification.yaml)*
 
@@ -17,10 +17,10 @@ blueprint:
 
     ## Features:
       - 📲 Sends a notification to a device with companion app installed.
-      - ✅ Confirm button with custom label and action
-      - ❌ Dismiss button with custom label and action
-      - ⌛️ Timeout options with custom duration if no `confirm` or `dismiss` response received.
-      - 🧹 Automatically dismiss notification if no response received after timeout.
+      - ✅ Confirm button with custom label and actions
+      - ❌ Dismiss button with custom label and actions
+      - ⌛️ Timeout actions with custom duration, fired if no `confirm` or `dismiss` response received.
+      - 🧹 Dismiss notification if no response received after timeout duration.
 
     ---
 
@@ -36,6 +36,14 @@ blueprint:
       - Timeout Action: `Run turn off script`
       - Clear on Timeout: `Clear Notification`
 
+    ---
+
+    ## Changelog
+
+    ### Version 1.1 - *25 March 2023*
+      - Updated: `Clear on Timeout` as boolean field
+      - Fixed: `Persistent` notifications not working
+      - Fixed: `Clear on Timeout` did not clear if a timeout happened
   domain: script
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   input:
@@ -102,12 +110,7 @@ blueprint:
       description: "Dismiss the notification after action selection times out."
       default: "leave_notification"
       selector:
-        select:
-          options:
-            - label: Clear Notification
-              value: clear_notification
-            - label: Leave Notification
-              value: leave_notification
+        boolean:
     persist:
       name: "🚩 (Android Only) Persistent Notification - ⚠️ Tag Required"
       description: "Ensures that notification cannot be dismissed by swiping away."
@@ -159,6 +162,7 @@ sequence:
       action_confirm: "{{ 'CONFIRM_' ~ context.id }}"
       action_dismiss: "{{ 'DISMISS_' ~ context.id }}"
       clear_on_timeout: !input clear_on_timeout
+      persist: !input persist
   - alias: "Send notification"
     domain: mobile_app
     type: notify
@@ -172,7 +176,7 @@ sequence:
         - action: "{{ action_dismiss }}"
           title: !input dismiss_text
       tag: !input tag
-      persist: !input persist
+      persistent: !input persist
       channel: !input channel
       importance: !input importance
       push:
@@ -196,11 +200,15 @@ sequence:
         sequence: !input dismiss_action
       - conditions: "{{ wait.trigger == none }}"
         sequence: !input timeout_action
-      - conditions: "{{ clear_on_timeout == 'clear_notification' }}"
-        sequence:
-          - domain: mobile_app
-            type: notify
-            device_id: !input notify_device
-            message: "clear_notification"
-            data:
-              tag: !input tag
+  - if:
+      - alias: "Clear Notification Enabled"
+        condition: template
+        value_template: "{{ clear_on_timeout == true }}"
+    then:
+      - alias: "Send clear notification command"
+        domain: mobile_app
+        type: notify
+        device_id: !input notify_device
+        message: "clear_notification"
+        data:
+          tag: !input tag
