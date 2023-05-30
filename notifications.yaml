@@ -8,7 +8,7 @@ blueprint:
 
     ---
 
-    ### Version: 1.1
+    ### Version: 1.2
 
     *Forked from Home Assistant's [Confirmable Notifications](https://github.com/home-assistant/core/blob/master/homeassistant/components/script/blueprints/confirmable_notification.yaml)*
 
@@ -40,6 +40,10 @@ blueprint:
 
     ## Changelog
 
+    ### Version 1.2 - *30 May 2023*
+      - Added: `Icon` and `Icon color` (Android Only) - [Huge thanks to joe.cole1](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552/4)
+      - Added: `Enable Timeout`, controls command response timeout feature - [Again, huge thanks to joe.cole1 for the insight](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552/12)
+
     ### Version 1.1 - *25 March 2023*
       - Updated: `Clear on Timeout` as boolean field
       - Fixed: `Persistent` notifications not working
@@ -62,6 +66,16 @@ blueprint:
     message:
       name: "💬 Message"
       description: "The message body"
+      selector:
+        text:
+    icon:
+      name: "🙂 Icon (Android Only)"
+      default: ""
+      selector:
+        icon:
+    icon_color:
+      name: "🎨 Icon Color (Android Only, hex or color name)"
+      default: ""
       selector:
         text:
     confirm_text:
@@ -88,6 +102,12 @@ blueprint:
       default: []
       selector:
         action:
+    enable_timeout:
+      name: "⌛️ Enable Timeout"
+      description: "Note: If disabled, script will wait for response indefinitely until next trigger."
+      default: true # Default `true` for backward compatibility.
+      selector:
+        boolean:
     timeout:
       name: "⌛️ Timeout Duration"
       description: "Amount of time to wait for a confirm/dismiss response before firing timeout action."
@@ -161,6 +181,7 @@ sequence:
     variables:
       action_confirm: "{{ 'CONFIRM_' ~ context.id }}"
       action_dismiss: "{{ 'DISMISS_' ~ context.id }}"
+      enable_timeout: !input enable_timeout
       clear_on_timeout: !input clear_on_timeout
       persist: !input persist
   - alias: "Send notification"
@@ -181,18 +202,36 @@ sequence:
       importance: !input importance
       push:
         interruption-level: !input interruption_level
-  - alias: "Awaiting response"
-    wait_for_trigger:
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: "{{ action_confirm }}"
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: "{{ action_dismiss }}"
-    timeout: !input timeout
-    continue_on_timeout: true
+      notification_icon: !input icon
+      color: !input icon_color
+  - if:
+      - alias: "Check timeout enabled"
+        condition: template
+        value_template: "{{ clear_on_timeout == true }}"
+    then:
+      - alias: "Awaiting response with Timeout"
+        wait_for_trigger:
+          - platform: event
+            event_type: mobile_app_notification_action
+            event_data:
+              action: "{{ action_confirm }}"
+          - platform: event
+            event_type: mobile_app_notification_action
+            event_data:
+              action: "{{ action_dismiss }}"
+        timeout: !input timeout
+        continue_on_timeout: true
+    else:
+      - alias: "Awaiting response indefinitely"
+        wait_for_trigger:
+          - platform: event
+            event_type: mobile_app_notification_action
+            event_data:
+              action: "{{ action_confirm }}"
+          - platform: event
+            event_type: mobile_app_notification_action
+            event_data:
+              action: "{{ action_dismiss }}"
   - choose:
       - conditions: "{{ wait.trigger.event.data.action == action_confirm }}"
         sequence: !input confirm_action
