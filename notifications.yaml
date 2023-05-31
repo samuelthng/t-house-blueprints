@@ -207,7 +207,7 @@ sequence:
   - if:
       - alias: "Check timeout enabled"
         condition: template
-        value_template: "{{ clear_on_timeout == true }}"
+        value_template: "{{ enable_timeout == true }}"
     then:
       - alias: "Awaiting response with Timeout"
         wait_for_trigger:
