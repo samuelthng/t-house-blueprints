@@ -128,7 +128,7 @@ blueprint:
     clear_on_timeout:
       name: "🧹 Clear notification on timeout - ⚠️ Tag Required"
       description: "Dismiss the notification after action selection times out."
-      default: "leave_notification"
+      default: false
       selector:
         boolean:
     persist:
