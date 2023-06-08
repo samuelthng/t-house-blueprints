@@ -161,6 +161,7 @@ blueprint:
     notification_link:
       name: "🔗 Notification Link"
       description: "Optional: Link to navigate to upon clicking the notification. https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url"
+      default: ""
       selector:
         text:
     channel:
