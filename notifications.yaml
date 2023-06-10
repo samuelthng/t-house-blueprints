@@ -215,10 +215,7 @@ sequence:
       timeout: !input timeout # Load timeout into variable for use with templates.
       timeout_seconds: "{{ (timeout.hours * 60 + timeout.minutes) * 60 + timeout.seconds }}"
       icon_color_selector: !input icon_color
-      icon_color_hex: >-
-        {% if icon_color_selector != false %}
-          {{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}        
-        {% endif %}
+      icon_color_hex: "{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}"
 
   # Send notification to target.
   - alias: "Send notification"
@@ -240,7 +237,7 @@ sequence:
       push:
         interruption-level: !input interruption_level
       notification_icon: !input icon
-      color: "{{ iif(icon_color_selector, icon_color_hex, )}}"
+      color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
       # color: !input icon_color
       clickAction: !input notification_link
       url: !input notification_link
