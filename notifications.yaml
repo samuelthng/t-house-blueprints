@@ -40,6 +40,10 @@ blueprint:
 
     ## Changelog
 
+    ### Version 1.3.1 - *10 Jun 2023*
+      - Fixed: `Enable Icon Color`
+      - Updated: `Icon Color` hex template
+
     ### Version 1.3 - *9 Jun 2023*
       - Fixed: [Incorrect property used for timeout enablement](https://github.com/samuelthng/t-house-blueprints/pull/2).
       - Added: Icon Color picker - ❗Breaking Change❗ 
