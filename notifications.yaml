@@ -114,6 +114,12 @@ blueprint:
       default: "Confirm"
       selector:
         text:
+    confirm_icon:
+      name: "🙂 Confirmation Icon"
+      description: "Optional: Custom icon to show on the confirmation button"
+      default: ""
+      selector:
+        icon:        
     confirm_action:
       name: "✅ Confirmation Action"
       description: "Optional: Action to run when notification is confirmed"
@@ -126,6 +132,12 @@ blueprint:
       default: "Dismiss"
       selector:
         text:
+    dismiss_icon:
+      name: "🙂 Dismiss Icon"
+      description: "Optional: Custom icon to show on the dismiss button"
+      default: ""
+      selector:
+        icon:        
     dismiss_action:
       name: "❌ Dismiss Action"
       description: "Optional: Action to run when notification is dismissed"
@@ -233,8 +245,10 @@ sequence:
       actions:
         - action: "{{ action_confirm }}"
           title: !input confirm_text
+          icon: !input confirm_icon
         - action: "{{ action_dismiss }}"
           title: !input dismiss_text
+          icon: !input dismiss_icon
       tag: !input tag
       persistent: !input persist
       channel: !input channel
