@@ -8,10 +8,13 @@ blueprint:
 
     ---
 
-    ### Version: 1.3.2
+    ### Version: 1.4
 
     *Forked from Home Assistant's [Confirmable Notifications](https://github.com/home-assistant/core/blob/master/homeassistant/components/script/blueprints/confirmable_notification.yaml)*
 
+    #### Known Issues:
+      - In some cases, iOS does not seem to play well with newer features. 
+        If that happens to you, you can [check out older releases here](https://github.com/samuelthng/t-house-blueprints/releases).
 
     ---
 
@@ -27,6 +30,12 @@ blueprint:
     ---
 
     ## Changelog
+
+    ### Version 1.4 - *7 Jul 2023*
+      - Reverted: Send clear notification command - for iOS compatibility.
+      - Added: `subtitle`, `group`, `visibility`.
+      - Refactor: `tag` is no longer recommended, will use `entity_id` by default.
+      - Fixed: During a timeout, the script throws error into logs due to checking attribs of `None` type.
 
     ### Version 1.3.2 - *28 Jun 2023*
       - [Added: `Action Icons`](https://github.com/samuelthng/t-house-blueprints/pull/9) - ` iOS Only` - Thanks [@ChrisMancini](https://github.com/ChrisMancini)
@@ -54,13 +63,19 @@ blueprint:
           integration: mobile_app
     title:
       name: "🏷️ Title"
-      description: "The title of the button shown in the notification."
+      description: "The title of the notification.  \n\n`Optional`\n"
+      default: ""
+      selector:
+        text:
+    subtitle:
+      name: "🏷️ Subtitle"
+      description: "The subtitle of the notification.  \n\n`Optional`\n"
       default: ""
       selector:
         text:
     message:
       name: "💬 Message"
-      description: "The message body to display on the notification."
+      description: "The message body to display on the notification.  \n\n`🤖 Android`: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
       selector:
         text:
     icon:
@@ -81,45 +96,39 @@ blueprint:
       default: [102, 186, 240]
       selector:
         color_rgb:
-    tag:
-      name: "🔖 Tag"
-      description: "Used for unique identification of the notification, any unique string will do fine.  \nExample: `my_awesome_notification_for_device_X`  \n\n`Recommended`  \n"
-      default: ""
-      selector:
-        text:
     confirm_text:
-      name: "✅ Confirmation Text"
-      description: "Text to show on the confirmation button."
+      name: "1️⃣ Option 1 Text"
+      description: "Text to show on the first option."
       default: "Confirm"
       selector:
         text:
     confirm_action:
-      name: "✅ Confirmation Action"
-      description: "Action to run when notification is confirmed.  \n\n`Optional`  \n"
+      name: "1️⃣ Option 1 Action(s)"
+      description: "Action(s) to run when the first option is selected.  \n\n`Optional`  \n"
       default: []
       selector:
         action:
     confirm_icon:
-      name: "🙂 Confirmation Icon"
-      description: "Custom icon to show on the confirmation button.  \nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/, there are other reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
+      name: "1️⃣ Option 1 Icon"
+      description: "Custom icon to show on the first option.  \n\nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/.  \nThere are more reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
       default: ""
       selector:
         text:
     dismiss_text:
-      name: "❌ Dismiss Text"
-      description: "Text to show on the dismiss button."
+      name: "2️⃣ Option 2 Text"
+      description: "Text to show on the second option."
       default: "Dismiss"
       selector:
         text:
     dismiss_action:
-      name: "❌ Dismiss Action"
-      description: "Action to run when notification is dismissed.  \n\n`Optional`  \n"
+      name: "2️⃣ Option 2 Action(s)"
+      description: "Action(s) to run when the second option is selected.  \n\n`Optional`  \n"
       default: []
       selector:
         action:
     dismiss_icon:
-      name: "🙂 Dismiss Icon"
-      description: "Custom icon to show on the dismiss button.  \nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/, there are other reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
+      name: "2️⃣ Option 2 Icon"
+      description: "Custom icon to show on the second option.  \n\nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/.  \nThere are more reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
       default: ""
       selector:
         text:
@@ -131,7 +140,7 @@ blueprint:
         boolean:
     timeout:
       name: "⌛️ Timeout Duration"
-      description: "Amount of time to wait for a confirm/dismiss response before firing timeout action.  \nDefault: 15 minutes"
+      description: "Amount of time to wait for an action response before firing timeout action.  \n\nRecommended: ≳ 1 minute, to allow notifications to be sent.  \nDefault: 15 minutes. \n"
       default:
         hours: 0
         minutes: 15
@@ -140,26 +149,44 @@ blueprint:
         duration:
           enable_day: false
     timeout_action:
-      name: "⌛️ Timeout Action"
+      name: "⌛️ Timeout Action(s)"
       description: "Action to run when notification response is timed out.  \n\n`Optional`  \n"
       default: []
       selector:
         action:
+    swipe_away_as_timeout:
+      name: "⌛️ Run timeout action(s) when notification cleared"
+      description: "If enabled, swiping the notification away will immediately trigger timeout actions.  \n\n`🤖 Android Only`  \n"
+      default: false
+      selector:
+        boolean:
     clear_on_timeout:
       name: "🧹 Clear notification on timeout"
-      description: "Dismiss the notification after action selection times out.  \n\n`🔖 Tag Required`  \n"
+      description: "Dismiss the notification after action selection times out.  \n"
       default: false
       selector:
         boolean:
     persist:
       name: "🚩 Persistent Notification"
-      description: "Ensures that notification cannot be dismissed by swiping away.  \n\n`🤖 Android Only`, `🔖 Tag Required`  \n"
+      description: "Ensures that notification cannot be dismissed by swiping away.  \n\n`🤖 Android Only`  \n"
       default: false
       selector:
         boolean:
     notification_link:
       name: "🔗 Notification Link"
-      description: "Link to navigate to upon clicking the notification.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information.  \n\n`Optional`  \n"
+      description: "Link to navigate to upon clicking the notification.  \n\n Examples:  \n - Home Assistant relative links: `/config/updates` or `/lovelace/home`  \n - Apps: `app://<package name>`  \n - Entity `More Info` Panel: `entityId:<entity_ID>`  \n - Deep links: `deep-link://<deep_link>`  \n\nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information and options.  \n\n`Optional`  \n"
+      default: ""
+      selector:
+        text:
+    tag:
+      name: "🔖 Tag"
+      description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n`Optional`  \n"
+      default: ""
+      selector:
+        text:
+    group:
+      name: "📣 Notification Group ID"
+      description: "Used for grouping different notifications together visually.  \n\n⚠️ iOS critical notifications do no support grouping.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information.  \n\n`Optional`  \n"
       default: ""
       selector:
         text:
@@ -199,6 +226,19 @@ blueprint:
               value: time-sensitive
             - label: "Critical (Overrides Focus and Mute, restricted features)"
               value: critical
+    visibility:
+      name: "🔏 Notification Lockscreen Visibility"
+      description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`  \n"
+      default: "private"
+      selector:
+        select:
+          options:
+            - label: "Public: Always show content."
+              value: public
+            - label: "Private: Show content based on phone settings."
+              value: private
+            - label: "Secret: Always hide content on the lockscreen."
+              value: secret
 
 mode: restart
 
@@ -206,8 +246,9 @@ sequence:
   # Evaluate inputs and variables
   - alias: "Set up variables"
     variables:
-      action_confirm: "{{ 'CONFIRM_' ~ context.id }}"
-      action_dismiss: "{{ 'DISMISS_' ~ context.id }}"
+      custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
+      first_option: "{{ 'FIRST_' ~ context.id }}"
+      second_option: "{{ 'SECOND_' ~ context.id }}"
       enable_timeout: !input enable_timeout
       clear_on_timeout: !input clear_on_timeout
       persist: !input persist
@@ -216,6 +257,7 @@ sequence:
       enable_icon_color: !input enable_icon_color
       icon_color_selector: !input icon_color
       icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
+      swipe_away_as_timeout: !input swipe_away_as_timeout
 
   # Send notification to target.
   - alias: "Send notification"
@@ -225,14 +267,19 @@ sequence:
     title: !input title
     message: !input message
     data:
+      subtitle: !input subtitle # iOS/macOS
+      subject: !input subtitle # Android
       actions:
-        - action: "{{ action_confirm }}"
+        - action: "{{ first_option }}"
           title: !input confirm_text
           icon: !input confirm_icon
-        - action: "{{ action_dismiss }}"
+        - action: "{{ second_option }}"
           title: !input dismiss_text
           icon: !input dismiss_icon
-      tag: !input tag
+        # Possibly add more actions with show/hide toggles in future?
+      visbility: !input visibility
+      tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
+      group: "{{ iif(group|length, group, ) }}"
       persistent: !input persist
       channel: !input channel
       importance: !input importance
@@ -240,47 +287,74 @@ sequence:
         interruption-level: !input interruption_level
       notification_icon: !input icon
       color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
-      # color: !input icon_color
       clickAction: !input notification_link
       url: !input notification_link
-      # Set notification timeout if timeout feature is enabled and notification should be cleared.
-      timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}"
+      timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
 
   # Listen for response from target, taking into account timeout configuration.
   - if:
-      - alias: "Check timeout enabled"
+      - alias: "Should await response with timeout?"
         condition: template
         value_template: "{{ enable_timeout == true }}"
     then:
-      - alias: "Awaiting response with Timeout"
+      - alias: "Awaiting response with timeout…"
         wait_for_trigger:
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_confirm }}"
+              action: "{{ first_option }}"
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_dismiss }}"
+              action: "{{ second_option }}"
+          - platform: event
+            event_type: mobile_app_notification_cleared
+            event_data:
+              action_1_key: "{{ first_option }}"
+              action_2_key: "{{ second_option }}"
         timeout: !input timeout
         continue_on_timeout: true
     else:
-      - alias: "Awaiting response indefinitely"
+      - alias: "Awaiting response indefinitely…"
         wait_for_trigger:
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_confirm }}"
+              action: "{{ first_option }}"
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_dismiss }}"
+              action: "{{ second_option }}"
+          - platform: event
+            event_type: mobile_app_notification_cleared
+            event_data:
+              action_1_key: "{{ first_option }}"
+              action_2_key: "{{ second_option }}"
 
   # Trigger actions based on response, or lack thereof.
   - choose:
-      - conditions: "{{ wait.trigger.event.data.action == action_confirm }}"
-        sequence: !input confirm_action
-      - conditions: "{{ wait.trigger.event.data.action == action_dismiss }}"
-        sequence: !input dismiss_action
-      - conditions: "{{ wait.trigger == none }}"
+      - alias: "Trigger: Timeout"
+        conditions: "{{ wait.trigger == none }}"
         sequence: !input timeout_action
+      - alias: "Trigger: Notification Cleared"
+        conditions: "{{ swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
+        sequence: !input timeout_action
+      - alias: "Trigger: first_option"
+        conditions: "{{ wait.trigger.event.data.action == first_option }}"
+        sequence: !input confirm_action
+      - alias: "Trigger: second_option"
+        conditions: "{{ wait.trigger.event.data.action == second_option }}"
+        sequence: !input dismiss_action
+
+  - if:
+      - alias: "Should send clear notification command? (for iOS/macOS)"
+        condition: template
+        value_template: "{{ enable_timeout and clear_on_timeout }}"
+    then:
+      - alias: "Send clear notification command"
+        domain: mobile_app
+        type: notify
+        device_id: !input notify_device
+        message: "clear_notification"
+        data:
+          tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
