@@ -87,12 +87,6 @@ blueprint:
       default: [102, 186, 240]
       selector:
         color_rgb:
-    tag:
-      name: "🔖 Tag"
-      description: "Used for unique identification of the notification, any unique string will do fine.  \nExample: `my_awesome_notification_for_device_X`  \n\n`Recommended`  \n"
-      default: ""
-      selector:
-        text:
     confirm_text:
       name: "✅ Confirmation Text"
       description: "Text to show on the confirmation button."
@@ -165,7 +159,19 @@ blueprint:
         boolean:
     notification_link:
       name: "🔗 Notification Link"
-      description: "Link to navigate to upon clicking the notification.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information.  \n\n`Optional`  \n"
+      description: "Link to navigate to upon clicking the notification.  \n\n Examples:  \n - Home Assistant relative links: `/config/updates` or `/lovelace/home`  \n - Apps: `app://<package name>`  \n - Entity `More Info` Panel: `entityId:<entity_ID>`  \n - Deep links: `deep-link://<deep_link>`  \n\nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information and options.  \n\n`Optional`  \n"
+      default: ""
+      selector:
+        text:
+    tag:
+      name: "🔖 Tag"
+      description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n`Optional`  \n"
+      default: ""
+      selector:
+        text:
+    group:
+      name: "📣 Notification Group ID"
+      description: "Used for grouping different notifications together visually.  \n\n⚠️ iOS critical notifications do no support grouping.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information.  \n\n`Optional`  \n"
       default: ""
       selector:
         text:
@@ -205,6 +211,19 @@ blueprint:
               value: time-sensitive
             - label: "Critical (Overrides Focus and Mute, restricted features)"
               value: critical
+    visibility:
+      name: "🔏 Notification Lockscreen Visibility"
+      description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`  \n"
+      default: "private"
+      selector:
+        select:
+          options:
+            - label: "Public: Always show content."
+              value: public
+            - label: "Private: Show content based on phone settings."
+              value: private
+            - label: "Secret: Always hide content on the lockscreen."
+              value: secret
 
 mode: restart
 
@@ -212,8 +231,7 @@ sequence:
   # Evaluate inputs and variables
   - alias: "Set up variables"
     variables:
-      action_confirm: "{{ 'CONFIRM_' ~ context.id }}"
-      action_dismiss: "{{ 'DISMISS_' ~ context.id }}"
+      custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
       enable_timeout: !input enable_timeout
       clear_on_timeout: !input clear_on_timeout
       persist: !input persist
@@ -240,7 +258,9 @@ sequence:
         - action: "{{ action_dismiss }}"
           title: !input dismiss_text
           icon: !input dismiss_icon
-      tag: !input tag
+      visbility: !input visibility
+      tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
+      group: "{{ iif(group|length, group, ) }}"
       persistent: !input persist
       channel: !input channel
       importance: !input importance
