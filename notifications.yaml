@@ -54,7 +54,13 @@ blueprint:
           integration: mobile_app
     title:
       name: "🏷️ Title"
-      description: "The title of the button shown in the notification."
+      description: "The title of the notification.  \n\n`Optional`\n"
+      default: ""
+      selector:
+        text:
+    subtitle:
+      name: "🏷️ Subtitle"
+      description: "The subtitle of the notification.  \n\n`Optional`\n"
       default: ""
       selector:
         text:
@@ -225,6 +231,8 @@ sequence:
     title: !input title
     message: !input message
     data:
+      subtitle: !input subtitle # iOS/macOS
+      subject: !input subtitle # Android
       actions:
         - action: "{{ action_confirm }}"
           title: !input confirm_text
