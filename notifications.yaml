@@ -337,3 +337,15 @@ sequence:
         conditions: "{{ wait.trigger.event.data.action == second_option }}"
         sequence: !input dismiss_action
 
+  - if:
+      - alias: "Should send clear notification command? (for iOS/macOS)"
+        condition: template
+        value_template: "{{ enable_timeout and clear_on_timeout }}"
+    then:
+      - alias: "Send clear notification command"
+        domain: mobile_app
+        type: notify
+        device_id: !input notify_device
+        message: "clear_notification"
+        data:
+          tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
