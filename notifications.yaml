@@ -66,7 +66,7 @@ blueprint:
         text:
     message:
       name: "💬 Message"
-      description: "The message body to display on the notification."
+      description: "The message body to display on the notification.  \n\n`🤖 Android`: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
       selector:
         text:
     icon:
@@ -88,38 +88,38 @@ blueprint:
       selector:
         color_rgb:
     confirm_text:
-      name: "✅ Confirmation Text"
-      description: "Text to show on the confirmation button."
+      name: "1️⃣ Option 1 Text"
+      description: "Text to show on the first option."
       default: "Confirm"
       selector:
         text:
     confirm_action:
-      name: "✅ Confirmation Action"
-      description: "Action to run when notification is confirmed.  \n\n`Optional`  \n"
+      name: "1️⃣ Option 1 Action(s)"
+      description: "Action(s) to run when the first option is selected.  \n\n`Optional`  \n"
       default: []
       selector:
         action:
     confirm_icon:
-      name: "🙂 Confirmation Icon"
-      description: "Custom icon to show on the confirmation button.  \nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/, there are other reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
+      name: "1️⃣ Option 1 Icon"
+      description: "Custom icon to show on the first option.  \n\nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/.  \nThere are more reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
       default: ""
       selector:
         text:
     dismiss_text:
-      name: "❌ Dismiss Text"
-      description: "Text to show on the dismiss button."
+      name: "2️⃣ Option 2 Text"
+      description: "Text to show on the second option."
       default: "Dismiss"
       selector:
         text:
     dismiss_action:
-      name: "❌ Dismiss Action"
-      description: "Action to run when notification is dismissed.  \n\n`Optional`  \n"
+      name: "2️⃣ Option 2 Action(s)"
+      description: "Action(s) to run when the second option is selected.  \n\n`Optional`  \n"
       default: []
       selector:
         action:
     dismiss_icon:
-      name: "🙂 Dismiss Icon"
-      description: "Custom icon to show on the dismiss button.  \nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/, there are other reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
+      name: "2️⃣ Option 2 Icon"
+      description: "Custom icon to show on the second option.  \n\nPrefix: `sfsymbols:`  \nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/.  \nThere are more reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`  \n"
       default: ""
       selector:
         text:
@@ -131,7 +131,7 @@ blueprint:
         boolean:
     timeout:
       name: "⌛️ Timeout Duration"
-      description: "Amount of time to wait for a confirm/dismiss response before firing timeout action.  \nDefault: 15 minutes"
+      description: "Amount of time to wait for an action response before firing timeout action.  \n\nRecommended: ≳ 1 minute, to allow notifications to be sent.  \nDefault: 15 minutes. \n"
       default:
         hours: 0
         minutes: 15
@@ -140,20 +140,26 @@ blueprint:
         duration:
           enable_day: false
     timeout_action:
-      name: "⌛️ Timeout Action"
+      name: "⌛️ Timeout Action(s)"
       description: "Action to run when notification response is timed out.  \n\n`Optional`  \n"
       default: []
       selector:
         action:
+    swipe_away_as_timeout:
+      name: "⌛️ Run timeout action(s) when notification cleared"
+      description: "If enabled, swiping the notification away will immediately trigger timeout actions.  \n\n`🤖 Android Only`  \n"
+      default: false
+      selector:
+        boolean:
     clear_on_timeout:
       name: "🧹 Clear notification on timeout"
-      description: "Dismiss the notification after action selection times out.  \n\n`🔖 Tag Required`  \n"
+      description: "Dismiss the notification after action selection times out.  \n"
       default: false
       selector:
         boolean:
     persist:
       name: "🚩 Persistent Notification"
-      description: "Ensures that notification cannot be dismissed by swiping away.  \n\n`🤖 Android Only`, `🔖 Tag Required`  \n"
+      description: "Ensures that notification cannot be dismissed by swiping away.  \n\n`🤖 Android Only`  \n"
       default: false
       selector:
         boolean:
@@ -232,6 +238,8 @@ sequence:
   - alias: "Set up variables"
     variables:
       custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
+      first_option: "{{ 'FIRST_' ~ context.id }}"
+      second_option: "{{ 'SECOND_' ~ context.id }}"
       enable_timeout: !input enable_timeout
       clear_on_timeout: !input clear_on_timeout
       persist: !input persist
@@ -240,6 +248,7 @@ sequence:
       enable_icon_color: !input enable_icon_color
       icon_color_selector: !input icon_color
       icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
+      swipe_away_as_timeout: !input swipe_away_as_timeout
 
   # Send notification to target.
   - alias: "Send notification"
@@ -252,12 +261,13 @@ sequence:
       subtitle: !input subtitle # iOS/macOS
       subject: !input subtitle # Android
       actions:
-        - action: "{{ action_confirm }}"
+        - action: "{{ first_option }}"
           title: !input confirm_text
           icon: !input confirm_icon
-        - action: "{{ action_dismiss }}"
+        - action: "{{ second_option }}"
           title: !input dismiss_text
           icon: !input dismiss_icon
+        # Possibly add more actions with show/hide toggles in future?
       visbility: !input visibility
       tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
       group: "{{ iif(group|length, group, ) }}"
@@ -268,47 +278,62 @@ sequence:
         interruption-level: !input interruption_level
       notification_icon: !input icon
       color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
-      # color: !input icon_color
       clickAction: !input notification_link
       url: !input notification_link
-      # Set notification timeout if timeout feature is enabled and notification should be cleared.
-      timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}"
+      timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
 
   # Listen for response from target, taking into account timeout configuration.
   - if:
-      - alias: "Check timeout enabled"
+      - alias: "Should await response with timeout?"
         condition: template
         value_template: "{{ enable_timeout == true }}"
     then:
-      - alias: "Awaiting response with Timeout"
+      - alias: "Awaiting response with timeout…"
         wait_for_trigger:
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_confirm }}"
+              action: "{{ first_option }}"
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_dismiss }}"
+              action: "{{ second_option }}"
+          - platform: event
+            event_type: mobile_app_notification_cleared
+            event_data:
+              action_1_key: "{{ first_option }}"
+              action_2_key: "{{ second_option }}"
         timeout: !input timeout
         continue_on_timeout: true
     else:
-      - alias: "Awaiting response indefinitely"
+      - alias: "Awaiting response indefinitely…"
         wait_for_trigger:
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_confirm }}"
+              action: "{{ first_option }}"
           - platform: event
             event_type: mobile_app_notification_action
             event_data:
-              action: "{{ action_dismiss }}"
+              action: "{{ second_option }}"
+          - platform: event
+            event_type: mobile_app_notification_cleared
+            event_data:
+              action_1_key: "{{ first_option }}"
+              action_2_key: "{{ second_option }}"
 
   # Trigger actions based on response, or lack thereof.
   - choose:
-      - conditions: "{{ wait.trigger.event.data.action == action_confirm }}"
-        sequence: !input confirm_action
-      - conditions: "{{ wait.trigger.event.data.action == action_dismiss }}"
-        sequence: !input dismiss_action
-      - conditions: "{{ wait.trigger == none }}"
+      - alias: "Trigger: Timeout"
+        conditions: "{{ wait.trigger == none }}"
         sequence: !input timeout_action
+      - alias: "Trigger: Notification Cleared"
+        conditions: "{{ swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
+        sequence: !input timeout_action
+      - alias: "Trigger: first_option"
+        conditions: "{{ wait.trigger.event.data.action == first_option }}"
+        sequence: !input confirm_action
+      - alias: "Trigger: second_option"
+        conditions: "{{ wait.trigger.event.data.action == second_option }}"
+        sequence: !input dismiss_action
+
