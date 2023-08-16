@@ -334,16 +334,24 @@ sequence:
   # Trigger actions based on response, or lack thereof.
   - choose:
       - alias: "Trigger: Timeout"
-        conditions: "{{ wait.trigger == none }}"
+        conditions:
+          - condition: template
+            value_template: "{{ wait.trigger == none }}"
         sequence: !input timeout_action
       - alias: "Trigger: Notification Cleared"
-        conditions: "{{ swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
+        conditions: 
+          - condition: template
+            value_template: "{{ swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
         sequence: !input timeout_action
       - alias: "Trigger: first_option"
-        conditions: "{{ wait.trigger.event.data.action == first_option }}"
+        conditions: 
+          - condition: template
+            value_template: "{{ wait.trigger.event.data.action == first_option }}"
         sequence: !input confirm_action
       - alias: "Trigger: second_option"
-        conditions: "{{ wait.trigger.event.data.action == second_option }}"
+        conditions: 
+          - condition: template
+            value_template: "{{ wait.trigger.event.data.action == second_option }}"
         sequence: !input dismiss_action
 
   - if:
