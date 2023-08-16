@@ -52,7 +52,7 @@ blueprint:
 
     ### Version 1.1 - *25 March 2023* [🔗](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#version-11-25-march-2023-11)
 
-  domain: script
+  domain: automation
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   input:
     notify_device:
