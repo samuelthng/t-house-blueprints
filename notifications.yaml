@@ -8,7 +8,7 @@ blueprint:
 
     ---
 
-    ### Version: 1.4
+    ### Version: 1.5 Beta
 
     *Forked from Home Assistant's [Confirmable Notifications](https://github.com/home-assistant/core/blob/master/homeassistant/components/script/blueprints/confirmable_notification.yaml)*
 
@@ -31,20 +31,19 @@ blueprint:
 
     ## Changelog
 
+    ### Version 1.5 Beta - *1 Oct 2023*
+      - Updated: Deprecated device selector
+      - Added: Notification Attachments
+
     ### Version 1.4 - *7 Jul 2023*
       - Reverted: Send clear notification command - for iOS compatibility.
       - Added: `subtitle`, `group`, `visibility`.
       - Refactor: `tag` is no longer recommended, will use `entity_id` by default.
       - Fixed: During a timeout, the script throws error into logs due to checking attribs of `None` type.
 
-    ### Version 1.3.2 - *28 Jun 2023*
-      - [Added: `Action Icons`](https://github.com/samuelthng/t-house-blueprints/pull/9) - ` iOS Only` - Thanks [@ChrisMancini](https://github.com/ChrisMancini)
-      - Fixed: Missing default values for a couple of inputs
-      - Updated: Input description style
+    ### Version 1.3.2 - *28 Jun 2023*[🔗](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#version-132-28-jun-2023-9)
 
-    ### Version 1.3.1 - *10 Jun 2023*
-      - Fixed: `Enable Icon Color`
-      - Updated: `Icon Color` hex template
+    ### Version 1.3.1 - *10 Jun 2023* [🔗](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#version-131-10-jun-2023-10)
 
     ### Version 1.3 - *9 Jun 2023* [🔗](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#version-13-9-jun-2023-9)
 
@@ -60,7 +59,8 @@ blueprint:
       description: "Device needs to run the official Home Assistant app to receive notifications."
       selector:
         device:
-          integration: mobile_app
+          filter:
+            - integration: mobile_app
     title:
       name: "🏷️ Title"
       description: "The title of the notification.  \n\n`Optional`\n"
@@ -178,6 +178,43 @@ blueprint:
       default: ""
       selector:
         text:
+    # =============
+    # [Attachments]
+    # =============
+    attachment_type:
+      name: "📎 Attachment Type"
+      description: >
+        Choose to send an attachment along with the notification.  
+
+        ### Camera Entity
+
+        Please note, there are different behaviours for each OS as specified in the documentation. See the links for more information.
+
+        - [Automatic Snapshots](https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots) - 🤖 Android Only
+
+        - [Camera Stream](https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream) -  iOS Only  
+
+
+        `Optional`
+
+      default: "none"
+      selector:
+        select:
+          options:
+            - label: "None"
+              value: "none"
+            - label: "Camera Entity"
+              value: "camera_entity"
+
+    attachment_camera_entity:
+      name: "📎 Attachment: Camera Entity"
+      description: "For use with `Attachment Type: Camera Entity`"
+      default: ""
+      selector:
+        entity:
+          filter:
+            - domain: "camera"
+
     tag:
       name: "🔖 Tag"
       description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n`Optional`  \n"
@@ -258,6 +295,15 @@ sequence:
       icon_color_selector: !input icon_color
       icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
       swipe_away_as_timeout: !input swipe_away_as_timeout
+      attachment_type: !input attachment_type
+      attachment_camera_entity: !input attachment_camera_entity
+      media_url: >-
+        {{
+          {
+            'none': '',
+            'camera_entity': "/api/camera_proxy/{id}".format(id=attachment_camera_entity)
+          }.get(attachment_type)
+        }}
 
   # Send notification to target.
   - alias: "Send notification"
@@ -290,6 +336,11 @@ sequence:
       clickAction: !input notification_link
       url: !input notification_link
       timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
+      # [Attachments]
+      entity_id: "{{ iif(attachment_type == 'camera_entity', attachment_camera_entity,) }}" # - Camera Stream (iOS)
+      image: "{{ media_url }}"
+      video: "{{ media_url }}"
+      audio: "{{ media_url }}"
 
   # Listen for response from target, taking into account timeout configuration.
   - if:
