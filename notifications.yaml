@@ -51,7 +51,7 @@ blueprint:
       ### Version 1.5 Beta - *1 Oct 2023*
       - Updated: Deprecated device selector
       - Added: Notification Attachments
-      - Added: Notification Strategy
+- Added: Notification Strategy
       - Added: Prefix for option icons
       - Updated: Blueprint descriptions
 
@@ -285,7 +285,6 @@ blueprint:
         See the links below for more information.
 
         <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">🤖 Automatic Snapshots</a></td></tr></table><br>
-
 
         ❔ Only used with `Attachment Type: Camera`
       default: ""
