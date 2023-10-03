@@ -51,7 +51,7 @@ blueprint:
       ### Version 1.5 Beta - *1 Oct 2023*
       - Updated: Deprecated device selector
       - Added: Notification Attachments
-- Added: Notification Strategy
+      - Added: Notification Strategy
       - Added: Prefix for option icons
       - Updated: Blueprint descriptions
 
@@ -444,7 +444,7 @@ sequence:
               url: !input notification_link
               timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
               # [Attachments]
-              entity_id: "{{ iif(attachment_type == 'camera_entity', attachment_camera_entity,) }}" # - Camera Stream (iOS)
+              entity_id: "{{ iif(attachment_type == 'camera_entity' and 'camera.' in attachment_camera_entity, attachment_camera_entity,) }}" # - Camera Stream (iOS)
               image: "{{ media_url }}"
               video: "{{ media_url }}"
               audio: "{{ media_url }}"
@@ -465,10 +465,10 @@ sequence:
                 actions:
                   - action: "{{ first_option }}"
                     title: !input confirm_text
-                    icon: !input confirm_icon
+                    icon: "{{ confirm_icon }}"
                   - action: "{{ second_option }}"
                     title: !input dismiss_text
-                    icon: !input dismiss_icon
+                    icon: "{{ dismiss_icon }}"
                   # Possibly add more actions with show/hide toggles in future?
                 visbility: !input visibility
                 tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
@@ -484,7 +484,7 @@ sequence:
                 url: !input notification_link
                 timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
                 # [Attachments]
-                entity_id: "{{ iif(attachment_type == 'camera_entity', attachment_camera_entity,) }}" # - Camera Stream (iOS)
+                entity_id: "{{ iif(attachment_type == 'camera_entity' and 'camera.' in attachment_camera_entity, attachment_camera_entity,) }}" # - Camera Stream (iOS)
                 image: "{{ media_url }}"
                 video: "{{ media_url }}"
                 audio: "{{ media_url }}"
