@@ -1,11 +1,11 @@
 blueprint:
-  name: 🔔 Notification with Confirm, Dismiss and Timeout
+  name: 🔔 Notifications
   domain: script
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   description: >-
     <div>
-        <h2>🔔 Notification with Confirm, Dismiss and Timeout</h2>
-        <h4>Version 1.5 Beta 3</h4>
+        <h2>🔔 Notifications</h2>
+        <h4>Version 1.5</h4>
         <table>
           <tr>
             <td>
@@ -29,17 +29,21 @@ blueprint:
 
       > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
 
-      > ✅ Confirm button with custom label and actions (Renamed: 1️⃣ Option 1)
+      > 1️⃣ First action button with custom label and actions (Previously: ✅ Confirm Button)
 
-      > ❌ Dismiss button with custom label and actions (Renamed: 2️⃣ Option 2)
+      > 2️⃣ Second action button with custom label and actions (Previously: ❌ Dismiss Button)
 
       > ⌛️ Timeout actions with custom duration, fired if no option response received
 
       > 🧹 Clear notification after timeout
 
-      > 🔗 Customise notification link
+      > 📸 Camera Snapshots
 
-      > 📸 Display camera entity snapshots
+      > 🔗 Custom Notification Link
+
+      > 🍎 Supports iOS
+      
+      > 🤖 Supports Android
 
       Examples can be found [here](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#example-usage-6)
 
@@ -48,7 +52,7 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 1.5 Beta - *1 Oct 2023*
+      ### Version 1.5 - *11 Oct 2023*
       - Updated: Deprecated device selector
       - Added: Notification Attachments
       - Added: Notification Strategy
@@ -394,100 +398,68 @@ sequence:
       swipe_away_as_timeout: !input swipe_away_as_timeout
       attachment_type: !input attachment_type
       attachment_camera_entity: !input attachment_camera_entity
+      camera_image_url: >-
+        {% if (attachment_camera_entity|length) %}
+          {% if (state_attr(attachment_camera_entity,'entity_picture')|length) %}
+            {{state_attr(attachment_camera_entity,'entity_picture')}}
+          {% else %}
+            {{"/api/camera_proxy/{id}".format(id=attachment_camera_entity)}}
+          {%- endif %}
+        {%- endif %}
       media_url: >-
         {{
           {
             'none': '',
-            'camera_entity': iif(attachment_camera_entity | length, "/api/camera_proxy/{id}".format(id=attachment_camera_entity))
+            'camera_entity': iif(camera_image_url | length)
           }.get(attachment_type)
         }}
       notify_type: !input notify_type
+      notify_device: !input notify_device
       notify_service_name: !input notify_service_name
+      notify_service: >-
+        {% if notify_type == 'device' %}
+        {{ "notify.mobile_app_{id}".format(id=device_attr(notify_device,'name')|slugify) }}
+        {% elif notify_type == 'notify_service' %}
+        {{ "notify.mobile_app_{id}".format(id=notify_service_name|slugify) }}
+        {%- endif %}
 
   ##############################
   # Send Notification
   ##############################
   - alias: "Send notification"
-    choose:
-      - conditions:
-          - alias: "Notification Strategy: Device"
-            condition: template
-            value_template: "{{ notify_type == 'device' }}"
-        sequence:
-          - domain: mobile_app
-            type: notify
-            device_id: !input notify_device
-            title: !input title
-            message: !input message
-            data:
-              subtitle: !input subtitle # iOS/macOS
-              subject: !input subtitle # Android
-              actions:
-                - action: "{{ first_option }}"
-                  title: !input confirm_text
-                  icon: "{{ confirm_icon }}"
-                - action: "{{ second_option }}"
-                  title: !input dismiss_text
-                  icon: "{{ dismiss_icon }}"
-                # Possibly add more actions with show/hide toggles in future?
-              visbility: !input visibility
-              tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
-              group: "{{ iif(group|length, group, ) }}"
-              persistent: !input persist
-              channel: !input channel
-              importance: !input importance
-              push:
-                interruption-level: !input interruption_level
-              notification_icon: !input icon
-              color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
-              clickAction: !input notification_link
-              url: !input notification_link
-              timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
-              # [Attachments]
-              entity_id: "{{ iif(attachment_type == 'camera_entity' and 'camera.' in attachment_camera_entity, attachment_camera_entity,) }}" # - Camera Stream (iOS)
-              image: "{{ media_url }}"
-              video: "{{ media_url }}"
-              audio: "{{ media_url }}"
-
-      - conditions:
-          - alias: "Notification Strategy: Device"
-            condition: template
-            value_template: "{{ notify_type == 'notify_service' }}"
-        sequence:
-          - service: >
-              {{ iif(notify_service_name, "notify.mobile_app_{id}".format(id=notify_service_name), 'notify.notify') }}
-            data:
-              title: !input title
-              message: !input message
-              data:
-                subtitle: !input subtitle # iOS/macOS
-                subject: !input subtitle # Android
-                actions:
-                  - action: "{{ first_option }}"
-                    title: !input confirm_text
-                    icon: "{{ confirm_icon }}"
-                  - action: "{{ second_option }}"
-                    title: !input dismiss_text
-                    icon: "{{ dismiss_icon }}"
-                  # Possibly add more actions with show/hide toggles in future?
-                visbility: !input visibility
-                tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
-                group: "{{ iif(group|length, group, ) }}"
-                persistent: !input persist
-                channel: !input channel
-                importance: !input importance
-                push:
-                  interruption-level: !input interruption_level
-                notification_icon: !input icon
-                color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
-                clickAction: !input notification_link
-                url: !input notification_link
-                timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
-                # [Attachments]
-                entity_id: "{{ iif(attachment_type == 'camera_entity' and 'camera.' in attachment_camera_entity, attachment_camera_entity,) }}" # - Camera Stream (iOS)
-                image: "{{ media_url }}"
-                video: "{{ media_url }}"
-                audio: "{{ media_url }}"
+    service: "{{ notify_service }}"
+    data:
+      title: !input title
+      message: !input message
+      data:
+        subtitle: !input subtitle # iOS/macOS
+        subject: !input subtitle # Android
+        actions:
+          - action: "{{ first_option }}"
+            title: !input confirm_text
+            icon: "{{ confirm_icon }}"
+          - action: "{{ second_option }}"
+            title: !input dismiss_text
+            icon: "{{ dismiss_icon }}"
+          # Possibly add more actions with show/hide toggles in future?
+        visbility: !input visibility
+        tag: "{{ iif(custom_tag|length, tag, this.entity_id)}}"
+        group: "{{ iif(group|length, group, ) }}"
+        persistent: !input persist
+        channel: !input channel
+        importance: !input importance
+        push:
+          interruption-level: !input interruption_level
+        notification_icon: !input icon
+        color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
+        clickAction: !input notification_link
+        url: !input notification_link
+        timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
+        # [Attachments]
+        entity_id: "{{ iif(attachment_type == 'camera_entity' and 'camera.' in attachment_camera_entity, attachment_camera_entity,) }}" # - Camera Stream (iOS)
+        image: "{{ media_url }}"
+        video: "{{ media_url }}"
+        audio: "{{ media_url }}"
 
   ##############################
   # Evaluate Response
