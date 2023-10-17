@@ -836,10 +836,10 @@ sequence:
           'action': option_one_action,
           'title': option_one_title,
           'actions': option_one_actions,
-          'uri': option_one_uri,
           'icon': option_one_icon,
           'destructive': option_one_is_destructive,
           'authenticationRequired': option_one_auth_required,
+          "{}".format('uri' if option_one_uri|length else ''): option_one_uri,
         }}}
       option_two_enabled: !input dismiss_enabled
       option_two_title: !input dismiss_text
@@ -867,10 +867,10 @@ sequence:
           'action': option_two_action,
           'title': option_two_title,
           'actions': option_two_actions,
-          'uri': option_two_uri,
           'icon': option_two_icon,
           'destructive': option_two_is_destructive,
           'authenticationRequired': option_two_auth_required,
+          "{}".format('uri' if option_two_uri|length else ''): option_two_uri,
         }}}
       option_three_enabled: !input option_three_enabled
       option_three_title: !input option_three_text
@@ -898,10 +898,10 @@ sequence:
           'action': option_three_action,
           'title': option_three_title,
           'actions': option_three_actions,
-          'uri': option_three_uri,
           'icon': option_three_icon,
           'destructive': option_three_is_destructive,
           'authenticationRequired': option_three_auth_required,
+          "{}".format('uri' if option_three_uri|length else ''): option_three_uri,
         }}}
       options: >-
         {{ [option_one, option_two, option_three] | selectattr('enabled') | list }}
