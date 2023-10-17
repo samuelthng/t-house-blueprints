@@ -310,7 +310,7 @@ blueprint:
 
     confirm_icon:
       name: "1️⃣ Option 1 - Icon"
-      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/.  \nThere are more reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`"
+      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
       default: ""
       selector:
         text:
@@ -450,7 +450,7 @@ blueprint:
 
     dismiss_icon:
       name: "2️⃣ Option 2 - Icon"
-      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/.  \nThere are more reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`"
+      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
       default: ""
       selector:
         text:
@@ -590,7 +590,7 @@ blueprint:
 
     option_three_icon:
       name: "3️⃣ Option 3 - Icon"
-      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nIcon reference: https://sfsymbols.com/.  \nThere are more reference pages out there, feel free to use a search engine!  \n\n` iOS Only`, `Optional`"
+      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
       default: ""
       selector:
         text:
