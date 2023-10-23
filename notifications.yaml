@@ -324,7 +324,7 @@ blueprint:
         boolean:
 
     confirm_authentication_required:
-      name: "2️⃣ Option 2 - Authentication Required"
+      name: "1️⃣ Option 1 - Authentication Required"
       description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
       default: false
       selector:
@@ -457,7 +457,7 @@ blueprint:
           prefix: "sfsymbols:"
 
     dismiss_is_destructive:
-      name: "1️⃣ Option 1 - Destructive"
+      name: "2️⃣ Option 2 - Destructive"
       description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
       default: false
       selector:
@@ -831,7 +831,7 @@ sequence:
         {{ first_option }}
         {% endif %}
       option_one: >-
-        {{{
+        {{ {
           'enabled': option_one_enabled,
           'action': option_one_action,
           'title': option_one_title,
@@ -840,7 +840,7 @@ sequence:
           'destructive': option_one_is_destructive,
           'authenticationRequired': option_one_auth_required,
           "{}".format('uri' if option_one_uri|length else ''): option_one_uri,
-        }}}
+        } }}
       option_two_enabled: !input dismiss_enabled
       option_two_title: !input dismiss_text
       option_two_mode: !input dismiss_option_mode
