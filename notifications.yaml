@@ -5,7 +5,7 @@ blueprint:
   description: >-
     <div>
         <h2>🔔 Notifications</h2>
-        <h4> Version 1.6<a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">🔗 Github Link</a><br /></h4>
+        <h4> Version 1.6.1<a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">🔗 Github Link</a><br /></h4>
         <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fmy.home-assistant.io%2Fredirect%2Fblueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fgithub.com%252Fsamuelthng%252Ft-house-blueprints%252Fblob%252Fmain%252Fnotifications.yaml" target="_blank">
         <img src="https://my.home-assistant.io/badges/blueprint_import.svg" alt="Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled." />
         </a>
@@ -29,7 +29,7 @@ blueprint:
       > 🔗 Custom Notification Link
 
       > 🍎 Supports iOS
-      
+
       > 🤖 Supports Android
 
       Examples can be found [here](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#example-usage-6)
@@ -38,6 +38,9 @@ blueprint:
 
       <details>
       <summary>Expand/collapse changelog</summary>
+
+      ### Version 1.6.1 - *26 Oct 2023*
+      - Fixed: Camera Snapshots not showing
 
       ### Version 1.6 - *26 Oct 2023*
       - Added: Show/Hide options toggle
@@ -793,7 +796,7 @@ sequence:
         {{
           {
             'none': '',
-            'camera_entity': iif(camera_image_url | length)
+            'camera_entity': iif(camera_image_url | length, camera_image_url)
           }.get(attachment_type)
         }}
       notify_type: !input notify_type
