@@ -5,7 +5,7 @@ blueprint:
   description: >-
     <div>
         <h2>🔔 Notifications</h2>
-        <h4> Version 1.6 Beta 1 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">🔗 Github Link</a><br /></h4>
+        <h4> Version 1.6<a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">🔗 Github Link</a><br /></h4>
         <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fmy.home-assistant.io%2Fredirect%2Fblueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fgithub.com%252Fsamuelthng%252Ft-house-blueprints%252Fblob%252Fmain%252Fnotifications.yaml" target="_blank">
         <img src="https://my.home-assistant.io/badges/blueprint_import.svg" alt="Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled." />
         </a>
@@ -39,17 +39,12 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 1.6 Beta 1 - *17 Oct 2023*
+      ### Version 1.6 - *26 Oct 2023*
       - Added: Show/Hide options toggle
       - Added: URI action options and iOS specific action options
       - Added: Third option
 
-      ### Version 1.5 - *11 Oct 2023*
-      - Updated: Deprecated device selector
-      - Added: Notification Attachments
-      - Added: Notification Strategy
-      - Added: Prefix for option icons
-      - Updated: Blueprint descriptions
+      ### Version 1.5 - *11 Oct 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552#version-14-7-jul-2023-8)
 
       ### Version 1.4 - *7 Jul 2023* [🔗](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#version-14-7-jul-2023-8)
 
