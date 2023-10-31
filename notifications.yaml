@@ -5,7 +5,7 @@ blueprint:
   description: >-
     <div>
         <h2>🔔 Notifications</h2>
-        <h4> Version 1.6.1<a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">🔗 Github Link</a><br /></h4>
+        <h4> Version 1.6.1 - Multi-device<a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">🔗 Github Link</a><br /></h4>
         <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fmy.home-assistant.io%2Fredirect%2Fblueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fgithub.com%252Fsamuelthng%252Ft-house-blueprints%252Fblob%252Fmain%252Fnotifications.yaml" target="_blank">
         <img src="https://my.home-assistant.io/badges/blueprint_import.svg" alt="Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled." />
         </a>
@@ -38,6 +38,9 @@ blueprint:
 
       <details>
       <summary>Expand/collapse changelog</summary>
+
+      ### Version 1.6.1 Multiple Device - *31 Oct 2023*
+      - Added: Experimental Multiple Device Support
 
       ### Version 1.6.1 - *26 Oct 2023*
       - Fixed: Camera Snapshots not showing
@@ -119,19 +122,21 @@ blueprint:
         select:
           mode: dropdown
           options:
-            - label: Device (Preferred)
+            - label: Device (👍🏻 Preferred)
               value: device
             - label: Notify Service
               value: notify_service
     notify_device:
-      name: "📲 Device to notify"
+      name: "📲 Device(s) to notify"
       description: >-
-        Device needs to run the official [Home Assistant Companion](https://companion.home-assistant.io/) app to receive notifications.<br><br>
+        Devices needs to run the official [Home Assistant Companion](https://companion.home-assistant.io/) app to receive notifications.<br><br>
         ❔ Only used with `📲 Notification Strategy: Device`<br>
         👍🏻 `Device` is the preferred and default option.
+        ⚠️ Sending notifications to multiple devices may cause disruptive experience for options and the timeout feature.<br>
       default: ""
       selector:
         device:
+          multiple: true
           filter:
             - integration: mobile_app
     notify_service_name:
@@ -804,9 +809,17 @@ sequence:
       notify_service_name: !input notify_service_name
       notify_service: >-
         {% if notify_type == 'device' %}
-        {{ "notify.mobile_app_{id}".format(id=device_attr(notify_device,'name')|slugify) }}
+          {% if notify_device is iterable and (notify_device is not string and notify_device is not mapping) %}
+            {% set devices = namespace(data = [])%}
+            {% for device in notify_device %}
+              {% set devices.data = devices.data + ["notify.mobile_app_{id}".format(id=device_attr(device,'name')|slugify)] %}
+            {% endfor %}
+            {{ devices.data | list }}
+          {% else %}
+            {{ ["notify.mobile_app_{id}".format(id=device_attr(notify_device,'name')|slugify)] | list }}
+          {% endif %}
         {% elif notify_type == 'notify_service' %}
-        {{ "notify.mobile_app_{id}".format(id=notify_service_name|slugify) }}
+        {{ ["notify.mobile_app_{id}".format(id=notify_service_name|slugify)] | list }}
         {%- endif %}
       option_one_enabled: !input confirm_enabled
       option_one_title: !input confirm_text
@@ -909,32 +922,35 @@ sequence:
   # Send Notification
   ##############################
   - alias: "Send notification"
-    service: "{{ notify_service }}"
-    data:
-      title: !input title
-      message: !input message
-      data:
-        subtitle: !input subtitle # iOS/macOS
-        subject: !input subtitle # Android
-        actions: "{{ options }}"
-        visbility: !input visibility
-        tag: "{{ tag }}"
-        group: "{{ iif(group|length, group, ) }}"
-        persistent: !input persist
-        channel: !input channel
-        importance: !input importance
-        push:
-          interruption-level: !input interruption_level
-        notification_icon: !input icon
-        color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
-        clickAction: !input notification_link
-        url: !input notification_link
-        timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
-        # [Attachments]
-        entity_id: "{{ iif(attachment_type == 'camera_entity' and 'camera.' in attachment_camera_entity, attachment_camera_entity,) }}" # - Camera Stream (iOS)
-        image: "{{ media_url }}"
-        video: "{{ media_url }}"
-        audio: "{{ media_url }}"
+    repeat:
+      for_each: "{{ notify_service }}"
+      sequence:
+        - service: "{{ repeat.item }}"
+          data:
+            title: !input title
+            message: !input message
+            data:
+              subtitle: !input subtitle # iOS/macOS
+              subject: !input subtitle # Android
+              actions: "{{ options }}"
+              visbility: !input visibility
+              tag: "{{ tag }}"
+              group: "{{ iif(group|length, group, ) }}"
+              persistent: !input persist
+              channel: !input channel
+              importance: !input importance
+              push:
+                interruption-level: !input interruption_level
+              notification_icon: !input icon
+              color: "{{ iif(enable_icon_color, icon_color_hex, )}}"
+              clickAction: !input notification_link
+              url: !input notification_link
+              timeout: "{{ iif(enable_timeout and clear_on_timeout, timeout_seconds, )}}" # Set notification timeout if timeout feature is enabled and notification should be cleared.
+              # [Attachments]
+              entity_id: "{{ iif(attachment_type == 'camera_entity' and 'camera.' in attachment_camera_entity, attachment_camera_entity,) }}" # - Camera Stream (iOS)
+              image: "{{ media_url }}"
+              video: "{{ media_url }}"
+              audio: "{{ media_url }}"
 
   ##############################
   # Evaluate Response
@@ -1013,9 +1029,11 @@ sequence:
         value_template: "{{ enable_timeout and clear_on_timeout }}"
     then:
       - alias: "Send clear notification command"
-        domain: mobile_app
-        type: notify
-        device_id: !input notify_device
-        message: "clear_notification"
-        data:
-          tag: "{{ tag }}"
+        repeat:
+          for_each: "{{ notify_service }}"
+          sequence:
+            - service: "{{ repeat.item }}"
+              data:
+                message: "clear_notification"
+                data:
+                  tag: "{{ tag }}"
