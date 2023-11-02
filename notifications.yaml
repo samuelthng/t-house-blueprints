@@ -1,14 +1,14 @@
+mode: restart
 blueprint:
   name: 🔔 Notifications
-  domain: script
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
+  homeassistant:
+    min_version: 2023.11.0
+  domain: script
   description: >-
     <div>
-        <h2>🔔 Notifications</h2>
-        <h4> Version 2 Beta 1 - Multi-device | <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">🔗 Github Link</a><br /></h4>
-        <a href="https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fmy.home-assistant.io%2Fredirect%2Fblueprint_import%2F%3Fblueprint_url%3Dhttps%253A%252F%252Fgithub.com%252Fsamuelthng%252Ft-house-blueprints%252Fblob%252Fmain%252Fnotifications.yaml" target="_blank">
-        <img src="https://my.home-assistant.io/badges/blueprint_import.svg" alt="Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled." />
-        </a>
+      <h2>🔔 Notifications</h2>
+      <b> Version 2 Beta 2 - Multi-device</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -28,6 +28,8 @@ blueprint:
 
       > 🔗 Custom Notification Link
 
+      > 📜 Flexible script inputs
+
       > 🍎 Supports iOS
 
       > 🤖 Supports Android
@@ -39,6 +41,21 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
+      ### Version 2 Beta 2 Multiple Device - *2 Nov 2023*
+      - Added: Support for [fields](https://www.home-assistant.io/integrations/script/#fields)
+        - Added: `🏷️ Title` field
+        - Added: `💬 Message` field
+        - Added: `🏷️ Subtitle` field
+        - Added: `📸 Attachment: Camera Entity: Camera Entity` field
+        - Added: Options show/hide fields
+        - Added: `⌛️ Enable Timeout` and `⌛️ Enable Timeout Action(s)` fields.
+      - Added: [`🚘 Show on Android Auto`](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=car_ui#android-auto-visibility) option.
+      - Added: `⌛️ Enable Timeout Action(s)` option and field.
+
+      > Notes:
+      >   When using boolean fields with value `false`, be sure to toggle them to `true` once, and then to `false`.
+      >   There seems to be a bug where the boolean value is not passed if it's enabled and value is false without the toggle.
+
       ### Version 2 Beta 1 Multiple Device - *1 Nov 2023*
       - Refactor: Build payload in templates
       - Fixed: iOS showing `Failed to load attachment`
@@ -46,13 +63,9 @@ blueprint:
       ### Version 1.6.1 Multiple Device - *31 Oct 2023*
       - Added: Experimental Multiple Device Support
 
-      ### Version 1.6.1 - *26 Oct 2023*
-      - Fixed: Camera Snapshots not showing
+      ### Version 1.6.1 - *26 Oct 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/66)
 
-      ### Version 1.6 - *26 Oct 2023*
-      - Added: Show/Hide options toggle
-      - Added: URI action options and iOS specific action options
-      - Added: Third option
+      ### Version 1.6 - *26 Oct 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/62)
 
       ### Version 1.5 - *11 Oct 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552#version-14-7-jul-2023-8)
 
@@ -115,21 +128,6 @@ blueprint:
     ##############################
     # Input: Notification Strategy
     ##############################
-    notify_type:
-      name: "📲 Notification Strategy"
-      description: >-
-        Pick a notification strategy.<br><br>
-        👍🏻 `Device` is the preferred and default option.<br>
-        ⚠️ Ensure that you have filled the required corresponding fields
-      default: "device"
-      selector:
-        select:
-          mode: dropdown
-          options:
-            - label: Device (👍🏻 Preferred)
-              value: device
-            - label: Notify Service
-              value: notify_service
     notify_device:
       name: "📲 Device(s) to notify"
       description: >-
@@ -143,16 +141,6 @@ blueprint:
           multiple: true
           filter:
             - integration: mobile_app
-    notify_service_name:
-      name: "📲 Service to notify"
-      description: >-
-        Service must be exposed by the Home Assistant [mobile app integration](https://companion.home-assistant.io/docs/notifications/notifications-basic).<br><br>
-        ❔ Only used with `📲 Notification Strategy: Notify Service`<br>
-        ⚠️ Use this option only if `Device` option does not show your devices.
-      default: ""
-      selector:
-        text:
-          prefix: "notify.mobile_app_"
 
     ##############################
     # Input: Notification Content
@@ -250,7 +238,7 @@ blueprint:
 
     confirm_action:
       name: "1️⃣ Option 1 - Action(s)"
-      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n`Optional`"
+      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
       default: []
       selector:
         action:
@@ -390,7 +378,7 @@ blueprint:
 
     dismiss_action:
       name: "2️⃣ Option 2 - Action(s)"
-      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n`Optional`"
+      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
       default: []
       selector:
         action:
@@ -530,7 +518,7 @@ blueprint:
 
     option_three_action:
       name: "3️⃣ Option 3 - Action(s)"
-      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n`Optional`"
+      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
       default: []
       selector:
         action:
@@ -636,6 +624,12 @@ blueprint:
       selector:
         duration:
           enable_day: false
+    run_timeout_actions:
+      name: "⌛️ Enable Timeout Action(s)"
+      description: "Run timeout actions upon a timeout event.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will timeout without executing any timeout actions."
+      default: true # Default `true` for backward compatibility.
+      selector:
+        boolean:
     timeout_action:
       name: "⌛️ Timeout Action(s)"
       description: "Action to run when notification response is timed out.  \n\n❔ Leave empty if no actions should be run  \n\n⚠️ Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\n❔ Android Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
@@ -657,12 +651,6 @@ blueprint:
     persist:
       name: "🚩 Persistent Notification"
       description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n`🤖 Android Only`"
-      default: false
-      selector:
-        boolean:
-    car_ui:
-      name: "🚘 Show on Android Auto"
-      description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
       default: false
       selector:
         boolean:
@@ -714,9 +702,15 @@ blueprint:
     ##############################
     # Input: Misc Inputs
     ##############################
+    car_ui:
+      name: "🚘 Show on Android Auto"
+      description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
+      default: false
+      selector:
+        boolean:
     tag:
       name: "🔖 Tag"
-      description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n`Optional`"
+      description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n\n`Optional`"
       default: ""
       selector:
         text:
@@ -776,7 +770,114 @@ blueprint:
             - label: "Secret: Always hide content on the lockscreen."
               value: secret
 
-mode: restart
+##############################
+# Fields
+##############################
+fields:
+  field_title:
+    name: "🏷️ Title"
+    description: "Override the title of the notification."
+    example: !input title
+    default: !input title
+    selector:
+      text:
+  field_message:
+    name: "💬 Message"
+    description: "Override the message body to display on the notification."
+    example: !input message
+    default: !input message
+    selector:
+      text:
+  field_subtitle:
+    name: "🏷️ Subtitle"
+    description: "Override the subtitle of the notification."
+    example: !input subtitle
+    default: !input subtitle
+    selector:
+      text:
+
+  field_attachment_camera_entity:
+    name: "📸 Attachment: Camera Entity"
+    description: "Override camera entity if your script has Attachments enabled."
+    example: !input attachment_camera_entity
+    default: !input attachment_camera_entity
+    selector:
+      entity:
+        filter:
+          - domain: "camera"
+
+  field_option_one_enabled:
+    name: "1️⃣ Option 1"
+    description: "Override showing or hiding this option."
+    example: !input confirm_enabled
+    selector:
+      boolean:
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_option_one_action:
+  #   name: "1️⃣ Option 1 - Action(s)"
+  #   description: "Override actions for this option."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input confirm_action
+  #   selector:
+  #     action:
+  field_option_two_enabled:
+    name: "2️⃣ Option 2"
+    description: "Override showing or hiding this option."
+    example: !input dismiss_enabled
+    selector:
+      boolean:
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_option_two_action:
+  #   name: "1️⃣ Option 2 - Action(s)"
+  #   description: "Override actions for this option."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input dismiss_action
+  #   selector:
+  #     action:
+  field_option_three_enabled:
+    name: "3️⃣ Option 3"
+    description: "Override showing or hiding this option."
+    example: !input dismiss_enabled
+    selector:
+      boolean:
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_option_three_action:
+  #   name: "1️⃣ Option 3 - Action(s)"
+  #   description: "Override actions for this option."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input option_three_action
+  #   selector:
+  #     action:
+  field_enable_timeout:
+    name: "⌛️ Enable Timeout"
+    description: "Override timeout feature."
+    example: !input enable_timeout
+    selector:
+      boolean:
+
+  field_run_timeout_actions:
+    name: "⌛️ Enable Timeout Action(s)"
+    description: "Override running timeout actions"
+    example: !input run_timeout_actions
+    selector:
+      boolean:
+
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_timeout_action:
+  #   name: "⌛️ Timeout Action(s)"
+  #   description: "Override timeout action."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input timeout_action
+  #   selector:
+  #     action:
 
 sequence:
   ##############################
@@ -784,7 +885,12 @@ sequence:
   ##############################
   - alias: "Setup variables"
     variables:
-      subtitle: !input subtitle
+      script_title: !input title
+      title: "{{ iif(field_title is defined, field_title, script_title) }}"
+      script_message: !input message
+      message: "{{ iif(field_message is defined and (field_message|length), field_message, script_message) }}"
+      script_subtitle: !input subtitle
+      subtitle: "{{ iif(field_subtitle is defined, field_subtitle, script_subtitle) }}"
       interruption_level: !input interruption_level
       notification_link: !input notification_link
       visibility: !input visibility
@@ -798,6 +904,8 @@ sequence:
       persist: !input persist
       timeout: !input timeout # Load timeout into variable for use with templates.
       timeout_seconds: "{{ (timeout.hours * 60 + timeout.minutes) * 60 + timeout.seconds }}"
+      script_run_timeout_actions: !input run_timeout_actions
+      run_timeout_actions: "{{ iif(field_run_timeout_actions is defined, field_run_timeout_actions, script_run_timeout_actions) }}"
       car_ui: !input car_ui
       icon: !input icon
       enable_icon_color: !input enable_icon_color
@@ -805,7 +913,8 @@ sequence:
       icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
       swipe_away_as_timeout: !input swipe_away_as_timeout
       attachment_type: !input attachment_type
-      attachment_camera_entity: !input attachment_camera_entity
+      script_attachment_camera_entity: !input attachment_camera_entity
+      attachment_camera_entity: "{{ iif(field_attachment_camera_entity is defined, field_attachment_camera_entity, script_attachment_camera_entity) }}"
       camera_image_url: >-
         {% if (attachment_camera_entity|length) %}
           {% if (state_attr(attachment_camera_entity,'entity_picture')|length) %}
@@ -821,27 +930,24 @@ sequence:
             'camera_entity': iif(camera_image_url | length, camera_image_url)
           }.get(attachment_type)
         }}
-      notify_type: !input notify_type
       notify_device: !input notify_device
-      notify_service_name: !input notify_service_name
       notify_service: >-
-        {% if notify_type == 'device' %}
-          {% if notify_device is iterable and (notify_device is not string and notify_device is not mapping) %}
-            {% set devices = namespace(data = [])%}
-            {% for device in notify_device %}
-              {% set devices.data = devices.data + ["notify.mobile_app_{id}".format(id=device_attr(device,'name')|slugify)] %}
-            {% endfor %}
-            {{ devices.data | list }}
-          {% else %}
-            {{ ["notify.mobile_app_{id}".format(id=device_attr(notify_device,'name')|slugify)] | list }}
-          {% endif %}
-        {% elif notify_type == 'notify_service' %}
-        {{ ["notify.mobile_app_{id}".format(id=notify_service_name|slugify)] | list }}
-        {%- endif %}
-      option_one_enabled: !input confirm_enabled
-      option_one_title: !input confirm_text
+        {% if notify_device is iterable and (notify_device is not string and notify_device is not mapping) %}
+          {% set devices = namespace(data = [])%}
+          {% for device in notify_device %}
+            {% set devices.data = devices.data + ["notify.mobile_app_{id}".format(id=device_attr(device,'name')|slugify)] %}
+          {% endfor %}
+          {{ devices.data | list }}
+        {% else %}
+          {{ ["notify.mobile_app_{id}".format(id=device_attr(notify_device,'name')|slugify)] | list }}
+        {% endif %}
+      script_option_one_enabled: !input confirm_enabled
+      option_one_enabled: "{{ iif(field_option_one_enabled is defined, field_option_one_enabled, script_option_one_enabled) }}"
+      script_option_one_title: !input confirm_text
+      option_one_title: "{{ iif(field_option_one_text is defined, field_option_one_text, script_option_one_title) }}"
       option_one_mode: !input confirm_option_mode
-      option_one_actions: !input confirm_action
+      script_option_one_actions: !input confirm_action
+      option_one_actions: "{{ iif(field_option_one_action is defined, field_option_one_action, script_option_one_actions) }}"
       option_one_uri: !input confirm_uri
       option_one_icon_value: !input confirm_icon
       option_one_icon: >-
@@ -869,10 +975,12 @@ sequence:
           'authenticationRequired': option_one_auth_required,
           "{}".format('uri' if option_one_uri|length else ''): option_one_uri,
         } }}
-      option_two_enabled: !input dismiss_enabled
+      script_option_two_enabled: !input dismiss_enabled
+      option_two_enabled: "{{ iif(field_option_two_enabled is defined, field_option_two_enabled, script_option_two_enabled) }}"
       option_two_title: !input dismiss_text
       option_two_mode: !input dismiss_option_mode
-      option_two_actions: !input dismiss_action
+      script_option_two_actions: !input dismiss_action
+      option_two_actions: "{{ iif(field_option_two_action is defined, field_option_two_action, script_option_two_actions) }}"
       option_two_uri: !input dismiss_uri
       option_two_icon_value: !input dismiss_icon
       option_two_icon: >-
@@ -900,10 +1008,12 @@ sequence:
           'authenticationRequired': option_two_auth_required,
           "{}".format('uri' if option_two_uri|length else ''): option_two_uri,
         }}}
-      option_three_enabled: !input option_three_enabled
+      script_option_three_enabled: !input option_three_enabled
+      option_three_enabled: "{{ iif(field_option_three_enabled is defined, field_option_three_enabled, script_option_three_enabled) }}"
       option_three_title: !input option_three_text
       option_three_mode: !input option_three_option_mode
-      option_three_actions: !input option_three_action
+      script_option_three_actions: !input option_three_action
+      option_three_actions: "{{ iif(field_option_three_action is defined, field_option_three_action, script_option_three_actions) }}"
       option_three_uri: !input option_three_uri
       option_three_icon_value: !input option_three_icon
       option_three_icon: >-
@@ -987,8 +1097,8 @@ sequence:
       sequence:
         - service: "{{ repeat.item }}"
           data:
-            title: !input title
-            message: !input message
+            title: "{{ title }}"
+            message: "{{ message }}"
             data: >-
               {{ notification_data[repeat.index - 1] }}
 
@@ -1045,20 +1155,20 @@ sequence:
   ##############################
   - choose:
       - alias: "Trigger: Timeout"
-        conditions: "{{ wait.trigger == none }}"
-        sequence: !input timeout_action
+        conditions: "{{ run_timeout_actions and wait.trigger == none }}"
+        sequence: !input timeout_action # "{{ timeout_actions }}"
       - alias: "Trigger: Notification Cleared"
-        conditions: "{{ swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
-        sequence: !input timeout_action
+        conditions: "{{ run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
+        sequence: !input timeout_action # "{{ timeout_actions }}"
       - alias: "Trigger: first_option"
         conditions: "{{ wait.trigger.event.data.action == option_one['action'] }}"
-        sequence: !input confirm_action
+        sequence: !input confirm_action # "{{ option_one_actions }}"
       - alias: "Trigger: second_option"
         conditions: "{{ wait.trigger.event.data.action == option_two['action'] }}"
-        sequence: !input dismiss_action
-      - alias: "Trigger: second_option"
+        sequence: !input dismiss_action # "{{ option_two_actions }}"
+      - alias: "Trigger: third_option"
         conditions: "{{ wait.trigger.event.data.action == option_three['action'] }}"
-        sequence: !input option_three_action
+        sequence: !input option_three_action # "{{ option_three_actions }}"
 
   ##############################
   # Compatibility: iOS Clear Notification
