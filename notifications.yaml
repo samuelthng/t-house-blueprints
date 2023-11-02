@@ -5,6 +5,7 @@ blueprint:
   homeassistant:
     min_version: 2023.11.0
   domain: script
+  author: samuelthng/t-house-blueprints
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
