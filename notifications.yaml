@@ -42,6 +42,8 @@ blueprint:
       <summary>Expand/collapse changelog</summary>
 
       ### Version 2 Beta 2 - *2 Nov 2023*
+      - Deprecated: `📲 Notification Strategy` due to refactor.
+      - Deprecated: `📲 Service to notify` due to refactor.
       - Added: Support for [fields](https://www.home-assistant.io/integrations/script/#fields)
         - Added: `🏷️ Title` field
         - Added: `💬 Message` field
@@ -53,8 +55,9 @@ blueprint:
       - Added: `⌛️ Enable Timeout Action(s)` option and field.
 
       > Notes:
-        When enabling boolean fields with value of false, be sure to toggle them to true once, and then to false.
-        There seems to be a bug where the boolean value is not passed if it's enabled and value is false without the toggle.
+        - When enabling boolean fields with value of false, be sure to toggle them to true once, and then to false.
+          There seems to be a bug where the boolean value is not passed if it's enabled and value is false without the toggle.
+        - If you rely on `📲 Service to notify`, do not upgrade, `Version 1.6.1` will be the last version supporting that feature.
 
       ### Version 2 Beta 1 - *1 Nov 2023*
       - Refactor: Build payload in templates
