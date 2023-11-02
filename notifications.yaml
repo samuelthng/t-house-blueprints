@@ -53,8 +53,8 @@ blueprint:
       - Added: `⌛️ Enable Timeout Action(s)` option and field.
 
       > Notes:
-      >   When using boolean fields with value `false`, be sure to toggle them to `true` once, and then to `false`.
-      >   There seems to be a bug where the boolean value is not passed if it's enabled and value is false without the toggle.
+        When enabling boolean fields with value of false, be sure to toggle them to true once, and then to false.
+        There seems to be a bug where the boolean value is not passed if it's enabled and value is false without the toggle.
 
       ### Version 2 Beta 1 Multiple Device - *1 Nov 2023*
       - Refactor: Build payload in templates
@@ -774,31 +774,50 @@ blueprint:
 # Fields
 ##############################
 fields:
+  field_notify_device:
+    name: "📲 Device to notify"
+    description: Override device to be notified.
+    default: !input notify_device
+    selector:
+      device:
+        filter:
+          - integration: mobile_app
   field_title:
     name: "🏷️ Title"
-    description: "Override the title of the notification."
+    description: "Override title of the notification."
     example: !input title
     default: !input title
     selector:
       text:
   field_message:
     name: "💬 Message"
-    description: "Override the message body to display on the notification."
+    description: "Override message body to display on the notification."
     example: !input message
     default: !input message
     selector:
       text:
   field_subtitle:
     name: "🏷️ Subtitle"
-    description: "Override the subtitle of the notification."
+    description: "Override subtitle of the notification."
     example: !input subtitle
     default: !input subtitle
     selector:
       text:
-
+  field_attachment_type:
+    name: "📸 Attachment Type"
+    description: "Override the Attachment Type of the notification."
+    example: !input attachment_type
+    default: !input attachment_type
+    selector:
+      select:
+        options:
+          - label: "None"
+            value: "none"
+          - label: "Camera"
+            value: "camera_entity"
   field_attachment_camera_entity:
     name: "📸 Attachment: Camera Entity"
-    description: "Override camera entity if your script has Attachments enabled."
+    description: "Override camera entity if your script has attachment type set to Camera."
     example: !input attachment_camera_entity
     default: !input attachment_camera_entity
     selector:
@@ -861,6 +880,14 @@ fields:
     selector:
       boolean:
 
+  field_timeout:
+    name: "⌛️ Timeout Duration"
+    description: "Override timeout duration"
+    default: !input timeout
+    selector:
+      duration:
+        enable_day: false
+
   field_run_timeout_actions:
     name: "⌛️ Enable Timeout Action(s)"
     description: "Override running timeout actions"
@@ -902,7 +929,8 @@ sequence:
       enable_timeout: !input enable_timeout
       clear_on_timeout: !input clear_on_timeout
       persist: !input persist
-      timeout: !input timeout # Load timeout into variable for use with templates.
+      script_timeout: !input timeout # Load timeout into variable for use with templates.
+      timeout: "{{ iif(field_timeout is defined, field_timeout, script_timeout) }}"
       timeout_seconds: "{{ (timeout.hours * 60 + timeout.minutes) * 60 + timeout.seconds }}"
       script_run_timeout_actions: !input run_timeout_actions
       run_timeout_actions: "{{ iif(field_run_timeout_actions is defined, field_run_timeout_actions, script_run_timeout_actions) }}"
@@ -912,7 +940,8 @@ sequence:
       icon_color_selector: !input icon_color
       icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
       swipe_away_as_timeout: !input swipe_away_as_timeout
-      attachment_type: !input attachment_type
+      script_attachment_type: !input attachment_type
+      attachment_type: "{{ iif(field_attachment_type is defined, field_attachment_type, script_attachment_type) }}"
       script_attachment_camera_entity: !input attachment_camera_entity
       attachment_camera_entity: "{{ iif(field_attachment_camera_entity is defined, field_attachment_camera_entity, script_attachment_camera_entity) }}"
       camera_image_url: >-
@@ -930,7 +959,8 @@ sequence:
             'camera_entity': iif(camera_image_url | length, camera_image_url)
           }.get(attachment_type)
         }}
-      notify_device: !input notify_device
+      script_notify_device: !input notify_device
+      notify_device: "{{ iif(field_notify_device is defined, field_notify_device, script_notify_device) }}"
       notify_service: >-
         {% if notify_device is iterable and (notify_device is not string and notify_device is not mapping) %}
           {% set devices = namespace(data = [])%}
