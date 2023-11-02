@@ -780,6 +780,7 @@ fields:
     default: !input notify_device
     selector:
       device:
+        multiple: true
         filter:
           - integration: mobile_app
   field_title:
