@@ -1,7 +1,7 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications
-  source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
+  name: 🔔 Notifications (Version 2 - Multi-device)
+  source_url: https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml
   homeassistant:
     min_version: 2023.11.0
   domain: script
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b> Version 2 Beta 2 - Multi-device</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2 - Multi-device</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -29,7 +29,7 @@ blueprint:
 
       > 🔗 Custom Notification Link
 
-      > 📜 Flexible script inputs
+      > 📜 Flexible [script fields](https://www.home-assistant.io/integrations/script/#fields)
 
       > 🍎 Supports iOS
 
@@ -42,7 +42,9 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 2 Beta 2 Multiple Device - *2 Nov 2023*
+      ### Version 2 Multiple Device - *12 Dec 2023*
+      - Fixed: iOS showing `Failed to load attachment`
+      - Refactor: Build payload in templates
       - Deprecated: `📲 Notification Strategy` due to refactor.
       - Deprecated: `📲 Service to notify` due to refactor.
       - Added: Support for [fields](https://www.home-assistant.io/integrations/script/#fields)
@@ -59,10 +61,6 @@ blueprint:
       >  - When enabling boolean fields with value of false, be sure to toggle them to true once, and then to false.
       >    There seems to be a bug where the boolean value is not passed if it's enabled and value is false without the toggle.
       >  - If you rely on `📲 Service to notify`, do not upgrade, `Version 1.6.1` will be the last version supporting that feature.
-
-      ### Version 2 Beta 1 Multiple Device - *1 Nov 2023*
-      - Refactor: Build payload in templates
-      - Fixed: iOS showing `Failed to load attachment`
 
       ### Version 1.6.1 Multiple Device - *31 Oct 2023*
       - Added: Experimental Multiple Device Support
