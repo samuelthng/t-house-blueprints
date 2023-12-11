@@ -200,7 +200,7 @@ blueprint:
     confirm_text:
       name: "1️⃣ Option 1 - Title"
       description: "Title to show on the first option."
-      default: "Confirm"
+      default: "Option 1"
       selector:
         text:
 
@@ -340,7 +340,7 @@ blueprint:
     dismiss_text:
       name: "2️⃣ Option 2 - Title"
       description: "Title to show on the first option."
-      default: "Confirm"
+      default: "Option 2"
       selector:
         text:
 
