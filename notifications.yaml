@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 2 - Multi-device)
+  name: 🔔 Notifications (Version 2.0.1 - Multi-device)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml
   homeassistant:
     min_version: 2023.11.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2 - Multi-device</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.0.1 - Multi-device</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -42,25 +42,10 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 2 Multiple Device - *12 Dec 2023*
-      - Fixed: iOS showing `Failed to load attachment`
-      - Refactor: Build payload in templates
-      - Deprecated: `📲 Notification Strategy` due to refactor.
-      - Deprecated: `📲 Service to notify` due to refactor.
-      - Added: Support for [fields](https://www.home-assistant.io/integrations/script/#fields)
-        - Added: `🏷️ Title` field
-        - Added: `💬 Message` field
-        - Added: `🏷️ Subtitle` field
-        - Added: `📸 Attachment: Camera Entity: Camera Entity` field
-        - Added: Options show/hide fields
-        - Added: `⌛️ Enable Timeout` and `⌛️ Enable Timeout Action(s)` fields.
-      - Added: [`🚘 Show on Android Auto`](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=car_ui#android-auto-visibility) option.
-      - Added: `⌛️ Enable Timeout Action(s)` option and field.
+      ### Version 2.0.1 Multiple Device - *20 Dec 2023*
+      - Fixed: `Custom Tag` and `Groups` not being set properly.
 
-      > Notes:
-      >  - When enabling boolean fields with value of false, be sure to toggle them to true once, and then to false.
-      >    There seems to be a bug where the boolean value is not passed if it's enabled and value is false without the toggle.
-      >  - If you rely on `📲 Service to notify`, do not upgrade, `Version 1.6.1` will be the last version supporting that feature.
+      ### Version 2 Multiple Device - *12 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/109)
 
       ### Version 1.6.1 Multiple Device - *31 Oct 2023*
       - Added: Experimental Multiple Device Support
@@ -1076,7 +1061,8 @@ sequence:
         }}}
       options: >-
         {{ [option_one, option_two, option_three] | selectattr('enabled') | list }}
-      tag: "{{ iif(custom_tag|length, tag, this.entity_id ~ '-' ~ context.id) }}"
+      tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
+      group: !input group
       # Build OS specific notification payloads.
       notification_data: >-
         {% set notifications = namespace(data=[])%}
