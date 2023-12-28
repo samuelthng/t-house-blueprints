@@ -1,0 +1,89 @@
+blueprint:
+  name: "⏱️ Scheduled Interval"
+  domain: automation
+  description: >
+    A simple automation that runs within a time window and performs actions between intervals.
+
+    Ad-hoc blueprint for [🔗 this community post](https://community.home-assistant.io/t/repeat-until-time-in-automation-stops-earlier-than-the-scheduled-time/661967).
+  input:
+    start_time:
+      name: Start Time
+      description: When do you want to start the automation?
+      selector:
+        time:
+    start_action:
+      name: Start Actions
+      description: What do you want to do when the automation starts?
+      selector:
+        action:
+    end_time:
+      name: End Time
+      description: What do you want to end the automation?
+      selector:
+        time:
+    end_action:
+      name: End Actions
+      description: What do you want to do when the automation ends?
+      selector:
+        action:
+    interval_entity:
+      name: Entity to watch for changes
+      description: >
+        Which entities to watch?
+
+        Consider adding all entities involved. For example, the light you intend to turn on, and the color vector selector.
+      selector:
+        entity:
+          multiple: true
+    interval_duration:
+      name: Duration before next cycle action
+      description: How long to wait between any state changes in the entities selected above?
+      default:
+        hours: 0
+        minutes: 0
+        seconds: 5
+      selector:
+        duration:
+    interval_action:
+      name: Interval Action
+      description: What to do on each interval?
+      selector:
+        action:
+
+mode: single
+
+
+trigger:
+  - platform: time
+    at: !input start_time
+    id: Start Time
+  - platform: time
+    at: !input end_time
+    id: End Time
+  - platform: state
+    entity_id: !input interval_entity
+    for: !input interval_duration
+    id: Change Interval
+
+condition: []
+
+action:
+  - if:
+      - condition: trigger
+        id:
+          - Start Time
+    then: !input start_action
+  - if:
+      - condition: trigger
+        id:
+          - End Time
+    then: !input end_action
+  - if:
+      - condition: trigger
+        id:
+          - Change Interval
+          - Start Time
+      - condition: time
+        after: input_datetime.test_start_time
+        before: input_datetime.test_end_time
+    then: !input interval_action
