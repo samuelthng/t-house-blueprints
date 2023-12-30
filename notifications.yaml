@@ -883,6 +883,14 @@ fields:
     selector:
       boolean:
 
+  field_notification_link:
+    name: "🔗 Notification Link"
+    description: "Override notification link"
+    example: !input notification_link
+    default: !input notification_link
+    selector:
+      text:
+
   # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
   # field_timeout_action:
   #   name: "⌛️ Timeout Action(s)"
@@ -907,7 +915,8 @@ sequence:
       script_subtitle: !input subtitle
       subtitle: "{{ iif(field_subtitle is defined, field_subtitle, script_subtitle) }}"
       interruption_level: !input interruption_level
-      notification_link: !input notification_link
+      script_notification_link: !input notification_link
+      notification_link: "{{ iif(field_notification_link is defined, field_notification_link, script_notification_link) }}"
       visibility: !input visibility
       importance: !input importance
       custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
