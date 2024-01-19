@@ -1059,6 +1059,7 @@ sequence:
         {{ [option_one, option_two, option_three] | selectattr('enabled') | list }}
       tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
       group: !input group
+      expect_response: "{{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled }}" # If there's no timeout nor options, then no point waiting. Stop script.
       # Build OS specific notification payloads.
       notification_data: >-
         {% set apple_device = 'APPLE' in (device_attr(notify_device, "manufacturer")|upper) %}
@@ -1104,50 +1105,55 @@ sequence:
   ##############################
   # Evaluate Response
   ##############################
-  - if:
+  - alias: Determine if script has to wait for response?
+    choose:
+      - alias: "No need for response"
+        conditions: "{{ expect_response == false }}"
+        sequence: []
       - alias: "Should await response with timeout?"
-        condition: template
-        value_template: "{{ enable_timeout == true }}"
-    then:
-      - alias: "Awaiting response with timeout…"
-        wait_for_trigger:
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ first_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ second_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ third_option }}"
-          - platform: event
-            event_type: mobile_app_notification_cleared
-            event_data:
-              tag: "{{ tag }}"
-        timeout: "{{ timeout }}"
-        continue_on_timeout: true
-    else:
-      - alias: "Awaiting response indefinitely…"
-        wait_for_trigger:
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ first_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ second_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ third_option }}"
-          - platform: event
-            event_type: mobile_app_notification_cleared
-            event_data:
-              tag: "{{ tag }}"
+        conditions: "{{ enable_timeout }}"
+        sequence:
+          - alias: "Awaiting response with timeout…"
+            wait_for_trigger:
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ first_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ second_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ third_option }}"
+              - platform: event
+                event_type: mobile_app_notification_cleared
+                event_data:
+                  tag: "{{ tag }}"
+            timeout: "{{ timeout }}"
+            continue_on_timeout: true
+      - alias: "Should await response indefinitely?"
+        conditions: "{{ enable_timeout == false }}"
+        sequence:
+          - alias: "Awaiting response indefinitely…"
+            wait_for_trigger:
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ first_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ second_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ third_option }}"
+              - platform: event
+                event_type: mobile_app_notification_cleared
+                event_data:
+                  tag: "{{ tag }}"
 
   ##############################
   # Parse user response
@@ -1156,7 +1162,9 @@ sequence:
     variables:
       user_response: >-
         {% set response = namespace(data={ 'payload': notification_data }) %}
-        {% if run_timeout_actions and wait.trigger == none %}
+        {% if not expect_response %}
+        {% set response.data = dict(response.data, **{ 'result': "no_response" }) %}
+        {% elif run_timeout_actions and wait.trigger == none %}
         {% set response.data = dict(response.data, **{ 'result': "timeout" }) %}
         {% elif run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
         {% set response.data = dict(response.data, **{ 'result': "notification_cleared" }) %}
@@ -1172,7 +1180,9 @@ sequence:
   ##############################
   # Trigger Response Actions
   ##############################
-  - choose:
+  - alias: "Run response actions"
+    default: []
+    choose:
       - alias: "Trigger: Timeout"
         conditions: "{{ user_response.result == 'timeout' }}"
         sequence: !input timeout_action # "{{ timeout_actions }}"
@@ -1196,7 +1206,7 @@ sequence:
     if:
       - alias: "Should send clear notification command? (for iOS/macOS)?"
         condition: template
-        value_template: "{{ enable_timeout and clear_on_timeout and notification_data.apple_device }}"
+        value_template: "{{ expect_response and enable_timeout and clear_on_timeout and notification_data.apple_device }}"
     then:
       - alias: "Send clear notification command to iOS device"
         service: "{{ notify_service }}"
