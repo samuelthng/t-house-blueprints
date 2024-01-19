@@ -923,7 +923,8 @@ sequence:
       first_option: "{{ 'FIRST_' ~ context.id }}"
       second_option: "{{ 'SECOND_' ~ context.id }}"
       third_option: "{{ 'THIRD_' ~ context.id }}"
-      enable_timeout: !input enable_timeout
+      script_enable_timeout: !input enable_timeout
+      enable_timeout: "{{ iif(field_enable_timeout is defined, field_enable_timeout, script_enable_timeout) }}"
       clear_on_timeout: !input clear_on_timeout
       persist: !input persist
       script_timeout: !input timeout # Load timeout into variable for use with templates.
