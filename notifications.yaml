@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 2.0.1 - Multi-device)
+  name: 🔔 Notifications (Version 2.0.2 Beta - Multi-device)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml
   homeassistant:
     min_version: 2023.11.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.0.1 - Multi-device</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.0.2 Beta - Multi-device</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/multidevice/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -42,13 +42,14 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 2.0.1 Multiple Device - *20 Dec 2023*
-      - Fixed: `Custom Tag` and `Groups` not being set properly.
+      ### Version 2.0.2 Beta Multiple Device - *19 Jan 2023*
+      - Added: Field for `notification_link`. [#26](https://github.com/samuelthng/t-house-blueprints/pull/26) (Thanks to [HNKNTA](https://github.com/HNKNTA))
+      - Fixed: Field `enable_timeout`.
+      - Added: `response_variable` with payload and response.
+
+      ### Version 2.0.1 Multiple Device - *20 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/111?u=samuelthng)
 
       ### Version 2 Multiple Device - *12 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/109)
-
-      ### Version 1.6.1 Multiple Device - *31 Oct 2023*
-      - Added: Experimental Multiple Device Support
 
       ### Version 1.6.1 - *26 Oct 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/66)
 
@@ -883,6 +884,14 @@ fields:
     selector:
       boolean:
 
+  field_notification_link:
+    name: "🔗 Notification Link"
+    description: "Override notification link"
+    example: !input notification_link
+    default: !input notification_link
+    selector:
+      text:
+
   # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
   # field_timeout_action:
   #   name: "⌛️ Timeout Action(s)"
@@ -907,14 +916,16 @@ sequence:
       script_subtitle: !input subtitle
       subtitle: "{{ iif(field_subtitle is defined, field_subtitle, script_subtitle) }}"
       interruption_level: !input interruption_level
-      notification_link: !input notification_link
+      script_notification_link: !input notification_link
+      notification_link: "{{ iif(field_notification_link is defined, field_notification_link, script_notification_link) }}"
       visibility: !input visibility
       importance: !input importance
       custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
       first_option: "{{ 'FIRST_' ~ context.id }}"
       second_option: "{{ 'SECOND_' ~ context.id }}"
       third_option: "{{ 'THIRD_' ~ context.id }}"
-      enable_timeout: !input enable_timeout
+      script_enable_timeout: !input enable_timeout
+      enable_timeout: "{{ iif(field_enable_timeout is defined, field_enable_timeout, script_enable_timeout) }}"
       clear_on_timeout: !input clear_on_timeout
       persist: !input persist
       script_timeout: !input timeout # Load timeout into variable for use with templates.
@@ -1063,6 +1074,7 @@ sequence:
         {{ [option_one, option_two, option_three] | selectattr('enabled') | list }}
       tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
       group: !input group
+      expect_response: "{{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled }}" # If there's no timeout nor options, then no point waiting. Stop script.
       # Build OS specific notification payloads.
       notification_data: >-
         {% set notifications = namespace(data=[])%}
@@ -1124,69 +1136,98 @@ sequence:
   ##############################
   # Evaluate Response
   ##############################
-  - if:
+  - alias: Determine if script has to wait for response?
+    choose:
+      - alias: "No need for response"
+        conditions: "{{ expect_response == false }}"
+        sequence: []
       - alias: "Should await response with timeout?"
-        condition: template
-        value_template: "{{ enable_timeout == true }}"
-    then:
-      - alias: "Awaiting response with timeout…"
-        wait_for_trigger:
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ first_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ second_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ third_option }}"
-          - platform: event
-            event_type: mobile_app_notification_cleared
-            event_data:
-              tag: "{{ tag }}"
-        timeout: "{{ timeout }}"
-        continue_on_timeout: true
-    else:
-      - alias: "Awaiting response indefinitely…"
-        wait_for_trigger:
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ first_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ second_option }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ third_option }}"
-          - platform: event
-            event_type: mobile_app_notification_cleared
-            event_data:
-              tag: "{{ tag }}"
+        conditions: "{{ enable_timeout }}"
+        sequence:
+          - alias: "Awaiting response with timeout…"
+            wait_for_trigger:
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ first_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ second_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ third_option }}"
+              - platform: event
+                event_type: mobile_app_notification_cleared
+                event_data:
+                  tag: "{{ tag }}"
+            timeout: "{{ timeout }}"
+            continue_on_timeout: true
+      - alias: "Should await response indefinitely?"
+        conditions: "{{ enable_timeout == false }}"
+        sequence:
+          - alias: "Awaiting response indefinitely…"
+            wait_for_trigger:
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ first_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ second_option }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ third_option }}"
+              - platform: event
+                event_type: mobile_app_notification_cleared
+                event_data:
+                  tag: "{{ tag }}"
+
+  ##############################
+  # Parse user response
+  ##############################
+  - alias: "Parse response into variable"
+    variables:
+      user_response: >-
+        {% set response = namespace(data={ 'payload': notification_data }) %}
+        {% if not expect_response %}
+        {% set response.data = dict(response.data, **{ 'result': "no_response" }) %}
+        {% elif run_timeout_actions and wait.trigger == none %}
+        {% set response.data = dict(response.data, **{ 'result': "timeout" }) %}
+        {% elif run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
+        {% set response.data = dict(response.data, **{ 'result': "notification_cleared" }) %}
+        {% elif wait.trigger.event.data.action == option_one['action'] %}
+        {% set response.data = dict(response.data, **{ 'result': "option_one" }) %}
+        {% elif wait.trigger.event.data.action == option_two['action'] %}
+        {% set response.data = dict(response.data, **{ 'result': "option_two" }) %}
+        {% elif wait.trigger.event.data.action == option_three['action'] %}
+        {% set response.data = dict(response.data, **{ 'result': "option_three" }) %}
+        {%- endif %}
+        {{ response.data }}
 
   ##############################
   # Trigger Response Actions
   ##############################
-  - choose:
+  - alias: "Run response actions"
+    default: []
+    choose:
       - alias: "Trigger: Timeout"
-        conditions: "{{ run_timeout_actions and wait.trigger == none }}"
+        conditions: "{{ user_response.result == 'timeout' }}"
         sequence: !input timeout_action # "{{ timeout_actions }}"
       - alias: "Trigger: Notification Cleared"
-        conditions: "{{ run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
+        conditions: "{{ user_response.result == 'notification_cleared' }}"
         sequence: !input timeout_action # "{{ timeout_actions }}"
       - alias: "Trigger: first_option"
-        conditions: "{{ wait.trigger.event.data.action == option_one['action'] }}"
+        conditions: "{{ user_response.result == 'option_one' }}"
         sequence: !input confirm_action # "{{ option_one_actions }}"
       - alias: "Trigger: second_option"
-        conditions: "{{ wait.trigger.event.data.action == option_two['action'] }}"
+        conditions: "{{ user_response.result == 'option_two' }}"
         sequence: !input dismiss_action # "{{ option_two_actions }}"
       - alias: "Trigger: third_option"
-        conditions: "{{ wait.trigger.event.data.action == option_three['action'] }}"
+        conditions: "{{ user_response.result == 'option_three' }}"
         sequence: !input option_three_action # "{{ option_three_actions }}"
 
   ##############################
@@ -1199,7 +1240,7 @@ sequence:
         - if:
             - alias: "Should send clear notification command? (for iOS/macOS)?"
               condition: template
-              value_template: "{{ enable_timeout and clear_on_timeout and notification_data[repeat.index - 1].apple_device }}"
+              value_template: "{{ expect_response and enable_timeout and clear_on_timeout and notification_data[repeat.index - 1].apple_device }}"
           then:
             - alias: "Send clear notification command to iOS device"
               service: "{{ repeat.item }}"
@@ -1207,3 +1248,9 @@ sequence:
                 message: "clear_notification"
                 data:
                   tag: "{{ tag }}"
+
+  ##############################
+  # Return user response
+  ##############################
+  - stop: "Script stopped."
+    response_variable: "user_response"
