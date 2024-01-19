@@ -1179,23 +1179,43 @@ sequence:
               tag: "{{ tag }}"
 
   ##############################
+  # Parse user response
+  ##############################
+  - alias: "Parse response into variable"
+    variables:
+      user_response: >-
+        {% set response = namespace(data={ 'payload': notification_data }) %}
+        {% if run_timeout_actions and wait.trigger == none %}
+        {% set response.data = dict(response.data, **{ 'result': "timeout" }) %}
+        {% elif run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
+        {% set response.data = dict(response.data, **{ 'result': "notification_cleared" }) %}
+        {% elif wait.trigger.event.data.action == option_one['action'] %}
+        {% set response.data = dict(response.data, **{ 'result': "option_one" }) %}
+        {% elif wait.trigger.event.data.action == option_two['action'] %}
+        {% set response.data = dict(response.data, **{ 'result': "option_two" }) %}
+        {% elif wait.trigger.event.data.action == option_three['action'] %}
+        {% set response.data = dict(response.data, **{ 'result': "option_three" }) %}
+        {%- endif %}
+        {{ response.data }}
+
+  ##############################
   # Trigger Response Actions
   ##############################
   - choose:
       - alias: "Trigger: Timeout"
-        conditions: "{{ run_timeout_actions and wait.trigger == none }}"
+        conditions: "{{ user_response.result == 'timeout' }}"
         sequence: !input timeout_action # "{{ timeout_actions }}"
       - alias: "Trigger: Notification Cleared"
-        conditions: "{{ run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' }}"
+        conditions: "{{ user_response.result == 'notification_cleared' }}"
         sequence: !input timeout_action # "{{ timeout_actions }}"
       - alias: "Trigger: first_option"
-        conditions: "{{ wait.trigger.event.data.action == option_one['action'] }}"
+        conditions: "{{ user_response.result == 'option_one' }}"
         sequence: !input confirm_action # "{{ option_one_actions }}"
       - alias: "Trigger: second_option"
-        conditions: "{{ wait.trigger.event.data.action == option_two['action'] }}"
+        conditions: "{{ user_response.result == 'option_two' }}"
         sequence: !input dismiss_action # "{{ option_two_actions }}"
       - alias: "Trigger: third_option"
-        conditions: "{{ wait.trigger.event.data.action == option_three['action'] }}"
+        conditions: "{{ user_response.result == 'option_three' }}"
         sequence: !input option_three_action # "{{ option_three_actions }}"
 
   ##############################
@@ -1216,3 +1236,9 @@ sequence:
                 message: "clear_notification"
                 data:
                   tag: "{{ tag }}"
+
+  ##############################
+  # Return user response
+  ##############################
+  - stop: "Script stopped."
+    response_variable: "user_response"
