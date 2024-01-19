@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 2.0.1)
+  name: 🔔 Notifications (Version 2.0.2 Beta)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2023.11.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.0.1</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.0.2 Beta</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -42,8 +42,12 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 2.0.1 - *20 Dec 2023*
-      - Fixed: `Custom Tag` and `Groups` not being set properly.
+      ### Version 2.0.2 Beta Multiple Device - *19 Jan 2023*
+      - Added: Field for `notification_link`. [#26](https://github.com/samuelthng/t-house-blueprints/pull/26) (Thanks to [HNKNTA](https://github.com/HNKNTA))
+      - Fixed: Field `enable_timeout`.
+      - Added: `response_variable` with payload and response.
+
+      ### Version 2.0.1 - *20 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/111?u=samuelthng)
 
       ### Version 2 - *12 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/109)
 
