@@ -904,38 +904,77 @@ sequence:
   ##############################
   # Setup Variables
   ##############################
-  - alias: "Setup variables"
+  - alias: Basic Notification Content
     variables:
+      # Title
       script_title: !input title
       title: "{{ iif(field_title is defined, field_title, script_title) }}"
-      script_message: !input message
-      message: "{{ iif(field_message is defined and (field_message|length), field_message, script_message) }}"
+
+      # Subtitle
       script_subtitle: !input subtitle
       subtitle: "{{ iif(field_subtitle is defined, field_subtitle, script_subtitle) }}"
-      interruption_level: !input interruption_level
+
+      # Message
+      script_message: !input message
+      message: "{{ iif(field_message is defined and (field_message|length), field_message, script_message) }}"
+
+  - alias: Common Configuration Options
+    variables:
+      # [Opening a URL] - https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url
       script_notification_link: !input notification_link
       notification_link: "{{ iif(field_notification_link is defined, field_notification_link, script_notification_link) }}"
+
+      # [Tag]
+      custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
+      tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
+
+      # [Grouping]
+      group: !input group
+
+  - alias: Android Configuration Options
+    variables:
+      # sticky: !input sticky # Unlikely to support due to potential for users thinking that notifications are stuck.
+      channel: !input channel
       visibility: !input visibility
       importance: !input importance
-      custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
-      first_option: "{{ 'FIRST_' ~ context.id }}"
-      second_option: "{{ 'SECOND_' ~ context.id }}"
-      third_option: "{{ 'THIRD_' ~ context.id }}"
+      persist: !input persist
+      # chronometer: !input chronometer # Unlikely to support, depends on template flexibility
+      # alert_once: !input alert_once
+      car_ui: !input car_ui
+
+      # [Notification Banner Icon]
+      notification_icon: !input icon
+      enable_icon_color: !input enable_icon_color
+      icon_color_selector: !input icon_color
+      icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
+      # notification_icon: !input notification_icon
+      # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
+      # priority: !input priority
+      # ttl: !input ttl
+
+  - alias: iOS Configuration Options
+    variables:
+      interruption_level: !input interruption_level
+      # presentation_options: !input presentation_options
+      # shortcut: !input shortcut # Unlikely to be supported due to complexity.
+      # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
+      # critical: !input critical
+      # volume: !input volume
+
+  - alias: Timeout
+    variables:
       script_enable_timeout: !input enable_timeout
       enable_timeout: "{{ iif(field_enable_timeout is defined, field_enable_timeout, script_enable_timeout) }}"
       clear_on_timeout: !input clear_on_timeout
-      persist: !input persist
       script_timeout: !input timeout # Load timeout into variable for use with templates.
       timeout: "{{ iif(field_timeout is defined, field_timeout, script_timeout) }}"
       timeout_seconds: "{{ (timeout.hours * 60 + timeout.minutes) * 60 + timeout.seconds }}"
       script_run_timeout_actions: !input run_timeout_actions
       run_timeout_actions: "{{ iif(field_run_timeout_actions is defined, field_run_timeout_actions, script_run_timeout_actions) }}"
-      car_ui: !input car_ui
-      icon: !input icon
-      enable_icon_color: !input enable_icon_color
-      icon_color_selector: !input icon_color
-      icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
       swipe_away_as_timeout: !input swipe_away_as_timeout
+
+  - alias: Attachments
+    variables:
       script_attachment_type: !input attachment_type
       attachment_type: "{{ iif(field_attachment_type is defined, field_attachment_type, script_attachment_type) }}"
       script_attachment_camera_entity: !input attachment_camera_entity
@@ -955,10 +994,17 @@ sequence:
             'camera_entity': iif(camera_image_url | length, camera_image_url)
           }.get(attachment_type)
         }}
+
+  - alias: Device Configuration
+    variables:
       script_notify_device: !input notify_device
       notify_device: "{{ iif(field_notify_device is defined, field_notify_device, script_notify_device) }}"
       notify_service: >-
         {{ "notify.mobile_app_{id}".format(id=device_attr(notify_device,'name')|slugify) }}
+
+  - alias: Option 1
+    variables:
+      first_option: "{{ 'FIRST_' ~ context.id }}"
       script_option_one_enabled: !input confirm_enabled
       option_one_enabled: "{{ iif(field_option_one_enabled is defined, field_option_one_enabled, script_option_one_enabled) }}"
       script_option_one_title: !input confirm_text
@@ -993,6 +1039,10 @@ sequence:
           'authenticationRequired': option_one_auth_required,
           "{}".format('uri' if option_one_uri|length else ''): option_one_uri,
         } }}
+
+  - alias: Option 2
+    variables:
+      second_option: "{{ 'SECOND_' ~ context.id }}"
       script_option_two_enabled: !input dismiss_enabled
       option_two_enabled: "{{ iif(field_option_two_enabled is defined, field_option_two_enabled, script_option_two_enabled) }}"
       option_two_title: !input dismiss_text
@@ -1026,6 +1076,10 @@ sequence:
           'authenticationRequired': option_two_auth_required,
           "{}".format('uri' if option_two_uri|length else ''): option_two_uri,
         }}}
+
+  - alias: Option 3
+    variables:
+      third_option: "{{ 'THIRD_' ~ context.id }}"
       script_option_three_enabled: !input option_three_enabled
       option_three_enabled: "{{ iif(field_option_three_enabled is defined, field_option_three_enabled, script_option_three_enabled) }}"
       option_three_title: !input option_three_text
@@ -1059,10 +1113,11 @@ sequence:
           'authenticationRequired': option_three_auth_required,
           "{}".format('uri' if option_three_uri|length else ''): option_three_uri,
         }}}
+
+  - alias: Setup Payload
+    variables:
       options: >-
         {{ [option_one, option_two, option_three] | selectattr('enabled') | list }}
-      tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
-      group: !input group
       expect_response: "{{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled }}" # If there's no timeout nor options, then no point waiting. Stop script.
       # Build OS specific notification payloads.
       notification_data: >-
@@ -1083,7 +1138,7 @@ sequence:
           {% set payload.data = dict(payload.data, **{ 'importance': importance }) %}
           {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'clickAction': notification_link }) %}{% endif %}
           {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set payload.data = dict(payload.data, **{ 'image': media_url }) %}{% endif %}
-          {% if icon|length %}{% set payload.data = dict(payload.data, **{ 'notification_icon': icon }) %}{% endif %}
+          {% if notification_icon|length %}{% set payload.data = dict(payload.data, **{ 'notification_icon': notification_icon }) %}{% endif %}
           {% if enable_icon_color %}{% set payload.data = dict(payload.data, **{ 'color': icon_color_hex }) %}{% endif %}
           {% if enable_timeout and clear_on_timeout %}{% set payload.data = dict(payload.data, **{ 'timeout': timeout_seconds }) %}{% endif %}
           {% if channel|length %}{% set payload.data = dict(payload.data, **{ 'channel': channel }) %}{% endif %}
