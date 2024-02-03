@@ -727,6 +727,12 @@ blueprint:
               value: low
             - label: "Low (Makes no sound, doesn't appear in status bar)"
               value: min
+    android_high_priority:
+      name: "❕ High Priority Mode"
+      description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.  \n\n`🤖 Android Only`"
+      default: true
+      selector:
+        boolean:
     interruption_level:
       name: "❕ Interruption Level"
       description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
@@ -947,10 +953,7 @@ sequence:
       enable_icon_color: !input enable_icon_color
       icon_color_selector: !input icon_color
       icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
-      # notification_icon: !input notification_icon
-      # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
-      # priority: !input priority
-      # ttl: !input ttl
+      android_high_priority: !input android_high_priority
 
   - alias: iOS Configuration Options
     variables:
@@ -1136,6 +1139,7 @@ sequence:
           {% set payload.data = dict(payload.data, **{ 'subject': subtitle }) %}
           {% set payload.data = dict(payload.data, **{ 'visibility': visibility }) %}
           {% set payload.data = dict(payload.data, **{ 'importance': importance }) %}
+          {% if android_high_priority %}{% set payload.data = dict(payload.data, **{ 'priority': 'high', 'ttl': 0 }) %}{% endif %}
           {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'clickAction': notification_link }) %}{% endif %}
           {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set payload.data = dict(payload.data, **{ 'image': media_url }) %}{% endif %}
           {% if notification_icon|length %}{% set payload.data = dict(payload.data, **{ 'notification_icon': notification_icon }) %}{% endif %}
