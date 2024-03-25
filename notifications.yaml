@@ -1,6 +1,6 @@
-mode: restart
+mode: parallel
 blueprint:
-  name: 🔔 Notifications (Version 2.0.2 Beta)
+  name: 🔔 Notifications (Version 2.0.2 Beta 2)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2023.11.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.0.2 Beta</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.0.2 Beta 2</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -42,12 +42,17 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 2.0.2 Beta Multiple Device - *19 Jan 2023*
+      ### Version 2.0.2 Beta 2 - *23 March 2024*
       - Added: Field for `notification_link`. [#26](https://github.com/samuelthng/t-house-blueprints/pull/26) (Thanks to [HNKNTA](https://github.com/HNKNTA))
       - Fixed: Field `enable_timeout`.
       - Added: `response_variable` with payload and response.
+      - Added: Android High Priority Notifications [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/139)
+      - Added: iOS Critical Notifications Volume [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/155)
+      - Updated: `mode: parallel` [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/145)
+      - Refactor: Device specific payloads are now evaluated separately for future alternative device support [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/156)
+      - Added: Optional Server URL input [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/159)
 
-      ### Version 2.0.1 - *20 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/111?u=samuelthng)
+      ### Version 2.0.1 - *20 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/111)
 
       ### Version 2 - *12 Dec 2023* [🔗](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/109)
 
@@ -684,6 +689,20 @@ blueprint:
         entity:
           filter:
             - domain: "camera"
+    attachment_server_url:
+      name: "📸 Attachment: Prepend Server URL"
+      description: >-
+        Allows prepending a server URL before the camera stream URL.<br>
+
+        ❔ Only used with `Attachment Type: Camera`<br>
+        ❔ Only required for issues loading camera stream due to relative URL.<br>
+
+        `Optional`
+      default:  ""
+      selector:
+        text:
+          type: url
+          autocomplete: url
 
     ##############################
     # Input: Misc Inputs
@@ -696,7 +715,7 @@ blueprint:
         boolean:
     tag:
       name: "🔖 Tag"
-      description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n\n`Optional`"
+      description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty  \n⚠️ If you intend to reuse this script for multiple purposes, leave empty\n\n`Optional`"
       default: ""
       selector:
         text:
@@ -730,9 +749,23 @@ blueprint:
     android_high_priority:
       name: "❕ High Priority Mode"
       description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.  \n\n`🤖 Android Only`"
-      default: true
+      default: false
       selector:
         boolean:
+    visibility:
+      name: "🔏 Notification Lockscreen Visibility"
+      description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`"
+      default: "private"
+      selector:
+        select:
+          options:
+            - label: "Public: Always show content."
+              value: public
+            - label: "Private: Show content based on phone settings."
+              value: private
+            - label: "Secret: Always hide content on the lockscreen."
+              value: secret
+
     interruption_level:
       name: "❕ Interruption Level"
       description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
@@ -748,19 +781,24 @@ blueprint:
               value: time-sensitive
             - label: "Critical (Overrides Focus and Mute, restricted features)"
               value: critical
-    visibility:
-      name: "🔏 Notification Lockscreen Visibility"
-      description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`"
-      default: "private"
+
+    ios_critical_notification_volume:
+      name: "🔊 Critical Notifications Volume"
+      description: "Customises the volume of critical notifications.  \n\n⚠️ Ensure that the Interruption Level has been set to `Critical` to use this option.  \n\n` iOS Only`"
+      default: 1
       selector:
-        select:
-          options:
-            - label: "Public: Always show content."
-              value: public
-            - label: "Private: Show content based on phone settings."
-              value: private
-            - label: "Secret: Always hide content on the lockscreen."
-              value: secret
+        number:
+          min: 0
+          max: 1
+          step: 0.1
+          mode: slider
+    
+    debug:
+      name: "🐞 Debug"
+      description: "Forces the script to generate all available payload types for debugging purposes.  \n\n`Optional`"
+      default: false
+      selector:
+        boolean:
 
 ##############################
 # Fields
@@ -816,6 +854,15 @@ fields:
       entity:
         filter:
           - domain: "camera"
+  field_attachment_server_url:
+    name: "📸 Attachment: Prepend Server URL"
+    description: "Override camera entity prepended server URL."
+    example: !input attachment_server_url
+    default: !input attachment_server_url
+    selector:
+      text:
+        type: url
+        autocomplete: url
 
   field_option_one_enabled:
     name: "1️⃣ Option 1"
@@ -906,6 +953,13 @@ fields:
   #   selector:
   #     action:
 
+  field_debug:
+    name: "🐞 Debug"
+    description: "Enable or disable creating all supported payloads, to trace issues with payloads."
+    example: !input debug
+    selector:
+      boolean:
+
 sequence:
   ##############################
   # Setup Variables
@@ -958,11 +1012,7 @@ sequence:
   - alias: iOS Configuration Options
     variables:
       interruption_level: !input interruption_level
-      # presentation_options: !input presentation_options
-      # shortcut: !input shortcut # Unlikely to be supported due to complexity.
-      # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
-      # critical: !input critical
-      # volume: !input volume
+      ios_critical_notification_volume: !input ios_critical_notification_volume
 
   - alias: Timeout
     variables:
@@ -982,12 +1032,14 @@ sequence:
       attachment_type: "{{ iif(field_attachment_type is defined, field_attachment_type, script_attachment_type) }}"
       script_attachment_camera_entity: !input attachment_camera_entity
       attachment_camera_entity: "{{ iif(field_attachment_camera_entity is defined, field_attachment_camera_entity, script_attachment_camera_entity) }}"
+      script_attachment_server_url: !input attachment_server_url
+      attachment_server_url: "{{ iif(field_attachment_server_url is defined, field_attachment_server_url, script_attachment_server_url) }}"
       camera_image_url: >-
         {% if (attachment_camera_entity|length) %}
           {% if (state_attr(attachment_camera_entity,'entity_picture')|length) %}
-            {{state_attr(attachment_camera_entity,'entity_picture')}}
+            {{attachment_server_url ~ state_attr(attachment_camera_entity,'entity_picture')}}
           {% else %}
-            {{"/api/camera_proxy/{id}".format(id=attachment_camera_entity)}}
+            {{attachment_server_url ~ "/api/camera_proxy/{id}".format(id=attachment_camera_entity)}}
           {%- endif %}
         {%- endif %}
       media_url: >-
@@ -1004,6 +1056,10 @@ sequence:
       notify_device: "{{ iif(field_notify_device is defined, field_notify_device, script_notify_device) }}"
       notify_service: >-
         {{ "notify.mobile_app_{id}".format(id=device_attr(notify_device,'name')|slugify) }}
+      is_apple_device: >-
+        {{ 'APPLE' in (device_attr(notify_device, "manufacturer")|upper) }}
+      script_debug: !input debug
+      debug: "{{ iif(field_debug is defined, field_debug, script_debug) }}"
 
   - alias: Option 1
     variables:
@@ -1117,43 +1173,63 @@ sequence:
           "{}".format('uri' if option_three_uri|length else ''): option_three_uri,
         }}}
 
-  - alias: Setup Payload
+  - alias: Setup Payloads
     variables:
       options: >-
         {{ [option_one, option_two, option_three] | selectattr('enabled') | list }}
-      expect_response: "{{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled }}" # If there's no timeout nor options, then no point waiting. Stop script.
-      # Build OS specific notification payloads.
-      notification_data: >-
-        {% set apple_device = 'APPLE' in (device_attr(notify_device, "manufacturer")|upper) %}
-        {% set payload = namespace(data={ 'apple_device': apple_device }) %}
-        {% if payload.data.apple_device %}
-          {# iOS #}
-          {% set push = namespace(d={}) %}
-          {% set payload.data = dict(payload.data, **{ 'subtitle': subtitle }) %}
-          {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
-          {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'url': notification_link }) %}{% endif %}
-          {% if attachment_type == 'camera_entity' %}{% set payload.data = dict(payload.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
-          {% set payload.data = dict(payload.data, **{ 'push': push.d }) %}
-        {% else %}
-          {# Android #}
-          {% set payload.data = dict(payload.data, **{ 'subject': subtitle }) %}
-          {% set payload.data = dict(payload.data, **{ 'visibility': visibility }) %}
-          {% set payload.data = dict(payload.data, **{ 'importance': importance }) %}
-          {% if android_high_priority %}{% set payload.data = dict(payload.data, **{ 'priority': 'high', 'ttl': 0 }) %}{% endif %}
-          {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'clickAction': notification_link }) %}{% endif %}
-          {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set payload.data = dict(payload.data, **{ 'image': media_url }) %}{% endif %}
-          {% if notification_icon|length %}{% set payload.data = dict(payload.data, **{ 'notification_icon': notification_icon }) %}{% endif %}
-          {% if enable_icon_color %}{% set payload.data = dict(payload.data, **{ 'color': icon_color_hex }) %}{% endif %}
-          {% if enable_timeout and clear_on_timeout %}{% set payload.data = dict(payload.data, **{ 'timeout': timeout_seconds }) %}{% endif %}
-          {% if channel|length %}{% set payload.data = dict(payload.data, **{ 'channel': channel }) %}{% endif %}
-          {% if persist %}{% set payload.data = dict(payload.data, **{ 'persistent': persist }) %}{% endif %}
-          {% if car_ui %}{% set payload.data = dict(payload.data, **{ 'car_ui': car_ui }) %}{% endif %}
+      expect_response: >-
+        {# If there's no timeout nor options, then no point waiting. Stop script. #}
+        {{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled }}
+
+      common: >-
+        {# [Common]  #}
+        {% set common = namespace(data={ 'actions': options, 'tag': tag }) %}
+        {% if group|length %}{% set common.data = dict(common.data, **{ 'group': group }) %}{% endif %}
+        {{ common.data }}
+
+      ios_payload: >-
+        {% if is_apple_device or debug %}
+          {# [iOS Specific Payload] #}
+          {% set ios = namespace(data={}) %}
+          {% set ios.data= dict(ios.data, **common) %}
+          {% if subtitle|length %}{% set ios.data = dict(ios.data, **{ 'subtitle': subtitle }) %}{% endif %}
+          {% if notification_link|length %}{% set ios.data = dict(ios.data, **{ 'url': notification_link }) %}{% endif %}
+          {% if attachment_type == 'camera_entity' %}{% set ios.data = dict(ios.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
+            {# iOS push payload #}
+            {% set push = namespace(d={}) %}
+            {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
+            {% if interruption_level == 'critical' %}
+              {# iOS Critical Notifications Volume #}
+              {% set sound = namespace(d={ 'name': 'default', 'critical': 1, 'volume': ios_critical_notification_volume }) %}
+              {% set push.d = dict(push.d, **{ 'sound': sound.d }) %}
+              {# End: iOS Critical Notifications Volume #}
+            {% endif %}
+            {% set ios.data = dict(ios.data, **{ 'push': push.d }) %}
+            {# End: iOS push payload #}
+          {{ ios.data }}
         {% endif %}
-        {# Common  #}
-        {% set payload.data = dict(payload.data, **{ 'actions': options }) %}
-        {% set payload.data = dict(payload.data, **{ 'tag': tag }) %}
-        {% if group|length %}{% set payload.data = dict(payload.data, **{ 'group': group }) %}{% endif %}
-        {{ payload.data }}
+
+      android_payload: >-
+        {% if not is_apple_device or debug %}
+          {# [Android Specific Payload] #}
+          {% set android = namespace(data={}) %}
+          {% set android.data = dict(android.data, **common) %}
+          {% set android.data = dict(android.data, **{ 'visibility': visibility }) %}
+          {% set android.data = dict(android.data, **{ 'importance': importance }) %}
+          {% if subtitle|length %}{% set android.data = dict(android.data, **{ 'subject': subtitle }) %}{% endif %}
+          {% if android_high_priority %}{% set android.data = dict(android.data, **{ 'priority': 'high', 'ttl': 0 }) %}{% endif %}
+          {% if notification_link|length %}{% set android.data = dict(android.data, **{ 'clickAction': notification_link }) %}{% endif %}
+          {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set android.data = dict(android.data, **{ 'image': media_url }) %}{% endif %}
+          {% if notification_icon|length %}{% set android.data = dict(android.data, **{ 'notification_icon': notification_icon }) %}{% endif %}
+          {% if enable_icon_color %}{% set android.data = dict(android.data, **{ 'color': icon_color_hex }) %}{% endif %}
+          {% if enable_timeout and clear_on_timeout %}{% set android.data = dict(android.data, **{ 'timeout': timeout_seconds }) %}{% endif %}
+          {% if channel|length %}{% set android.data = dict(android.data, **{ 'channel': channel }) %}{% endif %}
+          {% if persist %}{% set android.data = dict(android.data, **{ 'persistent': persist }) %}{% endif %}
+          {% if car_ui %}{% set android.data = dict(android.data, **{ 'car_ui': car_ui }) %}{% endif %}
+          {{ android.data }}
+        {% endif %}
+
+      notification_data: '{{ iif(is_apple_device, ios_payload, android_payload) }}'
 
   ##############################
   # Send Notification
@@ -1269,7 +1345,7 @@ sequence:
     if:
       - alias: "Should send clear notification command? (for iOS/macOS)?"
         condition: template
-        value_template: "{{ expect_response and enable_timeout and clear_on_timeout and notification_data.apple_device }}"
+        value_template: "{{ expect_response and enable_timeout and clear_on_timeout and is_apple_device }}"
     then:
       - alias: "Send clear notification command to iOS device"
         service: "{{ notify_service }}"
