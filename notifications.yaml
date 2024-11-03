@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 2.0.2 Beta)
+  name: 🔔 Notifications (Version 2.0.3 Beta)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2023.11.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.0.2 Beta</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.0.3 Beta</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -42,6 +42,8 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
+      ### Version 2.0.3 Beta 
+      
       ### Version 2.0.2 Beta Multiple Device - *19 Jan 2023*
       - Added: Field for `notification_link`. [#26](https://github.com/samuelthng/t-house-blueprints/pull/26) (Thanks to [HNKNTA](https://github.com/HNKNTA))
       - Fixed: Field `enable_timeout`.
@@ -652,6 +654,16 @@ blueprint:
         text:
 
     ##############################
+    # Input: Notification Sound
+    ##############################
+    notification_sound:
+      name: "🔈 Notification Sound"
+      description: "Use a custom sound for the notification.  \n\nSee [documentation](https://companion.home-assistant.io/docs/notifications/notification-sounds) for configuration options.  \n\n  \n\n` iOS Only`, `Optional`"
+      default: ""
+      selector:
+        text:
+
+    ##############################
     # Input: Attachments
     ##############################
     attachment_type:
@@ -895,6 +907,14 @@ fields:
     selector:
       text:
 
+  field_notification_sound:
+    name: "🔈 Notification Sound"
+    description: "Override custom notification sound"
+    example: !input notification_sound
+    default: !input notification_sound
+    selector:
+      text:
+
   # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
   # field_timeout_action:
   #   name: "⌛️ Timeout Action(s)"
@@ -958,6 +978,8 @@ sequence:
   - alias: iOS Configuration Options
     variables:
       interruption_level: !input interruption_level
+      script_notification_sound: !input notification_sound
+      notification_sound: "{{ iif(field_notification_sound is defined, field_notification_sound, script_notification_sound) }}"
       # presentation_options: !input presentation_options
       # shortcut: !input shortcut # Unlikely to be supported due to complexity.
       # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
@@ -1132,6 +1154,7 @@ sequence:
           {% set payload.data = dict(payload.data, **{ 'subtitle': subtitle }) %}
           {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
           {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'url': notification_link }) %}{% endif %}
+          {% if notification_sound|length %}{% set push.d = dict(push.d, **{ 'sound': notification_sound }) %}{% endif %}
           {% if attachment_type == 'camera_entity' %}{% set payload.data = dict(payload.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
           {% set payload.data = dict(payload.data, **{ 'push': push.d }) %}
         {% else %}
