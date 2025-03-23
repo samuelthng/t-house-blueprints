@@ -1,6 +1,6 @@
 mode: parallel
 blueprint:
-  name: 🔔 Notifications (Version 2.1.3)
+  name: 🔔 Notifications (Version 2.1.4)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2024.06.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.1.3</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.1.4</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -24,6 +24,8 @@ blueprint:
       > ⌛️ Timeout actions with custom duration, fired if no option response received
 
       > 🧹 Clear notification after timeout and after response received
+
+      > 🔄 Clear notification when entity state changes
 
       > 📸 Camera Snapshots
 
@@ -43,6 +45,9 @@ blueprint:
 
       <details>
       <summary>Expand/collapse changelog</summary>
+      
+      ### Version 2.1.4
+      - Added: Clear notification when an entity state changes
       
       ### Version 2.1.3
       - Fixed: When `notify_device` is empty, automatically include all available mobile devices
@@ -660,10 +665,11 @@ blueprint:
     ##############################
     # Input: Timeout Options
     ##############################
-    timeoutoption: ## Timeout Options
-      name: Timout Options
+    lifecycle_options: ## Lifecycle Options
+      name: Notification Lifecycle
       collapsed: true
       input: 
+        # Timeout options
         enable_timeout:
           name: "⌛️ Enable Timeout"
           description: "Require script to stop listening after the set duration. Can be overrided.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will wait for response indefinitely until the next time it is triggered."
@@ -698,6 +704,7 @@ blueprint:
           default: false
           selector:
             boolean:
+        # Notification clearing options
         clear_on_timeout:
           name: "🧹 Clear notification on timeout"
           description: "Dismiss the notification after action selection times out."
@@ -710,6 +717,25 @@ blueprint:
           default: false
           selector:
             boolean:
+        watched_entity_enable:
+          name: "🔄 Enable Entity Watch"
+          description: "Enable or disable watching the specified entity for state changes that will trigger the removal of the notification."
+          default: false
+          selector:
+            boolean:
+        watched_entity:
+          name: "🔄 Entity to Watch"
+          description: "The entity whose state change will trigger the removal of the notification. If specified, the notification will be cleared when the state changes. Can't be empty"
+          default: "input_boolean.dummy_notify_eraser"
+          selector:
+            entity:
+        watched_entity_state:
+          name: "🔄 State to Watch (optional)"
+          description: "If specified, the notification will only be cleared when the entity takes this value. Leave empty to remove the notification on any state change."
+          default: ""
+          selector:
+            text:
+        # Other lifecycle options
         persist:
           name: "🚩 Persistent Notification"
           description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n`🤖 Android Only`"
@@ -778,31 +804,31 @@ blueprint:
       collapsed: true
       input: 
         car_ui:
-          name: "🚘 Show on Android Auto"
+          name: "🚘 Show on Android Auto"
           description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
           default: false
           selector:
             boolean:
         tag:
-          name: "🔖 Tag"
-          description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n\n`Optional`"
+          name: "🔖 Tag"
+          description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n\n`Optional`"
           default: ""
           selector:
             text:
         group:
-          name: "📣 Notification Group ID"
-          description: "Used for grouping different notifications together visually.  \n\n⚠️ iOS critical notifications do no support grouping.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information.  \n\n`Optional`"
+          name: "📣 Notification Group ID"
+          description: "Used for grouping different notifications together visually.  \n\n⚠️ iOS critical notifications do no support grouping.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information.  \n\n`Optional`"
           default: ""
           selector:
             text:
         channel:
-          name: "📣 Notification Channel"
+          name: "📣 Notification Channel"
           description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`🤖 Android Only`, `Optional`"
           default: "General"
           selector:
             text:
         importance:
-          name: "❕ Notification Channel Importance"
+          name: "❕ Notification Channel Importance"
           description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) for more information.  \n\n`🤖 Android Only`"
           default: default
           selector:
@@ -817,14 +843,14 @@ blueprint:
                 - label: "Low (Makes no sound, doesn't appear in status bar)"
                   value: min
         android_high_priority:
-          name: "❕ High Priority Mode"
+          name: "❕ High Priority Mode"
           description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.  \n\n`🤖 Android Only`"
           default: true
           selector:
             boolean:
         interruption_level:
-          name: "❕ Interruption Level"
-          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
+          name: "❕ Interruption Level"
+          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
           default: active
           selector:
             select:
@@ -838,7 +864,7 @@ blueprint:
                 - label: "Critical (Overrides Focus and Mute, restricted features)"
                   value: critical
         visibility:
-          name: "🔏 Notification Lockscreen Visibility"
+          name: "🔏 Notification Lockscreen Visibility"
           description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`"
           default: "private"
           selector:
@@ -942,7 +968,7 @@ fields:
   field_option_three_enabled:
     name: "3️⃣ Option 3"
     description: "Override showing or hiding this option."
-    example: !input dismiss_enabled
+    example: !input option_three_enabled
     selector:
       boolean:
   # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
@@ -1069,8 +1095,9 @@ sequence:
       # critical: !input critical
       # volume: !input volume
 
-  - alias: Timeout
+  - alias: Timeout and clear
     variables:
+      # [Timout]
       script_enable_timeout: !input enable_timeout
       enable_timeout: "{{ iif(field_enable_timeout is defined, field_enable_timeout, script_enable_timeout) }}"
       clear_on_timeout: !input clear_on_timeout
@@ -1083,6 +1110,13 @@ sequence:
       # [Clear on response]
       script_clear_on_response: !input clear_on_response
       clear_on_response: "{{ iif(field_clear_on_response is defined, field_clear_on_response, script_clear_on_response) }}"
+      # [Clear on entity change]
+      script_watched_entity_enable: !input watched_entity_enable
+      watched_entity_enable: "{{ iif(field_watched_entity_enable is defined, field_watched_entity_enable, script_watched_entity_enable) }}"
+      script_watched_entity: !input watched_entity
+      watched_entity: "{{ iif(field_watched_entity is defined, field_watched_entity, script_watched_entity) }}"
+      script_watched_entity_state: !input watched_entity_state
+      watched_entity_state: "{{ iif(field_watched_entity_state is defined, field_watched_entity_state, script_watched_entity_state) }}"
 
   - alias: Attachments
     variables:
@@ -1355,7 +1389,7 @@ sequence:
 
   - alias: Expect response
     variables:
-      expect_response: "{{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled }}" # If there's no timeout nor options, then no point waiting. Stop script.
+      expect_response: "{{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled or watched_entity_enable }}" # If there's no timeout nor options, then no point waiting. Stop script.
 
   ##############################
   # Send Notification to multiple devices
@@ -1374,12 +1408,12 @@ sequence:
   ##############################
   # Evaluate Response
   ##############################
-  - alias: Determine if script has to wait for response?
+  - alias: Determine if script has to wait for response
     choose:
       - alias: "No need for response"
         conditions: "{{ expect_response == false }}"
         sequence: []
-      - alias: "Should await response with timeout?"
+      - alias: "Wait response with timeout and watched_entity"
         conditions: "{{ enable_timeout }}"
         sequence:
           - alias: "Awaiting response with timeout…"
@@ -1400,9 +1434,14 @@ sequence:
                 event_type: mobile_app_notification_cleared
                 event_data:
                   tag: "{{ tag }}"
+              - platform: state
+                entity_id: !input watched_entity
+                to: !input watched_entity_state
+                for:
+                  seconds: 0
             timeout: "{{ timeout }}"
             continue_on_timeout: true
-      - alias: "Should await response indefinitely?"
+      - alias: "Wait response indefinitely and watched_entity"
         conditions: "{{ enable_timeout == false }}"
         sequence:
           - alias: "Awaiting response indefinitely…"
@@ -1423,6 +1462,11 @@ sequence:
                 event_type: mobile_app_notification_cleared
                 event_data:
                   tag: "{{ tag }}"
+              - platform: state
+                entity_id: !input watched_entity
+                to: !input watched_entity_state
+                for:
+                  seconds: 0
 
   ##############################
   # Parse user response
@@ -1439,6 +1483,8 @@ sequence:
           {% else %}
             {% set response.data = dict(response.data, **{ 'result': 'no_response' }) %}
           {% endif %}
+        {% elif wait.trigger.platform is defined and wait.trigger.platform == 'state' %}
+          {% set response.data = dict(response.data, **{ 'result': 'entity_changed' }) %}
         {% elif wait.trigger.event is defined %}
           {% if run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
             {% set response.data = dict(response.data, **{ 'result': 'notification_cleared' }) %}
@@ -1491,7 +1537,8 @@ sequence:
         value_template: >
           {{ 
             (clear_on_response and user_response.result not in ['timeout', 'notification_cleared', 'no_response']) or
-            (expect_response and enable_timeout and clear_on_timeout)
+            (expect_response and enable_timeout and clear_on_timeout) or
+            (watched_entity_enable and user_response.result == 'entity_changed')
           }}
     then:
       - repeat:
