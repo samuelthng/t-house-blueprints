@@ -15,25 +15,26 @@ blueprint:
 
     ---
 
-      <details><summary><h3>Features:</h3></summary>
+      <details>
+      <summary><h3>Features:</h3></summary>
 
-        > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
-        >
-        > 3️⃣ Up to 3 customisable, action buttons (Previously: ✅ Confirm and ❌ Dismiss Button)
-        >
-        > ⌛️ Timeout actions with custom duration, fired if no option response received
-        >
-        > 🧹 Clear notification after timeout
-        >
-        > 📸 Camera Snapshots
-        >
-        > 🔗 Custom Notification Link
-        >
-        > 📜 Flexible [script fields](https://www.home-assistant.io/integrations/script/#fields)
-        >
-        > 🍎 Supports iOS
-        >
-        > 🤖 Supports Android
+      > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
+      >
+      > 3️⃣ Up to 3 customisable, action buttons (Previously: ✅ Confirm and ❌ Dismiss Button)
+      >
+      > ⌛️ Timeout actions with custom duration, fired if no option response received
+      >
+      > 🧹 Clear notification after timeout
+      >
+      > 📸 Camera Snapshots
+      >
+      > 🔗 Custom Notification Link
+      >
+      > 📜 Flexible [script fields](https://www.home-assistant.io/integrations/script/#fields)
+      >
+      > 🍎 Supports iOS
+      >
+      > 🤖 Supports Android
 
       </details>
 
