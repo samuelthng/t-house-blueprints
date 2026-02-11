@@ -1218,16 +1218,18 @@ sequence:
       devices_info: >-
         {% set devices = namespace(list=[]) %}
         {% for device_id in notify_devices_list %}
-          {% set device_name = device_attr(device_id, 'name') | slugify %}
-          {% set device_manufacturer = device_attr(device_id, 'manufacturer') | upper %}
-          {% set is_apple = 'APPLE' in device_manufacturer %}
-          {% set service_name = "notify.mobile_app_{id}".format(id=device_name) %}
-          {% set devices.list = devices.list + [{
-            'device_id': device_id,
-            'device_name': device_name,
-            'is_apple': is_apple,
-            'service_name': service_name
-          }] %}
+          {% set device_name = device_attr(device_id, 'name') %}
+          {% if device_name is not none %}
+            {% set device_manufacturer = device_attr(device_id, 'manufacturer') | default('') | upper %}
+            {% set is_apple = 'APPLE' in device_manufacturer %}
+            {% set service_name = "notify.mobile_app_{id}".format(id=device_name|slugify) %}
+            {% set devices.list = devices.list + [{
+              'device_id': device_id,
+              'device_name': device_name|slugify,
+              'is_apple': is_apple,
+              'service_name': service_name
+            }] %}
+          {% endif %}
         {% endfor %}
         {{ devices.list }}
       # For backwards compatibility - use first device if only one selected
@@ -1504,7 +1506,8 @@ sequence:
         {{ response.data }}
       responding_device_name: >-
         {% if user_response.device_id is defined %}
-          {{ device_attr(user_response.device_id, 'name') }}
+          {% set name = device_attr(user_response.device_id, 'name') %}
+          {{ name if name is not none else 'unknown device' }}
         {% else %}
           unknown device
         {% endif %}
