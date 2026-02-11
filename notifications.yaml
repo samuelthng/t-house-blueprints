@@ -942,8 +942,6 @@ fields:
   #   default: !input timeout_action
   #   selector:
   #     action:
-
-sequence:
   field_badge:
     name: "🔢 Badge"
     description: "Override app badge number. 🍎 iOS Only"
