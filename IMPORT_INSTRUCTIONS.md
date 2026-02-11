@@ -1,58 +1,68 @@
-# Import Instructions for Beta Blueprint
+# ✅ Import Instructions - Beta Blueprint with Sections
 
-## ✅ Beta Blueprint Created!
+## IMPORTANT: Use the Correct URL!
 
-You can now import the beta version alongside your current blueprint without replacing it.
+### ✅ CORRECT Import URL (Use This!)
 
-## Import URLs
-
-### Main Blueprint (Current Stable)
-```
-https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
-```
-**Name in HA**: "🔔 Notifications (Version 2.0.2 Beta)"
-
-### Beta Blueprint (with iOS Fix)
 ```
 https://raw.githubusercontent.com/samuelthng/t-house-blueprints/copilot/summarize-notification-blueprint/notifications_beta.yaml
 ```
-**Name in HA**: "🔔 Notifications BETA (v2.1.1 - iOS Fixed)"
 
-## What's Different in Beta?
+**This URL points to the latest version with proper sections that Home Assistant can import.**
 
-### Critical iOS Fix
-- **iOS tag truncation to 64 bytes** - Fixes notification failures on iOS devices
-- Resolves Issue #47 where iOS users couldn't receive notifications in v2.0+
-- Applied: `| truncate(64, killwords=True, end='')`
+### ❌ Don't Use Old URLs
 
-### Beta Features
-- Separate name so it won't replace your current blueprint
-- Beta warning banner in the UI
-- Comprehensive changelog
-- Can be tested alongside stable version
+If you see an error like "extra keys not allowed @ data['blueprint']['input']['action_buttons']['collapse']", it means you're using an old URL with the wrong structure.
 
-## How to Import in Home Assistant
+## What's in the Beta?
 
-1. Go to **Settings** → **Automations & Scenes** → **Blueprints**
-2. Click **Import Blueprint** (bottom right)
-3. Paste the beta URL above
-4. Click **Preview Blueprint**
-5. Click **Import Blueprint**
+### Features
+- ✅ **6 Collapsible Sections** - Properly organized inputs
+- ✅ **iOS Tag Fix** - Truncates tags to 64 bytes (fixes iOS notification failures)
+- ✅ **All 49 Inputs** - Organized logically
+- ✅ **Beta Warning** - Banner to distinguish from main blueprint
 
-The beta will appear as a new, separate blueprint in your list!
+### Sections
+1. Device & Notification Content (7 inputs)
+2. Action Buttons (24 inputs)
+3. Timeout Settings (6 inputs)
+4. Attachments (2 inputs)
+5. Links & Behavior (5 inputs)
+6. Priority & Importance (5 inputs)
 
-## Testing
+## How to Import
 
-After importing, you can:
-- Create a test script using the BETA blueprint
-- Test iOS notifications
-- Compare with your current working blueprint
-- Keep both versions available
+1. Open **Home Assistant**
+2. Navigate to **Settings** → **Automations & Scenes** → **Blueprints**
+3. Click **Import Blueprint** (bottom right corner)
+4. **Paste the URL above**
+5. Click **Preview Blueprint**
+6. Click **Import Blueprint**
 
-## Feedback
+## Expected Result
 
-If the beta works well, especially for iOS users, please report back so we can merge the fix to the main branch.
+- ✅ Blueprint imports successfully (no errors)
+- ✅ Name: "🔔 Notifications (Version 2.0.2 Beta)"
+- ✅ 6 sections visible and collapsible
+- ✅ Yellow beta warning banner
+- ✅ Can be used alongside your existing blueprint
+
+## Troubleshooting
+
+### Error: "extra keys not allowed...collapse"
+**Problem**: You're using an old URL with `collapse: true` syntax  
+**Solution**: Use the correct URL above (with `/notifications_beta.yaml` at the end)
+
+### Blueprint doesn't show sections
+**Problem**: Old cached version  
+**Solution**: Remove and re-import using the correct URL
+
+### Can't find the sections
+**Problem**: Might be looking at old version  
+**Solution**: Check the blueprint name includes "BETA" or version number
 
 ---
 
-**Status**: ✅ Ready to import and test!
+**Blueprint Name**: "🔔 Notifications (Version 2.0.2 Beta)"  
+**Version**: 2.1.1 BETA - With Sections  
+**Status**: ✅ Ready to import!
