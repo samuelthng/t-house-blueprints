@@ -121,9 +121,11 @@ blueprint:
         notify_device:
           name: "📲 Device to notify"
           description: >-
-            Device needs to run the official [Home Assistant Companion](https://companion.home-assistant.io/) app to receive notifications.<br><br>
-            ❔ Only used with `📲 Notification Strategy: Device`<br>
-            👍🏻 `Device` is the preferred and default option.
+            Select the mobile device that will receive this notification. Device must have the official Home Assistant Companion app installed and configured.<br><br>
+            **Use case:** Send alerts to your personal phone when motion is detected at the front door.<br><br>
+            📖 [Companion App Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br><br>
+            ❔ Only used with `📲 Notification Strategy: Device`<br>
+            👍🏻 `Device` is the preferred and default option.
           default: ""
           selector:
             device:
@@ -134,24 +136,24 @@ blueprint:
         ##############################
         title:
           name: "🏷️ Title"
-          description: "The title of the notification.  \n\n`Optional`\n"
+          description: "Headline text displayed at the top of the notification. Makes your alert stand out.<br><br>**Use case:** \"Front Door Motion Detected\"<br><br>📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br><br>`Optional`"
           default: ""
           selector:
             text:
         subtitle:
           name: "🏷️ Subtitle"
-          description: "The subtitle of the notification.  \n\n`Optional`\n"
+          description: "Secondary text shown below the title. Provides additional context without opening the notification.<br><br>**Use case:** \"Person detected at 3:45 PM\"<br><br>📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br><br>`🍎 iOS Only`, `Optional`"
           default: ""
           selector:
             text:
         message:
           name: "💬 Message"
-          description: "The message body to display on the notification.  \n\n`🤖 Android`: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
+          description: "Main notification text body. Provides detailed information about the alert.<br><br>**Use case:** \"Motion detected by camera_front_door at 3:45 PM\"<br><br>📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | 🤖 [HTML Formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-message-html-formatting)<br><br>`Required`"
           selector:
             text:
         sound:
           name: "🔊 Sound"
-          description: "Custom notification sound.  \n\nExamples:  \n- 🍎 iOS: `US-EN-Morgan-Freeman.wav` or default system sounds  \n- 🤖 Android: `notification.mp3` (from /local/ folder)  \n\nSee [documentation](https://companion.home-assistant.io/docs/notifications/notification-sounds) for more information.  \n\n`Optional`"
+          description: "Custom sound to play when notification arrives. Helps distinguish different alert types.<br><br>**Examples:**<br>🍎 iOS: \"US-EN-Morgan-Freeman.wav\" or built-in sounds<br>🤖 Android: \"notification.mp3\" (place in /local/ folder)<br><br>**Use case:** Use \"alarm.mp3\" for security alerts, default for routine notifications.<br><br>📖 [Notification Sounds Guide](https://companion.home-assistant.io/docs/notifications/notification-sounds)<br><br>`Optional`"
           default: ""
           selector:
             text:
@@ -163,14 +165,14 @@ blueprint:
       input:
         confirm_enabled:
           name: "1️⃣ Option 1"
-          description: "Show or hide this option."
+          description: "Enable or disable the first action button on the notification.<br><br>**Use case:** Show \"Unlock Door\" button for front door alerts.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)"
           default: True
           selector:
             boolean:
         confirm_text:
           name: "1️⃣ Option 1 - Title"
           description: "Title to show on the first option."
-          default: "Option 1"
+          default: "Confirm"
           selector:
             text:
         confirm_option_mode:
@@ -273,14 +275,14 @@ blueprint:
         ## Option 2
         dismiss_enabled:
           name: "2️⃣ Option 2"
-          description: "Show or hide this option."
+          description: "Enable or disable the second action button on the notification.<br><br>**Use case:** Show \"View Camera\" button alongside \"Unlock Door\" for security alerts.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)"
           default: True
           selector:
             boolean:
         dismiss_text:
           name: "2️⃣ Option 2 - Title"
           description: "Title to show on the first option."
-          default: "Option 2"
+          default: "Dismiss"
           selector:
             text:
         dismiss_option_mode:
@@ -383,7 +385,7 @@ blueprint:
         ## Option 3
         option_three_enabled:
           name: "3️⃣ Option 3"
-          description: "Show or hide this option."
+          description: "Enable or disable the third action button on the notification.<br><br>**Use case:** Add \"Call Owner\" option for critical security alerts alongside \"Unlock\" and \"View Camera\".<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)"
           default: false
           selector:
             boolean:
@@ -508,7 +510,7 @@ blueprint:
             boolean:
         timeout:
           name: "⌛️ Timeout Duration"
-          description: "Amount of time to wait for an action response before firing timeout action.  \n\n👍🏻 Recommended: ≥1 minute, to allow notifications to be sent.  \nDefault: 15 minutes. \n"
+          description: "How long to wait for user response before executing timeout actions.<br><br>**Use case:** Wait 5 minutes for response to door unlock request, 30 seconds for garage closing confirmation.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)<br><br>👍🏻 Recommended: ≥1 minute for reliable notification delivery<br>Default: 15 minutes"
           default:
             hours: 0
             minutes: 15
@@ -575,13 +577,13 @@ blueprint:
                 - domain: "camera"
         image_url:
           name: "🖼️ Image URL"
-          description: "Direct image URL to display as attachment.  \n\nExamples:  \n- `https://example.com/image.jpg`  \n- `/local/images/alert.png`  \n- `https://via.placeholder.com/600x400`  \n\n`Optional`"
+          description: "Direct URL to an image file to attach to the notification. Supports both external URLs and local files.<br><br>**Examples:**<br>- `https://weather.example.com/radar.jpg` (external)<br>- `/local/images/fire_alert.png` (local file)<br>- `https://api.weather.gov/radar/latest.jpg`<br><br>📖 [Notification Attachments](https://companion.home-assistant.io/docs/notifications/notification-attachments)<br><br>`Optional`"
           default: ""
           selector:
             text:
         video_url:
           name: "🎥 Video URL"
-          description: "Video URL to display as attachment.  \n\nExamples:  \n- `https://example.com/video.mp4`  \n- `/local/videos/alert.mp4`  \n\nNote: Video support varies by platform.  \n\n`Optional`"
+          description: "Direct URL to a video file to attach to the notification. Platform support varies - test on your devices.<br><br>**Examples:**<br>- `/local/videos/doorbell_clip.mp4` (local file)<br>- `https://clips.example.com/motion_event.mp4` (external)<br><br>📖 [Video Attachments](https://companion.home-assistant.io/docs/notifications/notification-attachments#video)<br><br>⚠️ Platform support varies<br><br>`Optional`"
           default: ""
           selector:
             text:
@@ -639,7 +641,7 @@ blueprint:
                   value: critical
         badge:
           name: "🔢 Badge"
-          description: "App badge number to display on the Home Assistant app icon.  \n\nExamples:  \n- `5` - Shows badge with number 5  \n- `0` - Removes badge  \n\nRange: 0-999  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Number displayed on the Home Assistant app icon badge. Shows count of pending items or alerts.<br><br>**Examples:**<br>- `1` - One pending notification<br>- `3` - Three unread alerts<br>- `0` - Clear badge (remove number)<br><br>**Use case:** Increment badge for new alerts, set to 0 after user acknowledges.<br><br>📖 [Badge Numbers](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge)<br><br>Range: 0-999<br><br>`🍎 iOS Only`, `Optional`"
           default: ""
           selector:
             number:
@@ -648,13 +650,13 @@ blueprint:
               mode: box
         thread_id:
           name: "🧵 Thread ID"
-          description: "Thread/conversation identifier for grouping related notifications.  \n\nExamples:  \n- `doorbell-alerts`  \n- `security-events`  \n- `room-climate`  \n\nNotifications with the same thread ID are grouped together.  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Groups related notifications into conversation threads on iOS. Different from group ID - creates persistent threads in Notification Center.<br><br>**Examples:**<br>- \"front-door-events\" - All front door notifications<br>- \"garage-alerts\" - Garage-related alerts<br>- \"climate-bedroom\" - Bedroom temperature alerts<br><br>**Use case:** Keep all front door motion alerts in one thread for easy review.<br><br>📖 [Thread ID](https://companion.home-assistant.io/docs/notifications/notifications-basic#thread-id-grouping-notifications)<br><br>`🍎 iOS Only`, `Optional`"
           default: ""
           selector:
             text:
         presentation_options:
           name: "🎨 Presentation Options"
-          description: "Controls how notification is presented when app is in foreground.  \n\nOptions:  \n- `banner` - Show banner  \n- `sound` - Play sound  \n- `badge` - Update badge  \n- `list` - Add to notification list  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Controls notification behavior when Home Assistant app is actively open. Customize which elements appear.<br><br>**Options:**<br>- `banner` - Display notification banner at top of screen<br>- `sound` - Play notification sound<br>- `badge` - Update app icon badge number<br>- `list` - Add to Notification Center list<br><br>**Use case:** Enable all options for critical alerts, disable banner for background updates.<br><br>📖 [Presentation Options](https://companion.home-assistant.io/docs/notifications/notifications-basic#presentation-options)<br><br>`🍎 iOS Only`, `Optional`"
           default: []
           selector:
             select:
@@ -689,7 +691,7 @@ blueprint:
         icon_color:
           name: "🎨 Icon Color"
           description: "Custom icon color for this notification.  \n\n`🤖 Android Only`, `Optional`"
-          default: [102, 186, 240]
+          default: [3, 169, 244]
           selector:
             color_rgb:
         ##############################
@@ -700,7 +702,7 @@ blueprint:
         channel:
           name: "📣 Notification Channel"
           description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`🤖 Android Only`, `Optional`"
-          default: "General"
+          default: "Home Assistant"
           selector:
             text:
         importance:
@@ -756,25 +758,25 @@ blueprint:
             boolean:
         sticky:
           name: "📌 Sticky"
-          description: "Makes notification non-dismissible (cannot be swiped away).  \n\nUseful for critical alerts that require action.  \n\n`🤖 Android Only`, `Optional`"
+          description: "Prevents notification from being dismissed until action buttons are used. Similar to persistent but stricter.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`🤖 Android Only`, `Optional`"
           default: false
           selector:
             boolean:
         vibration_pattern:
           name: "📳 Vibration Pattern"
-          description: "Custom vibration pattern in milliseconds.  \n\nExamples:  \n- `100, 200, 100, 200` - Short vibrations  \n- `0, 500, 1000, 500` - Long pattern with delay  \n\nFormat: comma-separated values (wait, vibrate, wait, vibrate, ...)  \n\n`🤖 Android Only`, `Optional`"
+          description: "Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.<br><br>**Examples:**<br>- \"100,200,100,200\" - Quick double buzz for routine alerts<br>- \"0,500,200,500\" - Long-short-long for urgent alerts<br>- \"100,100,100,100,100,100\" - Rapid pulses for security<br><br>**Format:** wait,vibrate,wait,vibrate (in milliseconds)<br><br>📖 [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern)<br><br>`🤖 Android Only`, `Optional`"
           default: ""
           selector:
             text:
         led_color:
           name: "💡 LED Color"
-          description: "LED notification light color (for devices with notification LED).  \n\nExamples:  \n- `red`  \n- `blue`  \n- `#00FF00` (green in hex)  \n\n`🤖 Android Only`, `Optional`"
+          description: "Notification LED color for devices with LED indicators. Provides visual notification when screen is off.<br><br>**Examples:**<br>- \"red\" - Critical/security alerts<br>- \"blue\" - Information/status updates<br>- \"#00FF00\" - Success/all-clear (hex green)<br>- \"orange\" - Warnings<br><br>**Use case:** Red LED for alarm triggers, blue for routine door alerts.<br><br>📖 [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color)<br><br>⚠️ Only works on devices with notification LED<br><br>`🤖 Android Only`, `Optional`"
           default: ""
           selector:
             text:
         alert_once:
           name: "🔕 Alert Once"
-          description: "Alert (sound/vibrate) only on first notification show, not on updates.  \n\nUseful for notifications that update frequently.  \n\n`🤖 Android Only`, `Optional`"
+          description: "Play sound and vibrate only for initial notification, not for updates. Prevents notification spam for frequently updating alerts.<br><br>**Use case:** Motion sensor that updates every few seconds, or temperature alerts that change gradually.<br><br>📖 [Alert Once](https://companion.home-assistant.io/docs/notifications/notifications-basic#alert-once)<br><br>`🤖 Android Only`, `Optional`"
           default: false
           selector:
             boolean:
