@@ -131,8 +131,9 @@ blueprint:
       icon: mdi:cellphone
       collapsed: false
       description: >-
-
+        <br>
         Select which device should receive notifications.
+        <br>
 
       input:
         notify_device:
@@ -151,8 +152,9 @@ blueprint:
       icon: mdi:message-text
       collapsed: true
       description: >-
-
+        <br>
         Configure the title, subtitle, message text, and sound for your notification.
+        <br>
 
       input:
         title:
@@ -185,11 +187,13 @@ blueprint:
       icon: mdi:gesture-tap-button
       collapsed: true
       description: >-
+        <br>
         Configure up to 3 action buttons on notifications for quick actions.<br>
         Enable buttons below, then configure each in its respective section.<br><br>
         Examples: "Unlock Door" / "View Camera" / "Dismiss"<br><br>
         **⚠️ Android Note:** Android can't send events AND open links in one button. Choose Action(s) OR Link mode per button. iOS supports both simultaneously.<br><br>
         📖 [Actionable Notifications Guide](https://companion.home-assistant.io/docs/notifications/actionable-notifications)
+        <br>
 
         
       input:
@@ -213,8 +217,9 @@ blueprint:
       icon: mdi:numeric-1-box
       collapsed: true
       description: >-
-
+        <br>
         Configure the first action button's appearance and behavior.
+        <br>
 
       input:
         confirm_text:
@@ -282,8 +287,9 @@ blueprint:
       icon: mdi:numeric-2-box
       collapsed: true
       description: >-
-
+        <br>
         Configure the second action button's appearance and behavior.
+        <br>
 
       input:
         dismiss_text:
@@ -351,8 +357,9 @@ blueprint:
       icon: mdi:numeric-3-box
       collapsed: true
       description: >-
-
+        <br>
         Configure the third action button's appearance and behavior.
+        <br>
 
       input:
         option_three_text:
@@ -425,8 +432,9 @@ blueprint:
       icon: mdi:timer-outline
       collapsed: true
       description: >-
-
+        <br>
         Control how long to wait for user response and what happens when time expires.
+        <br>
 
       input:
         enable_timeout:
@@ -476,8 +484,9 @@ blueprint:
       icon: mdi:camera
       collapsed: true
       description: >-
-
+        <br>
         Add images, videos, or camera snapshots to your notification.
+        <br>
 
       input:
         attachment_type:
@@ -532,8 +541,9 @@ blueprint:
       icon: mdi:link-variant
       collapsed: true
       description: >-
-
+        <br>
         Configure notification link, tag, and grouping options.
+        <br>
 
       input:
         notification_link:
@@ -563,8 +573,9 @@ blueprint:
       icon: mdi:apple
       collapsed: true
       description: >-
-
+        <br>
         iOS-only features like interruption level, badge, thread ID, and presentation options.
+        <br>
 
       input:
         interruption_level:
@@ -619,8 +630,9 @@ blueprint:
       icon: mdi:android
       collapsed: true
       description: >-
-
+        <br>
         Android-only features like custom icons, notification channels, LED colors, and vibration patterns.
+        <br>
 
       input:
         icon:
