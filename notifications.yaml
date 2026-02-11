@@ -906,7 +906,6 @@ fields:
   field_badge:
     name: "🔢 Badge"
     description: "Override app badge number. 🍎 iOS Only"
-    example: !input badge
     default: !input badge
     selector:
       number:
@@ -916,14 +915,12 @@ fields:
   field_thread_id:
     name: "🧵 Thread ID"
     description: "Override thread/conversation ID. 🍎 iOS Only"
-    example: !input thread_id
     default: !input thread_id
     selector:
       text:
   field_presentation_options:
     name: "🎨 Presentation Options"
     description: "Override presentation options. 🍎 iOS Only"
-    example: !input presentation_options
     default: !input presentation_options
     selector:
       select:
@@ -940,28 +937,24 @@ fields:
   field_sticky:
     name: "📌 Sticky"
     description: "Override sticky notification setting. 🤖 Android Only"
-    example: !input sticky
     default: !input sticky
     selector:
       boolean:
   field_vibration_pattern:
     name: "📳 Vibration Pattern"
     description: "Override vibration pattern. 🤖 Android Only"
-    example: !input vibration_pattern
     default: !input vibration_pattern
     selector:
       text:
   field_led_color:
     name: "💡 LED Color"
     description: "Override LED color. 🤖 Android Only"
-    example: !input led_color
     default: !input led_color
     selector:
       text:
   field_alert_once:
     name: "🔕 Alert Once"
     description: "Override alert once setting. 🤖 Android Only"
-    example: !input alert_once
     default: !input alert_once
     selector:
       boolean:
