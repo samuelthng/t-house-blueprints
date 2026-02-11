@@ -1,23 +1,17 @@
 mode: restart
 blueprint:
   name: 🔔 Notifications (Version 2.0.2 Beta)
-  source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications_beta.yaml
+  source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
-    min_version: 2024.6.0
+    min_version: 2023.11.0
   domain: script
   author: samuelthng/t-house-blueprints
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.1.1 BETA - Sections</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.0.2 Beta</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
-
-    
-    <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 10px 0;">
-      <strong>⚠️ BETA - Organized Sections</strong><br>
-      Requires Home Assistant 2024.6.0+. This version organizes inputs into sections and includes iOS tag fix.
-    </div>
 
     ---
 
@@ -121,7 +115,8 @@ blueprint:
   input:
     notification_content:
       name: "Device & Notification Content"
-      description: "Configure the device and notification message content"
+      icon: mdi:cellphone-message
+      collapsed: true
       input:
         notify_device:
           name: "📲 Device to notify"
@@ -179,7 +174,8 @@ blueprint:
 
     action_buttons:
       name: "Action Buttons"
-      description: "Configure up to 3 customizable action buttons"
+      icon: mdi:gesture-tap-button
+      collapsed: true
       input:
         confirm_enabled:
           name: "1️⃣ Option 1"
@@ -516,7 +512,8 @@ blueprint:
 
     timeout_settings:
       name: "Timeout Settings"
-      description: "Configure timeout behavior and actions"
+      icon: mdi:timer-outline
+      collapsed: true
       input:
         enable_timeout:
           name: "⌛️ Enable Timeout"
@@ -561,7 +558,8 @@ blueprint:
 
     attachments:
       name: "Attachments"
-      description: "Add camera snapshots or images to notifications"
+      icon: mdi:camera
+      collapsed: true
       input:
         attachment_type:
           name: "📸 Attachment Type"
@@ -595,7 +593,8 @@ blueprint:
 
     links_and_behavior:
       name: "Links & Behavior"
-      description: "Configure notification links and behavior"
+      icon: mdi:link-variant
+      collapsed: true
       input:
         notification_link:
           name: "🔗 Notification Link"
@@ -636,7 +635,8 @@ blueprint:
 
     priority_settings:
       name: "Priority & Importance"
-      description: "Configure notification priority and importance levels"
+      icon: mdi:bell-ring
+      collapsed: true
       input:
         channel:
           name: "📣 Notification Channel"
