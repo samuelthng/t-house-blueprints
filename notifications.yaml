@@ -417,10 +417,100 @@ blueprint:
             boolean:
         option_three_authentication_required:
           name: "3️⃣ Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
+          description: "Require device to be unlocked to use this option.  \n\n`🍎 iOS Only`, `Optional`"
           default: false
           selector:
             boolean:
+    
+    ##############################
+    # Input: Response Handling
+    ##############################
+    response_handling:
+      name: "Response Handling"
+      icon: mdi:message-reply
+      collapsed: true
+      description: >-
+        <br>
+        **Multi-Device Response Control** - Configure how responses are handled when notifying multiple devices.
+        <br><br>
+        **Use Cases:**<br>
+         - Family alert: First person to respond wins, others auto-dismissed<br>
+         - Chore acceptance: One person claims task, notify others it's taken<br>
+         - Critical alerts: Ensure visibility by keeping notification on other devices<br><br>
+        
+      input:
+        response_mode:
+          name: "🎯 Response Mode"
+          description: >-
+            **Single Response**: Only first device's response is processed, others ignored. Useful when one person should handle the request.<br><br>
+            **Multi Response**: All devices can respond independently. Useful when each person should take action.<br><br>
+            💡 **Tip**: For single device, both modes work identically.<br><br>
+            Default: Single Response
+          default: "single"
+          selector:
+            select:
+              options:
+                - label: "Single Response (First Wins)"
+                  value: "single"
+                - label: "Multi Response (All Can Respond)"
+                  value: "multi"
+        clear_other_notifications:
+          name: "🧹 Auto-Clear Other Devices"
+          description: >-
+            **Single Response Mode Only** - When first device responds, automatically clear notifications on all other devices.<br><br>
+            **Use case:** Family sees "Door unlocked by Mom", notification cleared from Dad's & kids' phones.<br><br>
+            **Note**: Only works reliably on iOS. Android clearing has limitations.<br><br>
+            Default: Enabled
+          default: true
+          selector:
+            boolean:
+        notify_other_devices_on_response:
+          name: "📢 Notify Other Devices on Response"
+          description: >-
+            **Single Response Mode Only** - Send informational notification to other devices when first device responds.<br><br>
+            **Example**: "Front door unlocked by John's iPhone" sent to other family members.<br><br>
+            Default: Disabled
+          default: false
+          selector:
+            boolean:
+        other_devices_message_template:
+          name: "💬 Other Devices Message Template"
+          description: >-
+            **Requires "Notify Other Devices" enabled** - Message sent to other devices. Supports Jinja2 templates.<br><br>
+            **Available variables:**<br>
+             - `responding_device_name`: Name of device that responded (e.g., "John's iPhone")<br>
+             - `selected_action`: Which button was pressed<br>
+             - `original_message`: The original notification message<br><br>
+            **Examples:**<br>
+             - Simple: `Action handled by {{ responding_device_name }}`<br>
+             - Detailed: `{{ original_message }} - Responded by {{ responding_device_name }}`<br><br>
+            Default: "Action handled by another device"
+          default: "Action handled by {{ responding_device_name | default('another device') }}"
+          selector:
+            text:
+              multiline: true
+        run_actions_for_others_on_response:
+          name: "⚙️ Run Actions for Other Devices"
+          description: >-
+            **Single Response Mode Only** - Execute actions for devices that didn't respond when first device responds.<br><br>
+            **Use case:** Log which devices were notified but didn't respond, update dashboard, send follow-up.<br><br>
+            Default: Disabled
+          default: false
+          selector:
+            boolean:
+        other_devices_actions:
+          name: "⚙️ Actions for Other Devices"
+          description: >-
+            **Requires "Run Actions for Others" enabled** - Actions to run for each non-responding device.<br><br>
+            **Available variables:**<br>
+             - `responding_device_name`: Device that responded<br>
+             - `notified_devices`: List of all notified device names<br><br>
+            **Example**: Log to history, update input_boolean, send follow-up notification<br><br>
+            `Optional`
+          default: []
+          selector:
+            action:
+    
     ##############################
     # Input: Timeout Options
     ##############################
@@ -1046,6 +1136,19 @@ sequence:
       run_timeout_actions: "{{ iif(field_run_timeout_actions is defined, field_run_timeout_actions, script_run_timeout_actions) }}"
       swipe_away_as_timeout: !input swipe_away_as_timeout
 
+  - alias: Response Handling Configuration
+    variables:
+      response_mode: !input response_mode
+      clear_other_notifications: !input clear_other_notifications
+      notify_other_devices_on_response: !input notify_other_devices_on_response
+      other_devices_message_template: !input other_devices_message_template
+      run_actions_for_others_on_response: !input run_actions_for_others_on_response
+      other_devices_actions: !input other_devices_actions
+      # Track if we're in multi-device scenario
+      is_multi_device: "{{ devices_info | length > 1 }}"
+      # For single response mode, we'll track the responding device
+      responding_device_name: ""
+
   - alias: Attachments
     variables:
       script_attachment_type: !input attachment_type
@@ -1371,7 +1474,77 @@ sequence:
         {% elif wait.trigger.event.data.action == option_three['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_three" }) %}
         {%- endif %}
+        {# Add device info if available #}
+        {% if wait.trigger is defined and wait.trigger.event is defined and wait.trigger.event.data.device_id is defined %}
+        {% set response.data = dict(response.data, **{ 'device_id': wait.trigger.event.data.device_id }) %}
+        {% endif %}
         {{ response.data }}
+      responding_device_name: >-
+        {% if user_response.device_id is defined %}
+          {{ device_attr(user_response.device_id, 'name') }}
+        {% else %}
+          unknown device
+        {% endif %}
+
+  ##############################
+  # Handle Multi-Device Response
+  ##############################
+  - alias: "Handle other devices (single response mode)"
+    choose:
+      - alias: "Single response mode with multiple devices"
+        conditions:
+          - "{{ is_multi_device }}"
+          - "{{ response_mode == 'single' }}"
+          - "{{ user_response.result in ['option_one', 'option_two', 'option_three'] }}"
+        sequence:
+          # Clear notifications on other devices
+          - choose:
+              - conditions: "{{ clear_other_notifications }}"
+                sequence:
+                  - alias: "Clear notifications on other devices"
+                    repeat:
+                      for_each: "{{ devices_info }}"
+                      sequence:
+                        - choose:
+                            - conditions: "{{ repeat.item.device_id != user_response.device_id }}"
+                              sequence:
+                                - service: "{{ repeat.item.service_name }}"
+                                  data:
+                                    message: "clear_notification"
+                                    data:
+                                      tag: "{{ tag }}"
+          
+          # Notify other devices
+          - choose:
+              - conditions: "{{ notify_other_devices_on_response }}"
+                sequence:
+                  - alias: "Send notification to other devices"
+                    repeat:
+                      for_each: "{{ devices_info }}"
+                      sequence:
+                        - choose:
+                            - conditions: "{{ repeat.item.device_id != user_response.device_id }}"
+                              sequence:
+                                - service: "{{ repeat.item.service_name }}"
+                                  data:
+                                    title: "{{ title }}"
+                                    message: >-
+                                      {% set original_message = message %}
+                                      {{ other_devices_message_template }}
+                                    data:
+                                      tag: "{{ tag }}_handled"
+          
+          # Run actions for other devices
+          - choose:
+              - conditions: "{{ run_actions_for_others_on_response }}"
+                sequence:
+                  - alias: "Run actions for each non-responding device"
+                    repeat:
+                      for_each: "{{ devices_info }}"
+                      sequence:
+                        - choose:
+                            - conditions: "{{ repeat.item.device_id != user_response.device_id }}"
+                              sequence: !input other_devices_actions
 
   ##############################
   # Trigger Response Actions
