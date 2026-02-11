@@ -133,7 +133,7 @@ blueprint:
       description: >-
         <br>
         Select which device should receive notifications.
-        <br>
+        <br><br>
 
       input:
         notify_device:
@@ -154,7 +154,7 @@ blueprint:
       description: >-
         <br>
         Configure the title, subtitle, message text, and sound for your notification.
-        <br>
+        <br><br>
 
       input:
         title:
@@ -193,7 +193,7 @@ blueprint:
         Examples: "Unlock Door" / "View Camera" / "Dismiss"<br><br>
         **⚠️ Android Note:** Android can't send events AND open links in one button. Choose Action(s) OR Link mode per button. iOS supports both simultaneously.<br><br>
         📖 [Actionable Notifications Guide](https://companion.home-assistant.io/docs/notifications/actionable-notifications)
-        <br>
+        <br><br>
 
         
       input:
@@ -219,7 +219,7 @@ blueprint:
       description: >-
         <br>
         Configure the first action button's appearance and behavior.
-        <br>
+        <br><br>
 
       input:
         confirm_text:
@@ -289,7 +289,7 @@ blueprint:
       description: >-
         <br>
         Configure the second action button's appearance and behavior.
-        <br>
+        <br><br>
 
       input:
         dismiss_text:
@@ -359,7 +359,7 @@ blueprint:
       description: >-
         <br>
         Configure the third action button's appearance and behavior.
-        <br>
+        <br><br>
 
       input:
         option_three_text:
@@ -434,7 +434,7 @@ blueprint:
       description: >-
         <br>
         Control how long to wait for user response and what happens when time expires.
-        <br>
+        <br><br>
 
       input:
         enable_timeout:
@@ -486,7 +486,7 @@ blueprint:
       description: >-
         <br>
         Add images, videos, or camera snapshots to your notification.
-        <br>
+        <br><br>
 
       input:
         attachment_type:
@@ -543,7 +543,7 @@ blueprint:
       description: >-
         <br>
         Configure notification link, tag, and grouping options.
-        <br>
+        <br><br>
 
       input:
         notification_link:
@@ -575,7 +575,7 @@ blueprint:
       description: >-
         <br>
         iOS-only features like interruption level, badge, thread ID, and presentation options.
-        <br>
+        <br><br>
 
       input:
         interruption_level:
@@ -632,7 +632,7 @@ blueprint:
       description: >-
         <br>
         Android-only features like custom icons, notification channels, LED colors, and vibration patterns.
-        <br>
+        <br><br>
 
       input:
         icon:
