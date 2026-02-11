@@ -98,25 +98,35 @@
 
 ### 3. iOS Compatibility Issues (Issue #47)
 
-**Status**: 🔴 Critical - Unfixed  
+**Status**: 🟢 FIX IDENTIFIED - Ready to Implement  
 **Severity**: High  
-**Affected Users**: iOS users on v2.0+
+**Affected Users**: iOS users on v2.0+  
+**Source**: MB901 fork PR #2
 
 | Aspect | Details |
 |--------|---------|
 | **Problem** | v2.0+ doesn't send iOS notifications; v1.4 is last working version |
-| **Root Cause** | Unknown - possibly iOS-specific code changes |
-| **Scenario** | Users cannot upgrade to access new features |
+| **Root Cause** | ✅ **FOUND**: Tag length exceeding 64 bytes causes iOS to reject notifications |
+| **Scenario** | Auto-generated tags from `this.entity_id ~ '-' ~ context.id` can exceed limit |
 | **Impact** | iOS users stuck on old version, missing new features |
-| **Solution** | Investigate differences between v1.4 and v2.0 iOS handling |
-| **Investigation** | Compare device detection, payload structure, service calls |
-| **Workaround** | Downgrade to v1.4 (temporary) |
+| **Solution** | ✅ **IDENTIFIED**: Truncate tag to 64 bytes maximum |
+| **Code Location** | Tag generation in variables section (around line 1068) |
+| **Fix Verified** | MB901 fork v2.1.6 successfully fixes iOS notifications |
 
-**Investigation Needed**:
-- Compare `device_attr(notify_device, "manufacturer")` handling
-- Check iOS payload structure changes
-- Verify service call format compatibility
-- Test with different iOS versions and HA Companion app versions
+**Proposed Fix** (from MB901 PR #2):
+```yaml
+# Current (broken for iOS):
+tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
+
+# Fixed:
+tag: "{{ iif(custom_tag|length, custom_tag, (this.entity_id ~ '-' ~ context.id)) | truncate(64, killwords=True, end='') }}"
+```
+
+**Why This Works**:
+- iOS has a 64-byte limit on notification tags
+- Long entity IDs + context IDs can exceed this limit
+- Truncating to 64 bytes ensures iOS accepts the notification
+- `killwords=True, end=''` ensures clean truncation without adding ellipsis
 
 ---
 
@@ -727,9 +737,9 @@ jobs:
 **Goal**: Fix breaking issues
 
 - [ ] **P0**: Fix UndefinedError on timeout (Issue #43)
+- [ ] **P0**: Fix iOS tag length issue (Issue #47) - ✅ Fix identified from MB901 PR #2
 - [ ] **P0**: Fix Android notification clearing (Issue #41)
 - [ ] **P0**: Add error handling for device validation
-- [ ] **P1**: Investigate iOS compatibility (Issue #47)
 
 ### Phase 2: UI/UX Improvements (Week 2)
 **Goal**: Improve user experience
@@ -829,6 +839,7 @@ jobs:
 
 ### GitHub Pull Requests
 - **PR #48, #49** (MB901): Collapsed menus, multi-device, zone-based messaging, clear on response
+- **MB901 Fork PR #2**: ✅ iOS tag length fix (64-byte truncation) - **CRITICAL FIX IDENTIFIED**
 - **PR #39** (Trilis29): Critical sound level implementation
 - **PR #26** (HNKNTA): notification_link field
 - **PR #15** (ChrisBaker97): Template syntax improvements
