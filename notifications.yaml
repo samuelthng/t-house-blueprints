@@ -43,9 +43,9 @@ blueprint:
  <summary>Expand/collapse changelog</summary>
 
  ### Version 2.0.2 Beta Multiple Device - *19 Jan 2023*
- - Added: Field for `notification_link`. [#26](https://github.com/samuelthng/t-house-blueprints/pull/26) (Thanks to [HNKNTA](https://github.com/HNKNTA))
- - Fixed: Field `enable_timeout`.
- - Added: `response_variable` with payload and response.
+   - Added: Field for `notification_link`. [#26](https://github.com/samuelthng/t-house-blueprints/pull/26) (Thanks to [HNKNTA](https://github.com/HNKNTA))
+   - Fixed: Field `enable_timeout`.
+   - Added: `response_variable` with payload and response.
 
  ### Version 2.0.1 - *20 Dec 2023* [](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552/111?u=samuelthng)
 
@@ -75,18 +75,17 @@ blueprint:
 
  <details>
  <summary>Expand/collapse known issues</summary>
-
- - In some cases, iOS does not seem to play well with newer features.
+   - In some cases, iOS does not seem to play well with newer features.
  If that happens to you, you can [check out older releases here](https://github.com/samuelthng/t-house-blueprints/releases).
 
- - In some cases, some setups have difficulty receiving events from the device.
+   - In some cases, some setups have difficulty receiving events from the device.
  When this happens, no actions will be performed by Home Assistant.
 
  You can test this:
- - Navigate to Developer Tools → Events
- - Listen to event: `mobile_app_notification_action`
- - Trigger a notification to your device by running the script
- - Select an action option
+   - Navigate to Developer Tools → Events
+   - Listen to event: `mobile_app_notification_action`
+   - Trigger a notification to your device by running the script
+   - Select an action option
 
  If you do not see an event appearing in the Events page, this could be the issue.
  You might want to check the [troubleshooting documents](https://companion.home-assistant.io/docs/troubleshooting/faqs), or check your network configuration to resolve the issue.
@@ -97,16 +96,15 @@ blueprint:
 
  <details>
  <summary>Expand/collapse FAQ</summary>
-
- - **_Will you add sending notifications to multiple devices?_**
+   - **_Will you add sending notifications to multiple devices?_**
  Sadly, no. It is possible to send notifications to multiple devices, however, it will not work as well with the timeout feature and notifications clearing at this time.
 
  I might revisit it in future, but not at this time.
 
- - **_Why can't I see my devices or notify service?_**
+   - **_Why can't I see my devices or notify service?_**
  You might want to check if troubleshooting steps provided by the [Home Assistant Companion app documentation](https://companion.home-assistant.io/docs/troubleshooting/faqs) may be able to help.
 
- - **_Why do I keep receiving notifications incessantly?_**
+   - **_Why do I keep receiving notifications incessantly?_**
  Check your scripts and automation, there might be a logical loop going on that's triggering the notification over and over again. If you need further help, feel free to drop by the [main post](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/) and share your automation and scripts yamls.
 
  </details>
@@ -127,7 +125,7 @@ blueprint:
  **Use case:** Send alerts to your personal phone when motion is detected at the front door.
 
 
- [Companion App Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic
+ [Companion App Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic)
 
 
  Only used with ` Notification Strategy: Device`
@@ -146,25 +144,25 @@ blueprint:
  input:
  title:
  name: " Title"
- description: "Headline text displayed at the top of the notification. Makes your alert stand out. **Supports Jinja2 templates.**<br><br>**Examples:**<br> - Static: `Front Door Motion Detected`<br> - Template: `{{ trigger.to_state.attributes.friendly_name }} Alert`<br> - Template: `Motion at {{ now().strftime('%I:%M %p') }}`<br><br>**Use case:** \"Front Door Motion Detected\"<br><br> [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br><br>`Optional`"
+ description: "Headline text displayed at the top of the notification. Makes your alert stand out. **Supports Jinja2 templates.**<br><br>**Examples:**<br>  - Static: `Front Door Motion Detected`<br> - Template: `{{ trigger.to_state.attributes.friendly_name }} Alert`<br> - Template: `Motion at {{ now().strftime('%I:%M %p') }}`<br><br>**Use case:** \"Front Door Motion Detected\"<br><br> [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br><br>`Optional`"
  default: ""
  selector:
  text:
  subtitle:
  name: " Subtitle"
- description: "Secondary text shown below the title. Provides additional context without opening the notification. **Supports Jinja2 templates.**<br><br>**Examples:**<br> - Static: `Person detected at 3:45 PM`<br> - Template: `{{ states('sensor.front_door_last_detection') }}`<br> - Template: `Detected at {{ now().strftime('%I:%M %p') }}`<br><br>**Use case:** \"Person detected at 3:45 PM\"<br><br> [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br><br>` iOS Only`, `Optional`"
+ description: "Secondary text shown below the title. Provides additional context without opening the notification. **Supports Jinja2 templates.**<br><br>**Examples:**<br>  - Static: `Person detected at 3:45 PM`<br> - Template: `{{ states('sensor.front_door_last_detection') }}`<br> - Template: `Detected at {{ now().strftime('%I:%M %p') }}`<br><br>**Use case:** \"Person detected at 3:45 PM\"<br><br> [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br><br>` iOS Only`, `Optional`"
  default: ""
  selector:
  text:
  message:
  name: " Message"
- description: "Main notification text body. Provides detailed information about the alert. **Supports Jinja2 templates.**<br><br>**Examples:**<br> - Static: `Motion detected by camera_front_door at 3:45 PM`<br> - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br> - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`<br><br>**Use case:** \"Motion detected by camera_front_door at 3:45 PM\"<br><br> [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | [HTML Formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-message-html-formatting)<br><br>`Required`"
+ description: "Main notification text body. Provides detailed information about the alert. **Supports Jinja2 templates.**<br><br>**Examples:**<br>  - Static: `Motion detected by camera_front_door at 3:45 PM`<br> - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br> - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`<br><br>**Use case:** \"Motion detected by camera_front_door at 3:45 PM\"<br><br> [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | [HTML Formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-message-html-formatting)<br><br>`Required`"
  default: ""
  selector:
  text:
  sound:
  name: " Sound"
- description: "Custom sound to play when notification arrives. Helps distinguish different alert types. **Supports Jinja2 templates.**<br><br>**Examples:**<br> - Static: `alarm.mp3` or `US-EN-Morgan-Freeman.wav`<br> - Template: `{% if is_state('binary_sensor.motion_front_door', 'on') %}alarm.mp3{% else %}notification.mp3{% endif %}`<br> - iOS built-in: `default`, `US-EN-Daisy-Cheerful.wav`<br> - Android: Place files in `/local/` folder<br><br>**Use case:** Use \"alarm.mp3\" for security alerts, default for routine notifications.<br><br> [Notification Sounds Guide](https://companion.home-assistant.io/docs/notifications/notification-sounds)<br><br>`Optional`"
+ description: "Custom sound to play when notification arrives. Helps distinguish different alert types. **Supports Jinja2 templates.**<br><br>**Examples:**<br>  - Static: `alarm.mp3` or `US-EN-Morgan-Freeman.wav`<br> - Template: `{% if is_state('binary_sensor.motion_front_door', 'on') %}alarm.mp3{% else %}notification.mp3{% endif %}`<br> - iOS built-in: `default`, `US-EN-Daisy-Cheerful.wav`<br> - Android: Place files in `/local/` folder<br><br>**Use case:** Use \"alarm.mp3\" for security alerts, default for routine notifications.<br><br> [Notification Sounds Guide](https://companion.home-assistant.io/docs/notifications/notification-sounds)<br><br>`Optional`"
  default: ""
  selector:
  text:
@@ -237,11 +235,11 @@ blueprint:
  <summary> What is this?</summary>
  This option is only applicable to Android due to technical limitations.
 
- The android app can't sending events and open links on the device at the same time, using the same option.
- As such, options on the android app can only be either a link, or an action on Home Assistant. Not both.
+ The Android app can't send events and open links on the device at the same time, using the same option.
+ As such, options on the Android app can only be either a link, or an action on Home Assistant. Not both.
  This is due to:
- - The lack of events being sent when URI options are fired.
- - The requirement to set the `action` parameter to `"URI"`.
+   - The lack of events being sent when URI options are fired.
+   - The requirement to set the `action` parameter to `"URI"`.
  </details>
  iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
  ` Android Only`, `Optional`
@@ -258,7 +256,7 @@ blueprint:
  value: uri
  confirm_action:
  name: "1⃣ Option 1 - Action(s)"
- description: "Action(s) to run when this option is selected.\n\n Used with `Mode: Action(s)` option\n Script stops after actions are run\n Leave empty to do nothing\n\n`Optional`"
+ description: "Action(s) to run when this option is selected.<br><br> Used with `Mode: Action(s)` option<br> Script stops after actions are run<br> Leave empty to do nothing<br><br>`Optional`"
  default: []
  selector:
  action:
@@ -268,33 +266,33 @@ blueprint:
  Navigate to a link or app when this option is selected.<br />
  <details>
  <summary> Show Common Examples</summary>
- - To **open a Home Assistant view**, use relative links like these:
+   - To **open a Home Assistant view**, use relative links like these:
  `/lovelace/my-dashboard`
  `/config/dashboard`
  `/developer-tools/template`
- - Use **launch a page in your default browser**,
+   - Use **launch a page in your default browser**,
  select the appropriate `Link` option in modes and enter a URL here:
  `https://example.com`
  </details><br />
  <details>
  <summary> Show Android Specific Examples</summary>
- - To **open an Application** on your device, for example:
+   - To **open an Application** on your device, for example:
  `app://<android application package name>`
  `app://io.homeassistant.companion.android`
- - To **view an Entity** on your Home Assistant setup:
+   - To **view an Entity** on your Home Assistant setup:
  `entityId:<your_entity_id>`
  `entityId:sun.sun`
- - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
+   - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
  `intent://scan/#Intent;scheme=zxing;package=com.my.pkg;end`
- - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
+   - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
  `deep-link://<deep_link_here>`
  `deep-link://example://link/to/content`
- - To **see notification history**:
+   - To **see notification history**:
  `settings://notification_history`
  </details><br />
  <details>
  <summary> Show iOS Specific Examples</summary>
- - Use **application-launching URLs** on your device
+   - Use **application-launching URLs** on your device
  `tel:123456789`
  `mailto:my@email.com`
  </details><br />
@@ -308,7 +306,7 @@ blueprint:
  type: url
  confirm_icon:
  name: "1⃣ Option 1 - Icon"
- description: "Custom icon to show on this option. \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values). \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)! \n\n` iOS Only`, `Optional`"
+ description: "Custom icon to show on this option. \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values). \nThere are many reference pages out there, feel free to use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)! \n\n` iOS Only`, `Optional`"
  default: ""
  selector:
  text:
@@ -345,11 +343,11 @@ blueprint:
  <summary> What is this?</summary>
  This option is only applicable to Android due to technical limitations.
 
- The android app can't sending events and open links on the device at the same time, using the same option.
- As such, options on the android app can only be either a link, or an action on Home Assistant. Not both.
+ The Android app can't send events and open links on the device at the same time, using the same option.
+ As such, options on the Android app can only be either a link, or an action on Home Assistant. Not both.
  This is due to:
- - The lack of events being sent when URI options are fired.
- - The requirement to set the `action` parameter to `"URI"`.
+   - The lack of events being sent when URI options are fired.
+   - The requirement to set the `action` parameter to `"URI"`.
  </details>
  iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
  ` Android Only`, `Optional`
@@ -366,7 +364,7 @@ blueprint:
  value: uri
  dismiss_action:
  name: "2⃣ Option 2 - Action(s)"
- description: "Action(s) to run when this option is selected.\n\n Used with `Mode: Action(s)` option\n Script stops after actions are run\n Leave empty to do nothing\n\n`Optional`"
+ description: "Action(s) to run when this option is selected.<br><br> Used with `Mode: Action(s)` option<br> Script stops after actions are run<br> Leave empty to do nothing<br><br>`Optional`"
  default: []
  selector:
  action:
@@ -376,33 +374,33 @@ blueprint:
  Navigate to a link or app when this option is selected.<br />
  <details>
  <summary> Show Common Examples</summary>
- - To **open a Home Assistant view**, use relative links like these:
+   - To **open a Home Assistant view**, use relative links like these:
  `/lovelace/my-dashboard`
  `/config/dashboard`
  `/developer-tools/template`
- - Use **launch a page in your default browser**,
+   - Use **launch a page in your default browser**,
  select the appropriate `Link` option in modes and enter a URL here:
  `https://example.com`
  </details><br />
  <details>
  <summary> Show Android Specific Examples</summary>
- - To **open an Application** on your device, for example:
+   - To **open an Application** on your device, for example:
  `app://<android application package name>`
  `app://io.homeassistant.companion.android`
- - To **view an Entity** on your Home Assistant setup:
+   - To **view an Entity** on your Home Assistant setup:
  `entityId:<your_entity_id>`
  `entityId:sun.sun`
- - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
+   - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
  `intent://scan/#Intent;scheme=zxing;package=com.my.pkg;end`
- - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
+   - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
  `deep-link://<deep_link_here>`
  `deep-link://example://link/to/content`
- - To **see notification history**:
+   - To **see notification history**:
  `settings://notification_history`
  </details><br />
  <details>
  <summary> Show iOS Specific Examples</summary>
- - Use **application-launching URLs** on your device
+   - Use **application-launching URLs** on your device
  `tel:123456789`
  `mailto:my@email.com`
  </details><br />
@@ -416,7 +414,7 @@ blueprint:
  type: url
  dismiss_icon:
  name: "2⃣ Option 2 - Icon"
- description: "Custom icon to show on this option. \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values). \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)! \n\n` iOS Only`, `Optional`"
+ description: "Custom icon to show on this option. \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values). \nThere are many reference pages out there, feel free to use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)! \n\n` iOS Only`, `Optional`"
  default: ""
  selector:
  text:
@@ -453,11 +451,11 @@ blueprint:
  <summary> What is this?</summary>
  This option is only applicable to Android due to technical limitations.
 
- The android app can't sending events and open links on the device at the same time, using the same option.
- As such, options on the android app can only be either a link, or an action on Home Assistant. Not both.
+ The Android app can't send events and open links on the device at the same time, using the same option.
+ As such, options on the Android app can only be either a link, or an action on Home Assistant. Not both.
  This is due to:
- - The lack of events being sent when URI options are fired.
- - The requirement to set the `action` parameter to `"URI"`.
+   - The lack of events being sent when URI options are fired.
+   - The requirement to set the `action` parameter to `"URI"`.
  </details>
  iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
  ` Android Only`, `Optional`
@@ -474,7 +472,7 @@ blueprint:
  value: uri
  option_three_action:
  name: "3⃣ Option 3 - Action(s)"
- description: "Action(s) to run when this option is selected.\n\n Used with `Mode: Action(s)` option\n Script stops after actions are run\n Leave empty to do nothing\n\n`Optional`"
+ description: "Action(s) to run when this option is selected.<br><br> Used with `Mode: Action(s)` option<br> Script stops after actions are run<br> Leave empty to do nothing<br><br>`Optional`"
  default: []
  selector:
  action:
@@ -484,33 +482,33 @@ blueprint:
  Navigate to a link or app when this option is selected.<br />
  <details>
  <summary> Show Common Examples</summary>
- - To **open a Home Assistant view**, use relative links like these:
+   - To **open a Home Assistant view**, use relative links like these:
  `/lovelace/my-dashboard`
  `/config/dashboard`
  `/developer-tools/template`
- - Use **launch a page in your default browser**,
+   - Use **launch a page in your default browser**,
  select the appropriate `Link` option in modes and enter a URL here:
  `https://example.com`
  </details><br />
  <details>
  <summary> Show Android Specific Examples</summary>
- - To **open an Application** on your device, for example:
+   - To **open an Application** on your device, for example:
  `app://<android application package name>`
  `app://io.homeassistant.companion.android`
- - To **view an Entity** on your Home Assistant setup:
+   - To **view an Entity** on your Home Assistant setup:
  `entityId:<your_entity_id>`
  `entityId:sun.sun`
- - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
+   - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
  `intent://scan/#Intent;scheme=zxing;package=com.my.pkg;end`
- - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
+   - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
  `deep-link://<deep_link_here>`
  `deep-link://example://link/to/content`
- - To **see notification history**:
+   - To **see notification history**:
  `settings://notification_history`
  </details><br />
  <details>
  <summary> Show iOS Specific Examples</summary>
- - Use **application-launching URLs** on your device
+   - Use **application-launching URLs** on your device
  `tel:123456789`
  `mailto:my@email.com`
  </details><br />
@@ -524,7 +522,7 @@ blueprint:
  type: url
  option_three_icon:
  name: "3⃣ Option 3 - Icon"
- description: "Custom icon to show on this option. \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values). \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)! \n\n` iOS Only`, `Optional`"
+ description: "Custom icon to show on this option. \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values). \nThere are many reference pages out there, feel free to use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)! \n\n` iOS Only`, `Optional`"
  default: ""
  selector:
  text:
@@ -619,7 +617,7 @@ blueprint:
  name: " Attachment: Camera Entity"
  description: >-
  Camera Entity to display snapshots of on the notification.<br>
- Please note, iOS and Android have differing vehaviours, as specified in the documentation.
+ Please note, iOS and Android have differing behaviours, as specified in the documentation.
  See the links below for more information.
  <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots"> Automatic Snapshots</a></td></tr></table><br>
   Only used with `Attachment Type: Camera`
@@ -630,13 +628,13 @@ blueprint:
  - domain: "camera"
  image_url:
  name: " Image URL"
- description: "Direct URL to an image file to attach to the notification. Supports both external URLs and local files.<br><br>**Examples:**<br> - `https://weather.example.com/radar.jpg` (external)<br> - `/local/images/fire_alert.png` (local file)<br> - `https://api.weather.gov/radar/latest.jpg`<br><br> [Notification Attachments](https://companion.home-assistant.io/docs/notifications/notification-attachments)<br><br>`Optional`"
+ description: "Direct URL to an image file to attach to the notification. Supports both external URLs and local files.<br><br>**Examples:**<br>  - `https://weather.example.com/radar.jpg` (external)<br> - `/local/images/fire_alert.png` (local file)<br> - `https://api.weather.gov/radar/latest.jpg`<br><br> [Notification Attachments](https://companion.home-assistant.io/docs/notifications/notification-attachments)<br><br>`Optional`"
  default: ""
  selector:
  text:
  video_url:
  name: " Video URL"
- description: "Direct URL to a video file to attach to the notification. Platform support varies - test on your devices.<br><br>**Examples:**<br> - `/local/videos/doorbell_clip.mp4` (local file)<br> - `https://clips.example.com/motion_event.mp4` (external)<br><br> [Video Attachments](https://companion.home-assistant.io/docs/notifications/notification-attachments#video)<br><br> Platform support varies<br><br>`Optional`"
+ description: "Direct URL to a video file to attach to the notification. Platform support varies - test on your devices.<br><br>**Examples:**<br>  - `/local/videos/doorbell_clip.mp4` (local file)<br> - `https://clips.example.com/motion_event.mp4` (external)<br><br> [Video Attachments](https://companion.home-assistant.io/docs/notifications/notification-attachments#video)<br><br> Platform support varies<br><br>`Optional`"
  default: ""
  selector:
  text:
@@ -652,7 +650,7 @@ blueprint:
  input:
  notification_link:
  name: " Notification Link"
- description: "Link to navigate to upon clicking the notification. **Supports Jinja2 templates.**<br><br>**Examples:**<br> - Dashboard: `/lovelace/cameras` - View all cameras dashboard<br> - Dashboard: `/lovelace/security` - Security dashboard<br> - Entity view: `entityId:camera.front_door` - View front door camera<br> - Template: `/lovelace/{{ trigger.entity_id.split('.')[1] }}`<br> - Home Assistant views: `/config/updates` or `/lovelace/home`<br> - Apps: `app://<package name>`<br> - Deep links: `deep-link://<deep_link>`<br><br>See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information and options.<br><br>`Optional`"
+ description: "Link to navigate to upon clicking the notification. **Supports Jinja2 templates.**<br><br>**Examples:**<br>  - Dashboard: `/lovelace/cameras` - View all cameras dashboard<br> - Dashboard: `/lovelace/security` - Security dashboard<br> - Entity view: `entityId:camera.front_door` - View front door camera<br> - Template: `/lovelace/{{ trigger.entity_id.split('.')[1] }}`<br> - Home Assistant views: `/config/updates` or `/lovelace/home`<br> - Apps: `app://<package name>`<br> - Deep links: `deep-link://<deep_link>`<br><br>See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information and options.<br><br>`Optional`"
  default: ""
  selector:
  text:
@@ -667,7 +665,7 @@ blueprint:
  text:
  group:
  name: " Notification Group ID"
- description: "Used for grouping different notifications together visually. \n\n iOS critical notifications do no support grouping. \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information. \n\n`Optional`"
+ description: "Used for grouping different notifications together visually. \n\n iOS critical notifications do not support grouping. \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information. \n\n`Optional`"
  default: ""
  selector:
  text:
@@ -694,7 +692,7 @@ blueprint:
  value: critical
  badge:
  name: " Badge"
- description: "Number displayed on the Home Assistant app icon badge. Shows count of pending items or alerts.<br><br>**Examples:**<br> - `1` - One pending notification<br> - `3` - Three unread alerts<br> - `0` - Clear badge (remove number)<br><br>**Use case:** Increment badge for new alerts, set to 0 after user acknowledges.<br><br> [Badge Numbers](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge)<br><br>Range: 0-999<br><br>` iOS Only`, `Optional`"
+ description: "Number displayed on the Home Assistant app icon badge. Shows count of pending items or alerts.<br><br>**Examples:**<br>  - `1` - One pending notification<br> - `3` - Three unread alerts<br> - `0` - Clear badge (remove number)<br><br>**Use case:** Increment badge for new alerts, set to 0 after user acknowledges.<br><br> [Badge Numbers](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge)<br><br>Range: 0-999<br><br>` iOS Only`, `Optional`"
  default: ""
  selector:
  number:
@@ -703,7 +701,7 @@ blueprint:
  mode: box
  thread_id:
  name: " Thread ID"
- description: "Groups related notifications into conversation threads on iOS. Different from group ID - creates persistent threads in Notification Center.<br><br>**Examples:**<br> - \"front-door-events\" - All front door notifications<br> - \"garage-alerts\" - Garage-related alerts<br> - \"climate-bedroom\" - Bedroom temperature alerts<br><br>**Use case:** Keep all front door motion alerts in one thread for easy review.<br><br> [Thread ID](https://companion.home-assistant.io/docs/notifications/notifications-basic#thread-id-grouping-notifications)<br><br>` iOS Only`, `Optional`"
+ description: "Groups related notifications into conversation threads on iOS. Different from group ID - creates persistent threads in Notification Center.<br><br>**Examples:**<br>  - \"front-door-events\" - All front door notifications<br> - \"garage-alerts\" - Garage-related alerts<br> - \"climate-bedroom\" - Bedroom temperature alerts<br><br>**Use case:** Keep all front door motion alerts in one thread for easy review.<br><br> [Thread ID](https://companion.home-assistant.io/docs/notifications/notifications-basic#thread-id-grouping-notifications)<br><br>` iOS Only`, `Optional`"
  default: ""
  selector:
  text:
@@ -817,13 +815,13 @@ blueprint:
  boolean:
  vibration_pattern:
  name: " Vibration Pattern"
- description: "Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.<br><br>**Examples:**<br> - \"100,200,100,200\" - Quick double buzz for routine alerts<br> - \"0,500,200,500\" - Long-short-long for urgent alerts<br> - \"100,100,100,100,100,100\" - Rapid pulses for security<br><br>**Format:** wait,vibrate,wait,vibrate (in milliseconds)<br><br> [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern)<br><br>` Android Only`, `Optional`"
+ description: "Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.<br><br>**Examples:**<br>  - \"100,200,100,200\" - Quick double buzz for routine alerts<br> - \"0,500,200,500\" - Long-short-long for urgent alerts<br> - \"100,100,100,100,100,100\" - Rapid pulses for security<br><br>**Format:** wait,vibrate,wait,vibrate (in milliseconds)<br><br> [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern)<br><br>` Android Only`, `Optional`"
  default: ""
  selector:
  text:
  led_color:
  name: " LED Color"
- description: "Notification LED color for devices with LED indicators. Provides visual notification when screen is off.<br><br>**Examples:**<br> - \"red\" - Critical/security alerts<br> - \"blue\" - Information/status updates<br> - \"#00FF00\" - Success/all-clear (hex green)<br> - \"orange\" - Warnings<br><br>**Use case:** Red LED for alarm triggers, blue for routine door alerts.<br><br> [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color)<br><br> Only works on devices with notification LED<br><br>` Android Only`, `Optional`"
+ description: "Notification LED color for devices with LED indicators. Provides visual notification when screen is off.<br><br>**Examples:**<br>  - \"red\" - Critical/security alerts<br> - \"blue\" - Information/status updates<br> - \"#00FF00\" - Success/all-clear (hex green)<br> - \"orange\" - Warnings<br><br>**Use case:** Red LED for alarm triggers, blue for routine door alerts.<br><br> [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color)<br><br> Only works on devices with notification LED<br><br>` Android Only`, `Optional`"
  default: ""
  selector:
  text:
