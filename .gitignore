@@ -1,0 +1,12 @@
+# Backup files
+*.backup
+
+# Temporary files
+*.tmp
+reorganize_inputs.py
+notifications_new.yaml
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
