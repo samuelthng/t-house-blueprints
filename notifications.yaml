@@ -16,7 +16,7 @@ blueprint:
     ---
 
       <details>
-      <summary><h3>Features:</h3></summary>
+      <summary><h3 style="display: inline-block;">Features:</h3></summary>
 
       > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
       >
