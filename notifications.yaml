@@ -18,6 +18,7 @@ blueprint:
       ### Features:
       <details>
       <summary>Expand/collapse features</summary>
+
       > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
       >
       > 3️⃣ Up to 3 customisable, action buttons (Previously: ✅ Confirm and ❌ Dismiss Button)
@@ -35,6 +36,7 @@ blueprint:
       > 🍎 Supports iOS
       >
       > 🤖 Supports Android
+      
       </details>
 
       Examples can be found [here](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#example-usage-6)
