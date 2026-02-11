@@ -118,18 +118,18 @@
 2. **badge** (iOS) - App badge number
 3. **sticky** (Android) - Non-dismissible
 4. **thread_id** (iOS) - Conversation grouping  
-5. **image_url** - Direct image URL
-6. **video_url** - Video attachment
-7. **vibration_pattern** (Android) - Custom pattern
-8. **led_color** (Android) - LED color
-9. **alert_once** (Android) - Single alert
+5. **presentation_options** (iOS) - Array of foreground presentation options
+6. **image_url** - Direct image URL
+7. **video_url** - Video attachment
+8. **vibration_pattern** (Android) - Custom pattern
+9. **led_color** (Android) - LED color
+10. **alert_once** (Android) - Single alert
 
 ### Phase 2: Medium Priority (Requires Logic) 🔄
-1. **presentation_options** (iOS) - Array of options
-2. **critical_sound** (iOS) - Volume + critical flag
-3. **chronometer** (Android) - Timer display
-4. **when** (Android) - Timestamp override
-5. **ticker** (Android) - Status bar text
+1. **critical_sound** (iOS) - Volume + critical flag
+2. **chronometer** (Android) - Timer display
+3. **when** (Android) - Timestamp override
+4. **ticker** (Android) - Status bar text
 
 ### Phase 3: Advanced (Complex) ⏳
 1. **Reply actions** - Text input from notification
