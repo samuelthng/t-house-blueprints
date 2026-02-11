@@ -149,28 +149,6 @@ blueprint:
           description: "The message body to display on the notification.  \n\n`🤖 Android`: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
           selector:
             text:
-        icon:
-          name: "🙂 Icon"
-          description: "Custom icon for this notification.  \n\n`🤖 Android Only`, `Optional`"
-          default: ""
-          selector:
-            icon:
-        enable_icon_color:
-          name: "🎨 Use Icon Color"
-          description: "If disabled, uses default icon color.  \n\n`🤖 Android Only`, `Optional`"
-          default: false
-          selector:
-            boolean:
-        icon_color:
-          name: "🎨 Icon Color"
-          description: "Custom icon color for this notification.  \n\n`🤖 Android Only`, `Optional`"
-          default: [102, 186, 240]
-          selector:
-            color_rgb:
-        ##############################
-        # Input: Response Options
-        ##############################
-        ## Option 1
 
     action_buttons:
       name: "Action Buttons"
@@ -510,6 +488,7 @@ blueprint:
         # Input: Timeout Options
         ##############################
 
+
     timeout_settings:
       name: "Timeout Settings"
       icon: mdi:timer-outline
@@ -556,6 +535,7 @@ blueprint:
           selector:
             boolean:
 
+
     attachments:
       name: "Attachments"
       icon: mdi:camera
@@ -591,6 +571,7 @@ blueprint:
         # Input: Misc Inputs
         ##############################
 
+
     links_and_behavior:
       name: "Links & Behavior"
       icon: mdi:link-variant
@@ -617,27 +598,56 @@ blueprint:
           default: ""
           selector:
             text:
-        persist:
-          name: "🚩 Persistent Notification"
-          description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n`🤖 Android Only`"
-          default: false
-          selector:
-            boolean:
-        ##############################
-        # Input: Notification Link
-        ##############################
-        car_ui:
-          name: "🚘 Show on Android Auto"
-          description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
-          default: false
-          selector:
-            boolean:
 
-    priority_settings:
-      name: "Priority & Importance"
-      icon: mdi:bell-ring
+    ios_settings:
+      name: "iOS Specific Settings"
+      icon: mdi:apple
       collapsed: true
       input:
+        interruption_level:
+          name: "❕ Interruption Level"
+          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
+          default: active
+          selector:
+            select:
+              options:
+                - label: "Silent (Makes no sound, does not wake screen)"
+                  value: passive
+                - label: "Default"
+                  value: active
+                - label: "Important (Overrides Focus)"
+                  value: time-sensitive
+                - label: "Critical (Overrides Focus and Mute, restricted features)"
+                  value: critical
+
+    android_settings:
+      name: "Android Specific Settings"
+      icon: mdi:android
+      collapsed: true
+      input:
+        icon:
+          name: "🙂 Icon"
+          description: "Custom icon for this notification.  \n\n`🤖 Android Only`, `Optional`"
+          default: ""
+          selector:
+            icon:
+        enable_icon_color:
+          name: "🎨 Use Icon Color"
+          description: "If disabled, uses default icon color.  \n\n`🤖 Android Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+        icon_color:
+          name: "🎨 Icon Color"
+          description: "Custom icon color for this notification.  \n\n`🤖 Android Only`, `Optional`"
+          default: [102, 186, 240]
+          selector:
+            color_rgb:
+        ##############################
+        # Input: Response Options
+        ##############################
+        ## Option 1
+
         channel:
           name: "📣 Notification Channel"
           description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`🤖 Android Only`, `Optional`"
@@ -665,21 +675,6 @@ blueprint:
           default: true
           selector:
             boolean:
-        interruption_level:
-          name: "❕ Interruption Level"
-          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
-          default: active
-          selector:
-            select:
-              options:
-                - label: "Silent (Makes no sound, does not wake screen)"
-                  value: passive
-                - label: "Default"
-                  value: active
-                - label: "Important (Overrides Focus)"
-                  value: time-sensitive
-                - label: "Critical (Overrides Focus and Mute, restricted features)"
-                  value: critical
         visibility:
           name: "🔏 Notification Lockscreen Visibility"
           description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`"
@@ -693,6 +688,24 @@ blueprint:
                   value: private
                 - label: "Secret: Always hide content on the lockscreen."
                   value: secret
+
+
+        persist:
+          name: "🚩 Persistent Notification"
+          description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n`🤖 Android Only`"
+          default: false
+          selector:
+            boolean:
+        ##############################
+        # Input: Notification Link
+        ##############################
+        car_ui:
+          name: "🚘 Show on Android Auto"
+          description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
+          default: false
+          selector:
+            boolean:
+
 
 
 fields:
