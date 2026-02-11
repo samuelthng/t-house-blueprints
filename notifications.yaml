@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>Notifications</h2>
-      <b>Version 2.1.0 - Platform Organized</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.1.1 - Platform Separated</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -19,7 +19,7 @@ blueprint:
 
       > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
 
-      > 3️⃣ Up to 3 customisable, action buttons (Previously: ✅ Confirm and ❌ Dismiss Button)
+      > 3️⃣ Up to 3 customisable, action buttons (Previously: Confirm and Dismiss Button)
 
       > ⌛️ Timeout actions with custom duration, fired if no option response received
 
@@ -42,6 +42,12 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
+      ### Version 2.1.1 - *11 Feb 2026*
+      - **UI**: Separated iOS and Android specific settings into dedicated sections
+      - **UI**: Removed emojis from section names for cleaner editing
+      - **Enhancement**: Applied iOS tag length fix (64-byte truncation)
+      - **Enhancement**: Reorganized platform-specific features based on official HA documentation
+      
       ### Version 2.1.0 - *11 Feb 2026*
       - **UI**: Reorganized inputs into collapsed sections with icons for better navigation
       - **UI**: Improved field organization and discoverability
@@ -122,7 +128,7 @@ blueprint:
     # Section 1: Device & Notification Content
     ##############################
     notification_content:
-      name: "📲 Device & Notification Content"
+      name: "Device & Notification Content"
       collapse: true
       input:
         notify_device:
@@ -152,24 +158,24 @@ blueprint:
             text:
         message:
           name: "💬 Message"
-          description: "The message body to display on the notification.  \n\n`🤖 Android`: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
+          description: "The message body to display on the notification.  \n\nAndroid:: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
           selector:
             text:
         icon:
           name: "🙂 Icon"
-          description: "Custom icon for this notification.  \n\n`🤖 Android Only`, `Optional`"
+          description: "Custom icon for this notification.  \n\n(Android Only), `Optional`"
           default: ""
           selector:
             icon:
         enable_icon_color:
           name: "🎨 Use Icon Color"
-          description: "If disabled, uses default icon color.  \n\n`🤖 Android Only`, `Optional`"
+          description: "If disabled, uses default icon color.  \n\n(Android Only), `Optional`"
           default: false
           selector:
             boolean:
         icon_color:
           name: "🎨 Icon Color"
-          description: "Custom icon color for this notification.  \n\n`🤖 Android Only`, `Optional`"
+          description: "Custom icon color for this notification.  \n\n(Android Only), `Optional`"
           default: [102, 186, 240]
           selector:
             color_rgb:
@@ -180,7 +186,7 @@ blueprint:
     # Section 2: Action Buttons
     ##############################
     action_buttons:
-      name: "🔘 Action Buttons"
+      name: "Action Buttons"
       collapse: true
       input:
         confirm_enabled:
@@ -204,7 +210,7 @@ blueprint:
             If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
 
             <details>
-                <summary>❔ What is this?</summary>
+                <summary>What is this?</summary>
 
               This option is only applicable to Android due to technical limitations. 
                     
@@ -230,7 +236,7 @@ blueprint:
                   value: ""
                 - label: Action(s)
                   value: action
-                - label: "Link (🤖 Android Only)"
+                - label: "Link (Android Only)"
                   value: uri
 
         confirm_action:
@@ -346,7 +352,7 @@ blueprint:
             If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
 
             <details>
-                <summary>❔ What is this?</summary>
+                <summary>What is this?</summary>
 
               This option is only applicable to Android due to technical limitations. 
                     
@@ -372,7 +378,7 @@ blueprint:
                   value: ""
                 - label: Action(s)
                   value: action
-                - label: "Link (🤖 Android Only)"
+                - label: "Link (Android Only)"
                   value: uri
 
         dismiss_action:
@@ -488,7 +494,7 @@ blueprint:
             If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
 
             <details>
-                <summary>❔ What is this?</summary>
+                <summary>What is this?</summary>
 
               This option is only applicable to Android due to technical limitations. 
                     
@@ -514,7 +520,7 @@ blueprint:
                   value: ""
                 - label: Action(s)
                   value: action
-                - label: "Link (🤖 Android Only)"
+                - label: "Link (Android Only)"
                   value: uri
 
         option_three_action:
@@ -611,7 +617,7 @@ blueprint:
     # Section 3: Timeout Settings
     ##############################
     timeout_settings:
-      name: "⏱️ Timeout Settings"
+      name: "Timeout Settings"
       collapse: true
       input:
         enable_timeout:
@@ -638,13 +644,13 @@ blueprint:
             boolean:
         timeout_action:
           name: "⌛️ Timeout Action(s)"
-          description: "Action to run when notification response is timed out.  \n\n❔ Leave empty if no actions should be run  \n\n⚠️ Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\n❔ Android Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
+          description: "Action to run when notification response is timed out.  \n\nLeave empty if no actions should be run  \n\nWarning: Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\nAndroid Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
           default: []
           selector:
             action:
         swipe_away_as_timeout:
           name: "⌛️ Run timeout action(s) when notification cleared"
-          description: "If enabled, swiping the notification away will immediately trigger timeout actions.  \n\n`🤖 Android Only`"
+          description: "If enabled, swiping the notification away will immediately trigger timeout actions.  \n\n(Android Only)"
           default: false
           selector:
             boolean:
@@ -659,7 +665,7 @@ blueprint:
     # Section 4: Attachments
     ##############################
     attachments:
-      name: "📸 Attachments"
+      name: "Attachments"
       collapse: true
       input:
         attachment_type:
@@ -698,7 +704,7 @@ blueprint:
     # Section 5: Links & Behavior
     ##############################
     links_and_behavior:
-      name: "🔗 Links & Behavior"
+      name: "Links & Behavior"
       collapse: true
       input:
         notification_link:
@@ -723,7 +729,7 @@ blueprint:
             text:
         persist:
           name: "🚩 Persistent Notification"
-          description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n`🤖 Android Only`"
+          description: "Prevents notifications from being swiped away by accident.  \n\nThis option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n(Android Only)"
           default: false
           selector:
             boolean:
@@ -731,7 +737,7 @@ blueprint:
         ##############################
         car_ui:
           name: "🚘 Show on Android Auto"
-          description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
+          description: "Display notification on Android Auto interface.  \n\n(Android Only)"
           default: false
           selector:
             boolean:
@@ -740,18 +746,18 @@ blueprint:
     # Section 6: Priority & Importance
     ##############################
     priority_settings:
-      name: "🔔 Priority & Importance"
+      name: "Priority & Importance"
       collapse: true
       input:
         channel:
           name: "📣 Notification Channel"
-          description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`🤖 Android Only`, `Optional`"
+          description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n(Android Only), `Optional`"
           default: "General"
           selector:
             text:
         importance:
           name: "❕ Notification Channel Importance"
-          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) for more information.  \n\n`🤖 Android Only`"
+          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) for more information.  \n\n(Android Only)"
           default: default
           selector:
             select:
@@ -766,7 +772,7 @@ blueprint:
                   value: min
         android_high_priority:
           name: "❕ High Priority Mode"
-          description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.  \n\n`🤖 Android Only`"
+          description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.  \n\n(Android Only)"
           default: true
           selector:
             boolean:
@@ -787,7 +793,7 @@ blueprint:
                   value: critical
         visibility:
           name: "🔏 Notification Lockscreen Visibility"
-          description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`"
+          description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n(Android Only)"
           default: "private"
           selector:
             select:
@@ -971,7 +977,7 @@ sequence:
 
       # [Tag]
       custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
-      tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
+      tag: "{{ iif(custom_tag|length, custom_tag, (this.entity_id ~ '-' ~ context.id)) | truncate(64, killwords=True, end='') }}"
 
       # [Grouping]
       group: !input group
