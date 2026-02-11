@@ -161,25 +161,59 @@ blueprint:
           selector:
             text:
 
-    action_buttons:
-      name: "Action Buttons"
+    action_buttons_config:
+      name: "Action Buttons Configuration"
       icon: mdi:gesture-tap-button
       collapsed: true
       input:
         confirm_enabled:
-          name: "1️⃣ Option 1"
-          description: "Enable or disable the first action button on the notification.<br><br>**Use case:** Show \"Unlock Door\" button for front door alerts.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)"
-          default: True
+          name: "Enable Option 1"
+          description: >-
+            Enable or disable the first action button on the notification.
+            
+            **What are Action Buttons?**
+            
+            Action buttons appear on your notification and allow users to take immediate action without opening Home Assistant. You can configure up to 3 customizable buttons.
+            
+            **How to use:**
+            1. Enable the options you want (Option 1, 2, and/or 3)
+            2. Configure each enabled option in its respective section below
+            3. Set button titles, actions, and platform-specific settings
+            
+            **Common examples:**
+            - Security: "Unlock Door", "View Camera", "Dismiss"
+            - Climate: "Turn On AC", "Set to 72°F", "Dismiss"
+            - Lights: "Turn On", "Turn Off", "Dim to 50%"
+            
+            📖 [Actionable Notifications Guide](https://companion.home-assistant.io/docs/notifications/actionable-notifications)
+          default: true
           selector:
             boolean:
+        dismiss_enabled:
+          name: "Enable Option 2"
+          description: "Enable or disable the second action button on the notification."
+          default: true
+          selector:
+            boolean:
+        option_three_enabled:
+          name: "Enable Option 3"
+          description: "Enable or disable the third action button on the notification."
+          default: false
+          selector:
+            boolean:
+    action_button_option1:
+      name: "Action Button - Option 1"
+      icon: mdi:numeric-1-box
+      collapsed: true
+      input:
         confirm_text:
-          name: "1️⃣ Option 1 - Title"
+          name: "1️⃣ Option 1 - Title"
           description: "Title to show on the first option."
           default: "Confirm"
           selector:
             text:
         confirm_option_mode:
-          name: "1️⃣ Option 1 - Mode"
+          name: "1️⃣ Option 1 - Mode"
           description: >-
             Action mode for this option.<br /><br />
             If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
@@ -193,8 +227,8 @@ blueprint:
               - The lack of events being sent when URI options are fired.
               - The requirement to set the `action` parameter to `"URI"`.
               </details>
-             iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
-            `🤖 Android Only`, `Optional`
+             iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
+            `🤖 Android Only`, `Optional`
           default: ""
           selector:
             select:
@@ -207,13 +241,13 @@ blueprint:
                 - label: "Link (🤖 Android Only)"
                   value: uri
         confirm_action:
-          name: "1️⃣ Option 1 - Action(s)"
-          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          name: "1️⃣ Option 1 - Action(s)"
+          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
           default: []
           selector:
             action:
         confirm_uri:
-          name: "1️⃣ Option 1 - Link"
+          name: "1️⃣ Option 1 - Link"
           description: >-
             Navigate to a link or app when this option is selected.<br />
             <details>
@@ -243,53 +277,51 @@ blueprint:
               `settings://notification_history`
               </details><br />
             <details>
-              <summary> Show iOS Specific Examples</summary>
+              <summary> Show iOS Specific Examples</summary>
             - Use **application-launching URLs** on your device
               `tel:123456789`
               `mailto:my@email.com`
               </details><br />
-            ❔ Android: Used with `Mode: Link` options<br />
-            ❔ iOS: Leave empty to disable<br />
-            ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
+            ❔ Android: Used with `Mode: Link` options<br />
+            ❔ iOS: Leave empty to disable<br />
+            ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
             `Optional`
           default: ""
           selector:
             text:
               type: url
         confirm_icon:
-          name: "1️⃣ Option 1 - Icon"
-          description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
+          name: "1️⃣ Option 1 - Icon"
+          description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         confirm_is_destructive:
-          name: "1️⃣ Option 1 - Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
+          name: "1️⃣ Option 1 - Destructive"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
           default: false
           selector:
             boolean:
         confirm_authentication_required:
-          name: "1️⃣ Option 1 - Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
+          name: "1️⃣ Option 1 - Authentication Required"
+          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
           default: false
           selector:
             boolean:
-        ## Option 2
-        dismiss_enabled:
-          name: "2️⃣ Option 2"
-          description: "Enable or disable the second action button on the notification.<br><br>**Use case:** Show \"View Camera\" button alongside \"Unlock Door\" for security alerts.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)"
-          default: True
-          selector:
-            boolean:
+    action_button_option2:
+      name: "Action Button - Option 2"
+      icon: mdi:numeric-2-box
+      collapsed: true
+      input:
         dismiss_text:
-          name: "2️⃣ Option 2 - Title"
+          name: "2️⃣ Option 2 - Title"
           description: "Title to show on the first option."
           default: "Dismiss"
           selector:
             text:
         dismiss_option_mode:
-          name: "2️⃣ Option 2 - Mode"
+          name: "2️⃣ Option 2 - Mode"
           description: >-
             Action mode for this option.<br /><br />
             If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
@@ -303,8 +335,8 @@ blueprint:
               - The lack of events being sent when URI options are fired.
               - The requirement to set the `action` parameter to `"URI"`.
               </details>
-             iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
-            `🤖 Android Only`, `Optional`
+             iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
+            `🤖 Android Only`, `Optional`
           default: ""
           selector:
             select:
@@ -317,13 +349,13 @@ blueprint:
                 - label: "Link (🤖 Android Only)"
                   value: uri
         dismiss_action:
-          name: "2️⃣ Option 2 - Action(s)"
-          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          name: "2️⃣ Option 2 - Action(s)"
+          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
           default: []
           selector:
             action:
         dismiss_uri:
-          name: "2️⃣ Option 2 - Link"
+          name: "2️⃣ Option 2 - Link"
           description: >-
             Navigate to a link or app when this option is selected.<br />
             <details>
@@ -353,53 +385,51 @@ blueprint:
               `settings://notification_history`
               </details><br />
             <details>
-              <summary> Show iOS Specific Examples</summary>
+              <summary> Show iOS Specific Examples</summary>
             - Use **application-launching URLs** on your device
               `tel:123456789`
               `mailto:my@email.com`
               </details><br />
-            ❔ Android: Used with `Mode: Link` options<br />
-            ❔ iOS: Leave empty to disable<br />
-            ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
+            ❔ Android: Used with `Mode: Link` options<br />
+            ❔ iOS: Leave empty to disable<br />
+            ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
             `Optional`
           default: ""
           selector:
             text:
               type: url
         dismiss_icon:
-          name: "2️⃣ Option 2 - Icon"
-          description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
+          name: "2️⃣ Option 2 - Icon"
+          description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         dismiss_is_destructive:
-          name: "2️⃣ Option 2 - Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
+          name: "2️⃣ Option 2 - Destructive"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
           default: false
           selector:
             boolean:
         dismiss_authentication_required:
-          name: "2️⃣ Option 2 - Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
+          name: "2️⃣ Option 2 - Authentication Required"
+          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
           default: false
           selector:
             boolean:
-        ## Option 3
-        option_three_enabled:
-          name: "3️⃣ Option 3"
-          description: "Enable or disable the third action button on the notification.<br><br>**Use case:** Add \"Call Owner\" option for critical security alerts alongside \"Unlock\" and \"View Camera\".<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)"
-          default: false
-          selector:
-            boolean:
+    action_button_option3:
+      name: "Action Button - Option 3"
+      icon: mdi:numeric-3-box
+      collapsed: true
+      input:
         option_three_text:
-          name: "3️⃣ Option 3 - Title"
+          name: "3️⃣ Option 3 - Title"
           description: "Title to show on the first option."
           default: "Option 3"
           selector:
             text:
         option_three_option_mode:
-          name: "3️⃣ Option 3 - Mode"
+          name: "3️⃣ Option 3 - Mode"
           description: >-
             Action mode for this option.<br /><br />
             If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
@@ -413,8 +443,8 @@ blueprint:
               - The lack of events being sent when URI options are fired.
               - The requirement to set the `action` parameter to `"URI"`.
               </details>
-             iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
-            `🤖 Android Only`, `Optional`
+             iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
+            `🤖 Android Only`, `Optional`
           default: ""
           selector:
             select:
@@ -427,13 +457,13 @@ blueprint:
                 - label: "Link (🤖 Android Only)"
                   value: uri
         option_three_action:
-          name: "3️⃣ Option 3 - Action(s)"
-          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          name: "3️⃣ Option 3 - Action(s)"
+          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
           default: []
           selector:
             action:
         option_three_uri:
-          name: "3️⃣ Option 3 - Link"
+          name: "3️⃣ Option 3 - Link"
           description: >-
             Navigate to a link or app when this option is selected.<br />
             <details>
@@ -463,41 +493,41 @@ blueprint:
               `settings://notification_history`
               </details><br />
             <details>
-              <summary> Show iOS Specific Examples</summary>
+              <summary> Show iOS Specific Examples</summary>
             - Use **application-launching URLs** on your device
               `tel:123456789`
               `mailto:my@email.com`
               </details><br />
-            ❔ Android: Used with `Mode: Link` options<br />
-            ❔ iOS: Leave empty to disable<br />
-            ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
+            ❔ Android: Used with `Mode: Link` options<br />
+            ❔ iOS: Leave empty to disable<br />
+            ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
             `Optional`
           default: ""
           selector:
             text:
               type: url
         option_three_icon:
-          name: "3️⃣ Option 3 - Icon"
-          description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
+          name: "3️⃣ Option 3 - Icon"
+          description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         option_three_is_destructive:
-          name: "3️⃣ Option 3 - Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
+          name: "3️⃣ Option 3 - Destructive"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
           default: false
           selector:
             boolean:
         option_three_authentication_required:
-          name: "3️⃣ Option 3 - Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
+          name: "3️⃣ Option 3 - Authentication Required"
+          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
           default: false
           selector:
             boolean:
-        ##############################
-        # Input: Timeout Options
-        ##############################
+    ##############################
+    # Input: Timeout Options
+    ##############################
 
 
     timeout_settings:
