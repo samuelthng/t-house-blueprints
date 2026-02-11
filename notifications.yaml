@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 2026.2.0)
+  name: 🔔 Notifications (Version 2.3.0 - Multi-Device)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2024.6.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2026.2.0</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.3.0 - Multi-Device Support</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -20,6 +20,13 @@ blueprint:
       <summary>Expand/collapse features</summary>
 
       > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
+      >
+      > 🔢 Multi-device support - Send to multiple devices simultaneously (NEW in v2.3.0)
+      >
+      > 🎯 Configurable response modes - First-response-wins or all-respond (NEW in v2.3.0)
+      >
+      > 🧹 Auto-clear other devices when first responds (NEW in v2.3.0)
+      >
       >
       > 3️⃣ Up to 3 customisable, action buttons (Previously: ✅ Confirm and ❌ Dismiss Button)
       >
@@ -47,6 +54,21 @@ blueprint:
 
       <details>
       <summary>Expand/collapse changelog</summary>
+
+      ### Version 2.3.0 - Multi-Device Support - *11 Feb 2026*
+      - **MAJOR**: Added multi-device support - send to multiple devices simultaneously
+      - **MAJOR**: Added response handling configuration section
+      - Added: Single response mode (first device wins, others auto-cleared)
+      - Added: Multi response mode (all devices can respond independently)
+      - Added: Auto-clear other devices when first responds
+      - Added: Notify other devices with customizable template message
+      - Added: Run actions for non-responding devices
+      - Changed: Device and message inputs moved to top-level (required fields)
+      - Changed: Platform-specific payloads built per device (iOS/Android)
+      - Enhanced: Response tracking includes responding device name
+      - Enhanced: Template variables available in other-device notifications
+      - Fixed: iOS tag truncation to 64 bytes (Issue #47)
+      - Note: Breaking change - users must re-select devices on update
 
       ### Version 2026.2.0 - *11 Feb 2026*
       - Changed: Mobile-optimized descriptions for better readability on small screens
@@ -111,10 +133,11 @@ blueprint:
       <details>
       <summary>Expand/collapse FAQ</summary>
 
-      - **_Will you add sending notifications to multiple devices?_**
-        Sadly, no. It is possible to send notifications to multiple devices, however, it will not work as well with the timeout feature and notifications clearing at this time.
+      - **_Can I send notifications to multiple devices?_**
+        Yes! Version 2.3.0 adds full multi-device support. Select multiple devices and configure response handling (first-response-wins or all-respond modes). Each device gets platform-optimized payloads (iOS/Android).
 
-        I might revisit it in future, but not at this time.
+      - **_Will you add sending notifications to multiple devices?_**
+        ✅ DONE! Version 2.3.0 implements multi-device support with advanced features like auto-clear, notify other devices, and configurable response modes.
 
       - **_Why can't I see my devices or notify service?_**
         You might want to check if troubleshooting steps provided by the [Home Assistant Companion app documentation](https://companion.home-assistant.io/docs/troubleshooting/faqs) may be able to help.
