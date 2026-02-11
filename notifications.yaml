@@ -149,6 +149,12 @@ blueprint:
           description: "The message body to display on the notification.  \n\n`🤖 Android`: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
           selector:
             text:
+        sound:
+          name: "🔊 Sound"
+          description: "Custom notification sound.  \n\nExamples:  \n- 🍎 iOS: `US-EN-Morgan-Freeman.wav` or default system sounds  \n- 🤖 Android: `notification.mp3` (from /local/ folder)  \n\nSee [documentation](https://companion.home-assistant.io/docs/notifications/notification-sounds) for more information.  \n\n`Optional`"
+          default: ""
+          selector:
+            text:
 
     action_buttons:
       name: "Action Buttons"
@@ -567,6 +573,18 @@ blueprint:
             entity:
               filter:
                 - domain: "camera"
+        image_url:
+          name: "🖼️ Image URL"
+          description: "Direct image URL to display as attachment.  \n\nExamples:  \n- `https://example.com/image.jpg`  \n- `/local/images/alert.png`  \n- `https://via.placeholder.com/600x400`  \n\n`Optional`"
+          default: ""
+          selector:
+            text:
+        video_url:
+          name: "🎥 Video URL"
+          description: "Video URL to display as attachment.  \n\nExamples:  \n- `https://example.com/video.mp4`  \n- `/local/videos/alert.mp4`  \n\nNote: Video support varies by platform.  \n\n`Optional`"
+          default: ""
+          selector:
+            text:
         ##############################
         # Input: Misc Inputs
         ##############################
@@ -619,6 +637,37 @@ blueprint:
                   value: time-sensitive
                 - label: "Critical (Overrides Focus and Mute, restricted features)"
                   value: critical
+        badge:
+          name: "🔢 Badge"
+          description: "App badge number to display on the Home Assistant app icon.  \n\nExamples:  \n- `5` - Shows badge with number 5  \n- `0` - Removes badge  \n\nRange: 0-999  \n\n`🍎 iOS Only`, `Optional`"
+          default: ""
+          selector:
+            number:
+              min: 0
+              max: 999
+              mode: box
+        thread_id:
+          name: "🧵 Thread ID"
+          description: "Thread/conversation identifier for grouping related notifications.  \n\nExamples:  \n- `doorbell-alerts`  \n- `security-events`  \n- `room-climate`  \n\nNotifications with the same thread ID are grouped together.  \n\n`🍎 iOS Only`, `Optional`"
+          default: ""
+          selector:
+            text:
+        presentation_options:
+          name: "🎨 Presentation Options"
+          description: "Controls how notification is presented when app is in foreground.  \n\nOptions:  \n- `banner` - Show banner  \n- `sound` - Play sound  \n- `badge` - Update badge  \n- `list` - Add to notification list  \n\n`🍎 iOS Only`, `Optional`"
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: "Banner"
+                  value: "banner"
+                - label: "Sound"
+                  value: "sound"
+                - label: "Badge"
+                  value: "badge"
+                - label: "List"
+                  value: "list"
 
     android_settings:
       name: "Android Specific Settings"
@@ -705,6 +754,30 @@ blueprint:
           default: false
           selector:
             boolean:
+        sticky:
+          name: "📌 Sticky"
+          description: "Makes notification non-dismissible (cannot be swiped away).  \n\nUseful for critical alerts that require action.  \n\n`🤖 Android Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+        vibration_pattern:
+          name: "📳 Vibration Pattern"
+          description: "Custom vibration pattern in milliseconds.  \n\nExamples:  \n- `100, 200, 100, 200` - Short vibrations  \n- `0, 500, 1000, 500` - Long pattern with delay  \n\nFormat: comma-separated values (wait, vibrate, wait, vibrate, ...)  \n\n`🤖 Android Only`, `Optional`"
+          default: ""
+          selector:
+            text:
+        led_color:
+          name: "💡 LED Color"
+          description: "LED notification light color (for devices with notification LED).  \n\nExamples:  \n- `red`  \n- `blue`  \n- `#00FF00` (green in hex)  \n\n`🤖 Android Only`, `Optional`"
+          default: ""
+          selector:
+            text:
+        alert_once:
+          name: "🔕 Alert Once"
+          description: "Alert (sound/vibrate) only on first notification show, not on updates.  \n\nUseful for notifications that update frequently.  \n\n`🤖 Android Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
 
 
 
@@ -738,8 +811,15 @@ fields:
     default: !input subtitle
     selector:
       text:
+  field_sound:
+    name: "🔊 Sound"
+    description: "Override custom notification sound."
+    example: !input sound
+    default: !input sound
+    selector:
+      text:
   field_attachment_type:
-    name: "📸 Attachment Type"
+    name: "📸 Attachment Type"
     description: "Override the Attachment Type of the notification."
     example: !input attachment_type
     default: !input attachment_type
@@ -760,8 +840,22 @@ fields:
         filter:
           - domain: "camera"
 
+  field_image_url:
+    name: "🖼️ Image URL"
+    description: "Override direct image URL."
+    example: !input image_url
+    default: !input image_url
+    selector:
+      text:
+  field_video_url:
+    name: "🎥 Video URL"
+    description: "Override video URL."
+    example: !input video_url
+    default: !input video_url
+    selector:
+      text:
   field_option_one_enabled:
-    name: "1️⃣ Option 1"
+    name: "1️⃣ Option 1"
     description: "Override showing or hiding this option."
     example: !input confirm_enabled
     selector:
@@ -850,6 +944,70 @@ fields:
   #     action:
 
 sequence:
+  field_badge:
+    name: "🔢 Badge"
+    description: "Override app badge number. 🍎 iOS Only"
+    example: !input badge
+    default: !input badge
+    selector:
+      number:
+        min: 0
+        max: 999
+        mode: box
+  field_thread_id:
+    name: "🧵 Thread ID"
+    description: "Override thread/conversation ID. 🍎 iOS Only"
+    example: !input thread_id
+    default: !input thread_id
+    selector:
+      text:
+  field_presentation_options:
+    name: "🎨 Presentation Options"
+    description: "Override presentation options. 🍎 iOS Only"
+    example: !input presentation_options
+    default: !input presentation_options
+    selector:
+      select:
+        multiple: true
+        options:
+          - label: "Banner"
+            value: "banner"
+          - label: "Sound"
+            value: "sound"
+          - label: "Badge"
+            value: "badge"
+          - label: "List"
+            value: "list"
+  field_sticky:
+    name: "📌 Sticky"
+    description: "Override sticky notification setting. 🤖 Android Only"
+    example: !input sticky
+    default: !input sticky
+    selector:
+      boolean:
+  field_vibration_pattern:
+    name: "📳 Vibration Pattern"
+    description: "Override vibration pattern. 🤖 Android Only"
+    example: !input vibration_pattern
+    default: !input vibration_pattern
+    selector:
+      text:
+  field_led_color:
+    name: "💡 LED Color"
+    description: "Override LED color. 🤖 Android Only"
+    example: !input led_color
+    default: !input led_color
+    selector:
+      text:
+  field_alert_once:
+    name: "🔕 Alert Once"
+    description: "Override alert once setting. 🤖 Android Only"
+    example: !input alert_once
+    default: !input alert_once
+    selector:
+      boolean:
+
+sequence:
   ##############################
   # Setup Variables
   ##############################
@@ -867,6 +1025,10 @@ sequence:
       script_message: !input message
       message: "{{ iif(field_message is defined and (field_message|length), field_message, script_message) }}"
 
+      # Sound
+      script_sound: !input sound
+      sound: "{{ iif(field_sound is defined, field_sound, script_sound) }}"
+
   - alias: Common Configuration Options
     variables:
       # [Opening a URL] - https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url
@@ -882,14 +1044,21 @@ sequence:
 
   - alias: Android Configuration Options
     variables:
-      # sticky: !input sticky # Unlikely to support due to potential for users thinking that notifications are stuck.
       channel: !input channel
       visibility: !input visibility
       importance: !input importance
       persist: !input persist
-      # chronometer: !input chronometer # Unlikely to support, depends on template flexibility
-      # alert_once: !input alert_once
       car_ui: !input car_ui
+      
+      # New Phase 1 features
+      script_sticky: !input sticky
+      sticky: "{{ iif(field_sticky is defined, field_sticky, script_sticky) }}"
+      script_vibration_pattern: !input vibration_pattern
+      vibration_pattern: "{{ iif(field_vibration_pattern is defined, field_vibration_pattern, script_vibration_pattern) }}"
+      script_led_color: !input led_color
+      led_color: "{{ iif(field_led_color is defined, field_led_color, script_led_color) }}"
+      script_alert_once: !input alert_once
+      alert_once: "{{ iif(field_alert_once is defined, field_alert_once, script_alert_once) }}"
 
       # [Notification Banner Icon]
       notification_icon: !input icon
@@ -901,7 +1070,14 @@ sequence:
   - alias: iOS Configuration Options
     variables:
       interruption_level: !input interruption_level
-      # presentation_options: !input presentation_options
+      
+      # New Phase 1 features
+      script_badge: !input badge
+      badge: "{{ iif(field_badge is defined, field_badge, script_badge) }}"
+      script_thread_id: !input thread_id
+      thread_id: "{{ iif(field_thread_id is defined, field_thread_id, script_thread_id) }}"
+      script_presentation_options: !input presentation_options
+      presentation_options: "{{ iif(field_presentation_options is defined, field_presentation_options, script_presentation_options) }}"
       # shortcut: !input shortcut # Unlikely to be supported due to complexity.
       # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
       # critical: !input critical
@@ -925,6 +1101,13 @@ sequence:
       attachment_type: "{{ iif(field_attachment_type is defined, field_attachment_type, script_attachment_type) }}"
       script_attachment_camera_entity: !input attachment_camera_entity
       attachment_camera_entity: "{{ iif(field_attachment_camera_entity is defined, field_attachment_camera_entity, script_attachment_camera_entity) }}"
+      
+      # New Phase 1 features
+      script_image_url: !input image_url
+      image_url: "{{ iif(field_image_url is defined, field_image_url, script_image_url) }}"
+      script_video_url: !input video_url
+      video_url: "{{ iif(field_video_url is defined, field_video_url, script_video_url) }}"
+      
       camera_image_url: >-
         {% if (attachment_camera_entity|length) %}
           {% if (state_attr(attachment_camera_entity,'entity_picture')|length) %}
@@ -1076,6 +1259,12 @@ sequence:
           {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
           {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'url': notification_link }) %}{% endif %}
           {% if attachment_type == 'camera_entity' %}{% set payload.data = dict(payload.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
+          {% if sound|length %}{% set push.d = dict(push.d, **{ 'sound': sound }) %}{% endif %}
+          {% if badge is not none and badge != '' %}{% set payload.data = dict(payload.data, **{ 'badge': badge }) %}{% endif %}
+          {% if thread_id|length %}{% set payload.data = dict(payload.data, **{ 'thread-id': thread_id }) %}{% endif %}
+          {% if presentation_options|length %}{% set push.d = dict(push.d, **{ 'presentation-options': presentation_options }) %}{% endif %}
+          {% if image_url|length %}{% set payload.data = dict(payload.data, **{ 'image': image_url }) %}{% endif %}
+          {% if video_url|length %}{% set payload.data = dict(payload.data, **{ 'video': video_url }) %}{% endif %}
           {% set payload.data = dict(payload.data, **{ 'push': push.d }) %}
         {% else %}
           {# Android #}
@@ -1091,6 +1280,13 @@ sequence:
           {% if channel|length %}{% set payload.data = dict(payload.data, **{ 'channel': channel }) %}{% endif %}
           {% if persist %}{% set payload.data = dict(payload.data, **{ 'persistent': persist }) %}{% endif %}
           {% if car_ui %}{% set payload.data = dict(payload.data, **{ 'car_ui': car_ui }) %}{% endif %}
+          {% if sound|length %}{% set payload.data = dict(payload.data, **{ 'sound': sound }) %}{% endif %}
+          {% if sticky %}{% set payload.data = dict(payload.data, **{ 'sticky': sticky }) %}{% endif %}
+          {% if vibration_pattern|length %}{% set payload.data = dict(payload.data, **{ 'vibrationPattern': vibration_pattern }) %}{% endif %}
+          {% if led_color|length %}{% set payload.data = dict(payload.data, **{ 'ledColor': led_color }) %}{% endif %}
+          {% if alert_once %}{% set payload.data = dict(payload.data, **{ 'alert_once': alert_once }) %}{% endif %}
+          {% if image_url|length %}{% set payload.data = dict(payload.data, **{ 'image': image_url }) %}{% endif %}
+          {% if video_url|length %}{% set payload.data = dict(payload.data, **{ 'video': video_url }) %}{% endif %}
         {% endif %}
         {# Common  #}
         {% set payload.data = dict(payload.data, **{ 'actions': options }) %}
