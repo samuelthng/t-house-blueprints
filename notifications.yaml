@@ -112,7 +112,7 @@ blueprint:
 
  input:
  device_selection:
- name: "Device Selection"
+ name: "📱 Device Selection"
  icon: mdi:cellphone
  collapsed: false
  input:
@@ -138,7 +138,7 @@ blueprint:
  - integration: mobile_app
 
  message_content:
- name: "Message Content"
+ name: "💬 Message Content"
  icon: mdi:message-text
  collapsed: true
  input:
@@ -168,7 +168,7 @@ blueprint:
  text:
 
  action_buttons_config:
- name: "Action Buttons Configuration"
+ name: "⚙️ Action Buttons Configuration"
  icon: mdi:gesture-tap-button
  collapsed: true
  description: >-
@@ -198,25 +198,25 @@ blueprint:
 
  input:
  confirm_enabled:
- name: "Enable Option 1"
+ name: "1️⃣ Enable Option 1"
  description: "Enable or disable the first action button on the notification."
  default: true
  selector:
  boolean:
  dismiss_enabled:
- name: "Enable Option 2"
+ name: "2️⃣ Enable Option 2"
  description: "Enable or disable the second action button on the notification."
  default: true
  selector:
  boolean:
  option_three_enabled:
- name: "Enable Option 3"
+ name: "3️⃣ Enable Option 3"
  description: "Enable or disable the third action button on the notification."
  default: false
  selector:
  boolean:
  action_button_option1:
- name: "Action Button - Option 1"
+ name: "1️⃣ Action Button - Option 1"
  icon: mdi:numeric-1-box
  collapsed: true
  input:
@@ -324,7 +324,7 @@ blueprint:
  selector:
  boolean:
  action_button_option2:
- name: "Action Button - Option 2"
+ name: "2️⃣ Action Button - Option 2"
  icon: mdi:numeric-2-box
  collapsed: true
  input:
@@ -432,7 +432,7 @@ blueprint:
  selector:
  boolean:
  action_button_option3:
- name: "Action Button - Option 3"
+ name: "3️⃣ Action Button - Option 3"
  icon: mdi:numeric-3-box
  collapsed: true
  input:
@@ -545,7 +545,7 @@ blueprint:
 
 
  timeout_settings:
- name: "Timeout Settings"
+ name: "⏱️ Timeout Settings"
  icon: mdi:timer-outline
  collapsed: true
  input:
@@ -592,7 +592,7 @@ blueprint:
 
 
  attachments:
- name: "Attachments"
+ name: "📸 Attachments"
  icon: mdi:camera
  collapsed: true
  input:
@@ -644,7 +644,7 @@ blueprint:
 
 
  links_and_behavior:
- name: "Links & Behavior"
+ name: "🔗 Links & Behavior"
  icon: mdi:link-variant
  collapsed: true
  input:
@@ -671,7 +671,7 @@ blueprint:
  text:
 
  ios_settings:
- name: "iOS Specific Settings"
+ name: "🍎 iOS Specific Settings"
  icon: mdi:apple
  collapsed: true
  input:
@@ -723,7 +723,7 @@ blueprint:
  value: "list"
 
  android_settings:
- name: "Android Specific Settings"
+ name: "🤖 Android Specific Settings"
  icon: mdi:android
  collapsed: true
  input:
