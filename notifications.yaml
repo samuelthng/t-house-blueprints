@@ -165,27 +165,33 @@ blueprint:
       name: "Action Buttons Configuration"
       icon: mdi:gesture-tap-button
       collapsed: true
+      description: >-
+        Configure which action buttons to display on the notification. Action buttons allow users to take immediate action without opening Home Assistant.
+        
+        
+        **How to use:**
+        
+        1. Enable the buttons you want below (up to 3 buttons)
+        
+        2. Configure each enabled button in its respective section
+        
+        3. Set button titles, actions, and platform-specific settings
+        
+        
+        **Common examples:**
+        
+        - Security: "Unlock Door" / "View Camera" / "Dismiss"
+        
+        - Climate: "Turn On AC" / "Set to 72°F" / "Dismiss"
+        
+        - Lights: "Turn On" / "Turn Off" / "Dim to 50%"
+        
+        
+        📖 [Actionable Notifications Guide](https://companion.home-assistant.io/docs/notifications/actionable-notifications)
       input:
         confirm_enabled:
           name: "Enable Option 1"
-          description: >-
-            Enable or disable the first action button on the notification.
-            
-            **What are Action Buttons?**
-            
-            Action buttons appear on your notification and allow users to take immediate action without opening Home Assistant. You can configure up to 3 customizable buttons.
-            
-            **How to use:**
-            1. Enable the options you want (Option 1, 2, and/or 3)
-            2. Configure each enabled option in its respective section below
-            3. Set button titles, actions, and platform-specific settings
-            
-            **Common examples:**
-            - Security: "Unlock Door", "View Camera", "Dismiss"
-            - Climate: "Turn On AC", "Set to 72°F", "Dismiss"
-            - Lights: "Turn On", "Turn Off", "Dim to 50%"
-            
-            📖 [Actionable Notifications Guide](https://companion.home-assistant.io/docs/notifications/actionable-notifications)
+          description: "Enable or disable the first action button on the notification."
           default: true
           selector:
             boolean:
