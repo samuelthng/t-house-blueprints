@@ -116,6 +116,7 @@ blueprint:
     device_selection:
       name: "Device Selection"
       icon: mdi:cellphone
+      collapsed: false
       input:
         notify_device:
           name: "📲 Device to notify"
@@ -158,6 +159,7 @@ blueprint:
         message:
           name: "💬 Message"
           description: "Main notification text body. Provides detailed information about the alert. **Supports Jinja2 templates.**<br><br>**Examples:**<br> - Static: `Motion detected by camera_front_door at 3:45 PM`<br> - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br> - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`<br><br>**Use case:** \"Motion detected by camera_front_door at 3:45 PM\"<br><br>📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | 🤖 [HTML Formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-message-html-formatting)<br><br>`Required`"
+          default: ""
           selector:
             text:
         sound:
