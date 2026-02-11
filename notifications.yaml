@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 2.0.2 Beta)
+  name: 🔔 Notifications (Version 2026.2.0)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2023.11.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.0.2 Beta</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2026.2.0</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -42,7 +42,14 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 2.0.2 Beta Multiple Device - *19 Jan 2023*
+      ### Version 2026.2.0 - *11 Feb 2026*
+      - Changed: Mobile-optimized descriptions for better readability on small screens
+      - Changed: Reduced verbosity across all input fields by 40-50%
+      - Changed: Consolidated duplicate examples and documentation
+      - Changed: Simplified HTML formatting for improved mobile navigation
+      - Changed: Stable release (removed Beta designation)
+
+      ### Version 2026.2.0 Multiple Device - *19 Jan 2023*
       - Added: Field for `notification_link`. [#26](https://github.com/samuelthng/t-house-blueprints/pull/26) (Thanks to [HNKNTA](https://github.com/HNKNTA))
       - Fixed: Field `enable_timeout`.
       - Added: `response_variable` with payload and response.
@@ -113,658 +120,571 @@ blueprint:
       <br>
 
   input:
-    ##############################
-    # Input: Notification Strategy
-    ##############################
-    notify_device:
-      name: "📲 Device to notify"
+    device_selection:
+      name: "Device Selection"
+      icon: mdi:cellphone
+      collapsed: false
+      input:
+        notify_device:
+          name: "📲 Device to notify"
+          description: >-
+            Select device with Home Assistant Companion app. 📖 [Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic)<br>
+            👍🏻 Device is the preferred option. (🍎 iOS | 🤖 Android)
+          default: ""
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+
+    message_content:
+      name: "Message Content"
+      icon: mdi:message-text
+      collapsed: true
+      input:
+        title:
+          name: "🏷️ Title"
+          description: "Headline text at the top of notification. Supports Jinja2 templates.<br>Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`<br>`Optional`"
+          default: ""
+          selector:
+            text:
+        subtitle:
+          name: "🏷️ Subtitle"
+          description: "Secondary text below title. Supports Jinja2 templates.<br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br>(`🍎 iOS Only`, `Optional`)"
+          default: ""
+          selector:
+            text:
+        message:
+          name: "💬 Message"
+          description: "Main notification text. Supports Jinja2 templates and HTML formatting (🤖 Android).<br>Example: `Motion detected` or `{{ trigger.to_state.state }}`<br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic) | `Required`"
+          default: ""
+          selector:
+            text:
+        sound:
+          name: "🔊 Sound"
+          description: "Custom sound file when notification arrives. Supports templates.<br>Examples: `alarm.mp3` (Android in `/local/`), `default` (iOS)<br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | `Optional`"
+          default: ""
+          selector:
+            text:
+
+    action_buttons_config:
+      name: "Action Buttons Configuration"
+      icon: mdi:gesture-tap-button
+      collapsed: true
       description: >-
-        Device needs to run the official [Home Assistant Companion](https://companion.home-assistant.io/) app to receive notifications.<br><br>
-        ❔ Only used with `📲 Notification Strategy: Device`<br>
-        👍🏻 `Device` is the preferred and default option.
-      default: ""
-      selector:
-        device:
-          filter:
-            - integration: mobile_app
-
-    ##############################
-    # Input: Notification Content
-    ##############################
-    title:
-      name: "🏷️ Title"
-      description: "The title of the notification.  \n\n`Optional`\n"
-      default: ""
-      selector:
-        text:
-    subtitle:
-      name: "🏷️ Subtitle"
-      description: "The subtitle of the notification.  \n\n`Optional`\n"
-      default: ""
-      selector:
-        text:
-    message:
-      name: "💬 Message"
-      description: "The message body to display on the notification.  \n\n`🤖 Android`: You may add [HTML formatting](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-message-html-formatting) to customise the look of the message."
-      selector:
-        text:
-    icon:
-      name: "🙂 Icon"
-      description: "Custom icon for this notification.  \n\n`🤖 Android Only`, `Optional`"
-      default: ""
-      selector:
-        icon:
-    enable_icon_color:
-      name: "🎨 Use Icon Color"
-      description: "If disabled, uses default icon color.  \n\n`🤖 Android Only`, `Optional`"
-      default: false
-      selector:
-        boolean:
-    icon_color:
-      name: "🎨 Icon Color"
-      description: "Custom icon color for this notification.  \n\n`🤖 Android Only`, `Optional`"
-      default: [102, 186, 240]
-      selector:
-        color_rgb:
-
-    ##############################
-    # Input: Response Options
-    ##############################
-
-    ## Option 1
-    confirm_enabled:
-      name: "1️⃣ Option 1"
-      description: "Show or hide this option."
-      default: True
-      selector:
-        boolean:
-
-    confirm_text:
-      name: "1️⃣ Option 1 - Title"
-      description: "Title to show on the first option."
-      default: "Option 1"
-      selector:
-        text:
-
-    confirm_option_mode:
-      name: "1️⃣ Option 1 - Mode"
-      description: >-
-        Action mode for this option.<br /><br />
-        If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
-
-        <details>
-            <summary>❔ What is this?</summary>
-
-          This option is only applicable to Android due to technical limitations. 
-                    
-          The android app can't sending events and open links on the device at the same time, using the same option.
-
-          As such, options on the android app can only be either a link, or an action on Home Assistant. Not both.
-
-          This is due to:
-
-          - The lack of events being sent when URI options are fired.
-          - The requirement to set the `action` parameter to `"URI"`.
-
-          </details>
-
-         iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
-        `🤖 Android Only`, `Optional`
-      default: ""
-      selector:
-        select:
-          mode: dropdown
-          options:
-            - label: ""
-              value: ""
-            - label: Action(s)
-              value: action
-            - label: "Link (🤖 Android Only)"
-              value: uri
-
-    confirm_action:
-      name: "1️⃣ Option 1 - Action(s)"
-      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
-      default: []
-      selector:
-        action:
-
-    confirm_uri:
-      name: "1️⃣ Option 1 - Link"
-      description: >-
-        Navigate to a link or app when this option is selected.<br />
-
-        <details>
-          <summary>🔗 Show Common Examples</summary>
-
-        - To **open a Home Assistant view**, use relative links like these:
-          `/lovelace/my-dashboard`
-          `/config/dashboard`
-          `/developer-tools/template`
-
-        - Use **launch a page in your default browser**,
-          select the appropriate `Link` option in modes and enter a URL here:
-          `https://example.com`
-
-          </details><br />
-
-        <details>
-          <summary>🤖 Show Android Specific Examples</summary>
-
-        - To **open an Application** on your device, for example:
-          `app://<android application package name>`
-          `app://io.homeassistant.companion.android`
-
-        - To **view an Entity** on your Home Assistant setup:
-          `entityId:<your_entity_id>`
-          `entityId:sun.sun`
-
-        - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
-          `intent://scan/#Intent;scheme=zxing;package=com.my.pkg;end`
-
-        - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
-          `deep-link://<deep_link_here>`
-          `deep-link://example://link/to/content`
-
-        - To **see notification history**:
-          `settings://notification_history`
-
-          </details><br />
-
-        <details>
-          <summary> Show iOS Specific Examples</summary>
-
-        - Use **application-launching URLs** on your device
-          `tel:123456789`
-          `mailto:my@email.com`
-
-          </details><br />
-
-        ❔ Android: Used with `Mode: Link` options<br />
-        ❔ iOS: Leave empty to disable<br />
-        ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
-        `Optional`
-      default: ""
-      selector:
-        text:
-          type: url
-
-    confirm_icon:
-      name: "1️⃣ Option 1 - Icon"
-      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
-      default: ""
-      selector:
-        text:
-          prefix: "sfsymbols:"
-
-    confirm_is_destructive:
-      name: "1️⃣ Option 1 - Destructive"
-      description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
-      default: false
-      selector:
-        boolean:
-
-    confirm_authentication_required:
-      name: "1️⃣ Option 1 - Authentication Required"
-      description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
-      default: false
-      selector:
-        boolean:
-
-    ## Option 2
-    dismiss_enabled:
-      name: "2️⃣ Option 2"
-      description: "Show or hide this option."
-      default: True
-      selector:
-        boolean:
-
-    dismiss_text:
-      name: "2️⃣ Option 2 - Title"
-      description: "Title to show on the first option."
-      default: "Option 2"
-      selector:
-        text:
-
-    dismiss_option_mode:
-      name: "2️⃣ Option 2 - Mode"
-      description: >-
-        Action mode for this option.<br /><br />
-        If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
-
-        <details>
-            <summary>❔ What is this?</summary>
-
-          This option is only applicable to Android due to technical limitations. 
-                    
-          The android app can't sending events and open links on the device at the same time, using the same option.
-
-          As such, options on the android app can only be either a link, or an action on Home Assistant. Not both.
-
-          This is due to:
-
-          - The lack of events being sent when URI options are fired.
-          - The requirement to set the `action` parameter to `"URI"`.
-
-          </details>
-
-         iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
-        `🤖 Android Only`, `Optional`
-      default: ""
-      selector:
-        select:
-          mode: dropdown
-          options:
-            - label: ""
-              value: ""
-            - label: Action(s)
-              value: action
-            - label: "Link (🤖 Android Only)"
-              value: uri
-
-    dismiss_action:
-      name: "2️⃣ Option 2 - Action(s)"
-      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
-      default: []
-      selector:
-        action:
-
-    dismiss_uri:
-      name: "2️⃣ Option 2 - Link"
-      description: >-
-        Navigate to a link or app when this option is selected.<br />
-
-        <details>
-          <summary>🔗 Show Common Examples</summary>
-
-        - To **open a Home Assistant view**, use relative links like these:
-          `/lovelace/my-dashboard`
-          `/config/dashboard`
-          `/developer-tools/template`
-
-        - Use **launch a page in your default browser**,
-          select the appropriate `Link` option in modes and enter a URL here:
-          `https://example.com`
-
-          </details><br />
-
-        <details>
-          <summary>🤖 Show Android Specific Examples</summary>
-
-        - To **open an Application** on your device, for example:
-          `app://<android application package name>`
-          `app://io.homeassistant.companion.android`
-
-        - To **view an Entity** on your Home Assistant setup:
-          `entityId:<your_entity_id>`
-          `entityId:sun.sun`
-
-        - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
-          `intent://scan/#Intent;scheme=zxing;package=com.my.pkg;end`
-
-        - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
-          `deep-link://<deep_link_here>`
-          `deep-link://example://link/to/content`
-
-        - To **see notification history**:
-          `settings://notification_history`
-
-          </details><br />
-
-        <details>
-          <summary> Show iOS Specific Examples</summary>
-
-        - Use **application-launching URLs** on your device
-          `tel:123456789`
-          `mailto:my@email.com`
-
-          </details><br />
-
-        ❔ Android: Used with `Mode: Link` options<br />
-        ❔ iOS: Leave empty to disable<br />
-        ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
-        `Optional`
-      default: ""
-      selector:
-        text:
-          type: url
-
-    dismiss_icon:
-      name: "2️⃣ Option 2 - Icon"
-      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
-      default: ""
-      selector:
-        text:
-          prefix: "sfsymbols:"
-
-    dismiss_is_destructive:
-      name: "2️⃣ Option 2 - Destructive"
-      description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
-      default: false
-      selector:
-        boolean:
-
-    dismiss_authentication_required:
-      name: "2️⃣ Option 2 - Authentication Required"
-      description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
-      default: false
-      selector:
-        boolean:
-
-    ## Option 3
-    option_three_enabled:
-      name: "3️⃣ Option 3"
-      description: "Show or hide this option."
-      default: false
-      selector:
-        boolean:
-
-    option_three_text:
-      name: "3️⃣ Option 3 - Title"
-      description: "Title to show on the first option."
-      default: "Option 3"
-      selector:
-        text:
-
-    option_three_option_mode:
-      name: "3️⃣ Option 3 - Mode"
-      description: >-
-        Action mode for this option.<br /><br />
-        If you need this option to do nothing, pick `Mode: Action(s)` here and leave the `Action(s)` input empty for this option.<br /><br />
-
-        <details>
-            <summary>❔ What is this?</summary>
-
-          This option is only applicable to Android due to technical limitations. 
-                    
-          The android app can't sending events and open links on the device at the same time, using the same option.
-
-          As such, options on the android app can only be either a link, or an action on Home Assistant. Not both.
-
-          This is due to:
-
-          - The lack of events being sent when URI options are fired.
-          - The requirement to set the `action` parameter to `"URI"`.
-
-          </details>
-
-         iOS: Ignore this, iOS will run both actions and links if they are set.<br /><br />
-        `🤖 Android Only`, `Optional`
-      default: ""
-      selector:
-        select:
-          mode: dropdown
-          options:
-            - label: ""
-              value: ""
-            - label: Action(s)
-              value: action
-            - label: "Link (🤖 Android Only)"
-              value: uri
-
-    option_three_action:
-      name: "3️⃣ Option 3 - Action(s)"
-      description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
-      default: []
-      selector:
-        action:
-
-    option_three_uri:
-      name: "3️⃣ Option 3 - Link"
-      description: >-
-        Navigate to a link or app when this option is selected.<br />
-
-        <details>
-          <summary>🔗 Show Common Examples</summary>
-
-        - To **open a Home Assistant view**, use relative links like these:
-          `/lovelace/my-dashboard`
-          `/config/dashboard`
-          `/developer-tools/template`
-
-        - Use **launch a page in your default browser**,
-          select the appropriate `Link` option in modes and enter a URL here:
-          `https://example.com`
-
-          </details><br />
-
-        <details>
-          <summary>🤖 Show Android Specific Examples</summary>
-
-        - To **open an Application** on your device, for example:
-          `app://<android application package name>`
-          `app://io.homeassistant.companion.android`
-
-        - To **view an Entity** on your Home Assistant setup:
-          `entityId:<your_entity_id>`
-          `entityId:sun.sun`
-
-        - To use [**Intent scheme URIs**](https://developer.chrome.com/docs/multidevice/android/intents/#syntax):
-          `intent://scan/#Intent;scheme=zxing;package=com.my.pkg;end`
-
-        - To use [**Deep links**](https://developer.android.com/training/app-links#deep-links):
-          `deep-link://<deep_link_here>`
-          `deep-link://example://link/to/content`
-
-        - To **see notification history**:
-          `settings://notification_history`
-
-          </details><br />
-
-        <details>
-          <summary> Show iOS Specific Examples</summary>
-
-        - Use **application-launching URLs** on your device
-          `tel:123456789`
-          `mailto:my@email.com`
-
-          </details><br />
-
-        ❔ Android: Used with `Mode: Link` options<br />
-        ❔ iOS: Leave empty to disable<br />
-        ⚠️ Android: Using this option **WILL NOT STOP** timeout countdown. Please triple check actions that will be run in `Timeout Action(s)`.<br /><br />
-        `Optional`
-      default: ""
-      selector:
-        text:
-          type: url
-
-    option_three_icon:
-      name: "3️⃣ Option 3 - Icon"
-      description: "Custom icon to show on this option.  \n\nPlease refer to the [documentation here](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values).  \nThere are many reference pages out there, feel use a [search engine](https://www.google.com/search?q=sfsymbols+reference+list)!  \n\n` iOS Only`, `Optional`"
-      default: ""
-      selector:
-        text:
-          prefix: "sfsymbols:"
-
-    option_three_is_destructive:
-      name: "3️⃣ Option 3 - Destructive"
-      description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
-      default: false
-      selector:
-        boolean:
-
-    option_three_authentication_required:
-      name: "3️⃣ Option 3 - Authentication Required"
-      description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
-      default: false
-      selector:
-        boolean:
-
+        Configure up to 3 action buttons on notifications for quick actions.<br>
+        Enable buttons below, then configure each in its respective section.<br>
+        Examples: "Unlock Door" / "View Camera" / "Dismiss"<br>
+        <br>
+        **⚠️ Android Note:** Android can't send events AND open links in one button. Choose Action(s) OR Link mode per button. iOS supports both simultaneously.<br>
+        📖 [Actionable Notifications Guide](https://companion.home-assistant.io/docs/notifications/actionable-notifications)
+
+        
+      input:
+        confirm_enabled:
+          name: "Enable Option 1"
+          description: "Enable or disable the first action button on the notification."
+          default: true
+          selector:
+            boolean:
+        dismiss_enabled:
+          name: "Enable Option 2"
+          description: "Enable or disable the second action button on the notification."
+          default: true
+          selector:
+            boolean:
+        option_three_enabled:
+          name: "Enable Option 3"
+          description: "Enable or disable the third action button on the notification."
+          default: false
+          selector:
+            boolean:
+    action_button_option1:
+      name: "Action Button - Option 1"
+      icon: mdi:numeric-1-box
+      collapsed: true
+      input:
+        confirm_text:
+          name: "1️⃣ Option 1 - Title"
+          description: "Title to show on the first option."
+          default: "Confirm"
+          selector:
+            text:
+        confirm_option_mode:
+          name: "1️⃣ Option 1 - Mode"
+          description: >-
+            Choose Action(s) or Link mode. See Android Note in "Action Buttons Configuration" section above.<br>
+            To do nothing: Pick `Action(s)` and leave Action(s) empty.<br>
+            (`🤖 Android Only`, `Optional`)
+          default: ""
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: ""
+                  value: ""
+                - label: Action(s)
+                  value: action
+                - label: "Link (🤖 Android Only)"
+                  value: uri
+        confirm_action:
+          name: "1️⃣ Option 1 - Action(s)"
+          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          default: []
+          selector:
+            action:
+        confirm_uri:
+          name: "1️⃣ Option 1 - Link"
+          description: >-
+            Open link/app when selected. Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`<br>
+            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url)<br>
+            ⚠️ Android: URI links won't stop timeout countdown. Check your timeout actions.<br>
+            (`Optional`)
+          default: ""
+          selector:
+            text:
+              type: url
+        confirm_icon:
+          name: "1️⃣ Option 1 - Icon"
+          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | (`🍎 iOS Only`, `Optional`)"
+          default: ""
+          selector:
+            text:
+              prefix: "sfsymbols:"
+        confirm_is_destructive:
+          name: "1️⃣ Option 1 - Destructive"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+        confirm_authentication_required:
+          name: "1️⃣ Option 1 - Authentication Required"
+          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+    action_button_option2:
+      name: "Action Button - Option 2"
+      icon: mdi:numeric-2-box
+      collapsed: true
+      input:
+        dismiss_text:
+          name: "2️⃣ Option 2 - Title"
+          description: "Title to show on the first option."
+          default: "Dismiss"
+          selector:
+            text:
+        dismiss_option_mode:
+          name: "2️⃣ Option 2 - Mode"
+          description: >-
+            Choose Action(s) or Link mode. See Android Note in "Action Buttons Configuration" section above.<br>
+            To do nothing: Pick `Action(s)` and leave Action(s) empty.<br>
+            (`🤖 Android Only`, `Optional`)
+          default: ""
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: ""
+                  value: ""
+                - label: Action(s)
+                  value: action
+                - label: "Link (🤖 Android Only)"
+                  value: uri
+        dismiss_action:
+          name: "2️⃣ Option 2 - Action(s)"
+          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          default: []
+          selector:
+            action:
+        dismiss_uri:
+          name: "2️⃣ Option 2 - Link"
+          description: >-
+            Open link/app when selected. Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`<br>
+            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url)<br>
+            ⚠️ Android: URI links won't stop timeout countdown. Check your timeout actions.<br>
+            (`Optional`)
+          default: ""
+          selector:
+            text:
+              type: url
+        dismiss_icon:
+          name: "2️⃣ Option 2 - Icon"
+          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | (`🍎 iOS Only`, `Optional`)"
+          default: ""
+          selector:
+            text:
+              prefix: "sfsymbols:"
+        dismiss_is_destructive:
+          name: "2️⃣ Option 2 - Destructive"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+        dismiss_authentication_required:
+          name: "2️⃣ Option 2 - Authentication Required"
+          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+    action_button_option3:
+      name: "Action Button - Option 3"
+      icon: mdi:numeric-3-box
+      collapsed: true
+      input:
+        option_three_text:
+          name: "3️⃣ Option 3 - Title"
+          description: "Title to show on the first option."
+          default: "Option 3"
+          selector:
+            text:
+        option_three_option_mode:
+          name: "3️⃣ Option 3 - Mode"
+          description: >-
+            Choose Action(s) or Link mode. See Android Note in "Action Buttons Configuration" section above.<br>
+            To do nothing: Pick `Action(s)` and leave Action(s) empty.<br>
+            (`🤖 Android Only`, `Optional`)
+          default: ""
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: ""
+                  value: ""
+                - label: Action(s)
+                  value: action
+                - label: "Link (🤖 Android Only)"
+                  value: uri
+        option_three_action:
+          name: "3️⃣ Option 3 - Action(s)"
+          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          default: []
+          selector:
+            action:
+        option_three_uri:
+          name: "3️⃣ Option 3 - Link"
+          description: >-
+            Open link/app when selected. Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`<br>
+            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url)<br>
+            ⚠️ Android: URI links won't stop timeout countdown. Check your timeout actions.<br>
+            (`Optional`)
+          default: ""
+          selector:
+            text:
+              type: url
+        option_three_icon:
+          name: "3️⃣ Option 3 - Icon"
+          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | (`🍎 iOS Only`, `Optional`)"
+          default: ""
+          selector:
+            text:
+              prefix: "sfsymbols:"
+        option_three_is_destructive:
+          name: "3️⃣ Option 3 - Destructive"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n` iOS Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+        option_three_authentication_required:
+          name: "3️⃣ Option 3 - Authentication Required"
+          description: "Require device to be unlocked to use this option.  \n\n` iOS Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
     ##############################
     # Input: Timeout Options
     ##############################
-    enable_timeout:
-      name: "⌛️ Enable Timeout"
-      description: "Require script to stop listening after the set duration.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will wait for response indefinitely until the next time it is triggered."
-      default: true # Default `true` for backward compatibility.
-      selector:
-        boolean:
-    timeout:
-      name: "⌛️ Timeout Duration"
-      description: "Amount of time to wait for an action response before firing timeout action.  \n\n👍🏻 Recommended: ≥1 minute, to allow notifications to be sent.  \nDefault: 15 minutes. \n"
-      default:
-        hours: 0
-        minutes: 15
-        seconds: 0
-      selector:
-        duration:
-          enable_day: false
-    run_timeout_actions:
-      name: "⌛️ Enable Timeout Action(s)"
-      description: "Run timeout actions upon a timeout event.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will timeout without executing any timeout actions."
-      default: true # Default `true` for backward compatibility.
-      selector:
-        boolean:
-    timeout_action:
-      name: "⌛️ Timeout Action(s)"
-      description: "Action to run when notification response is timed out.  \n\n❔ Leave empty if no actions should be run  \n\n⚠️ Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\n❔ Android Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
-      default: []
-      selector:
-        action:
-    swipe_away_as_timeout:
-      name: "⌛️ Run timeout action(s) when notification cleared"
-      description: "If enabled, swiping the notification away will immediately trigger timeout actions.  \n\n`🤖 Android Only`"
-      default: false
-      selector:
-        boolean:
-    clear_on_timeout:
-      name: "🧹 Clear notification on timeout"
-      description: "Dismiss the notification after action selection times out."
-      default: false
-      selector:
-        boolean:
-    persist:
-      name: "🚩 Persistent Notification"
-      description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n`🤖 Android Only`"
-      default: false
-      selector:
-        boolean:
 
-    ##############################
-    # Input: Notification Link
-    ##############################
-    notification_link:
-      name: "🔗 Notification Link"
-      description: "Link to navigate to upon clicking the notification.  \n\n Examples:  \n - Home Assistant relative links: `/config/updates` or `/lovelace/home`  \n - Apps: `app://<package name>`  \n - Entity `More Info` Panel: `entityId:<entity_ID>`  \n - Deep links: `deep-link://<deep_link>`  \n\nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information and options.  \n\n`Optional`"
-      default: ""
-      selector:
-        text:
 
-    ##############################
-    # Input: Attachments
-    ##############################
-    attachment_type:
-      name: "📸 Attachment Type"
-      description: >
-        Choose to send an attachment along with the notification.<br>
+    timeout_settings:
+      name: "Timeout Settings"
+      icon: mdi:timer-outline
+      collapsed: true
+      input:
+        enable_timeout:
+          name: "⌛️ Enable Timeout"
+          description: "Require script to stop listening after the set duration.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will wait for response indefinitely until the next time it is triggered."
+          default: true # Default `true` for backward compatibility.
+          selector:
+            boolean:
+        timeout:
+          name: "⌛️ Timeout Duration"
+          description: "How long to wait for user response before executing timeout actions.<br><br>**Use case:** Wait 5 minutes for response to door unlock request, 30 seconds for garage closing confirmation.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)<br><br>👍🏻 Recommended: ≥1 minute for reliable notification delivery<br>Default: 15 minutes"
+          default:
+            hours: 0
+            minutes: 15
+            seconds: 0
+          selector:
+            duration:
+              enable_day: false
+        run_timeout_actions:
+          name: "⌛️ Enable Timeout Action(s)"
+          description: "Run timeout actions upon a timeout event.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will timeout without executing any timeout actions."
+          default: true # Default `true` for backward compatibility.
+          selector:
+            boolean:
+        timeout_action:
+          name: "⌛️ Timeout Action(s)"
+          description: "Action to run when notification response is timed out.  \n\n❔ Leave empty if no actions should be run  \n\n⚠️ Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\n❔ Android Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
+          default: []
+          selector:
+            action:
+        swipe_away_as_timeout:
+          name: "⌛️ Run timeout action(s) when notification cleared"
+          description: "If enabled, swiping the notification away will immediately trigger timeout actions.  \n\n`🤖 Android Only`"
+          default: false
+          selector:
+            boolean:
+        clear_on_timeout:
+          name: "🧹 Clear notification on timeout"
+          description: "Dismiss the notification after action selection times out."
+          default: false
+          selector:
+            boolean:
 
-        `Optional`
-      default: "none"
-      selector:
-        select:
-          options:
-            - label: "None"
-              value: "none"
-            - label: "Camera"
-              value: "camera_entity"
-    attachment_camera_entity:
-      name: "📸 Attachment: Camera Entity"
-      description: >-
-        Camera Entity to display snapshots of on the notification.<br>
 
-        Please note, iOS and Android have differing vehaviours, as specified in the documentation.
-        See the links below for more information.
+    attachments:
+      name: "Attachments"
+      icon: mdi:camera
+      collapsed: true
+      input:
+        attachment_type:
+          name: "📸 Attachment Type"
+          description: >
+            Choose to send an attachment along with the notification.<br>
+            `Optional`
+          default: "none"
+          selector:
+            select:
+              options:
+                - label: "None"
+                  value: "none"
+                - label: "Camera"
+                  value: "camera_entity"
+                - label: "Image URL"
+                  value: "image_url"
+                - label: "Video URL"
+                  value: "video_url"
+        attachment_camera_entity:
+          name: "📸 Attachment: Camera Entity"
+          description: >-
+            Camera Entity to display snapshots of on the notification.<br>
+            Please note, iOS and Android have differing vehaviours, as specified in the documentation.
+            See the links below for more information.
+            <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">🤖 Automatic Snapshots</a></td></tr></table><br>
+            ❔ Only used with `Attachment Type: Camera`
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: "camera"
+        image_url:
+          name: "🖼️ Image URL"
+          description: "Image URL to attach. Examples: `https://example.com/image.jpg`, `/local/images/alert.png`<br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`"
+          default: ""
+          selector:
+            text:
+        video_url:
+          name: "🎥 Video URL"
+          description: "Video URL to attach. Example: `/local/videos/clip.mp4`<br>⚠️ Platform support varies. 📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments#video) | `Optional`"
+          default: ""
+          selector:
+            text:
+        ##############################
+        # Input: Misc Inputs
+        ##############################
 
-        <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">🤖 Automatic Snapshots</a></td></tr></table><br>
 
-        ❔ Only used with `Attachment Type: Camera`
-      default: ""
-      selector:
-        entity:
-          filter:
-            - domain: "camera"
+    links_and_behavior:
+      name: "Links & Behavior"
+      icon: mdi:link-variant
+      collapsed: true
+      input:
+        notification_link:
+          name: "🔗 Notification Link"
+          description: "Link to navigate to upon clicking the notification. **Supports Jinja2 templates.**<br><br>**Examples:**<br> - Dashboard: `/lovelace/cameras` - View all cameras dashboard<br> - Dashboard: `/lovelace/security` - Security dashboard<br> - Entity view: `entityId:camera.front_door` - View front door camera<br> - Template: `/lovelace/{{ trigger.entity_id.split('.')[1] }}`<br> - Home Assistant views: `/config/updates` or `/lovelace/home`<br> - Apps: `app://<package name>`<br> - Deep links: `deep-link://<deep_link>`<br><br>See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) for more information and options.<br><br>`Optional`"
+          default: ""
+          selector:
+            text:
+        ##############################
+        # Input: Attachments
+        ##############################
+        tag:
+          name: "🔖 Tag"
+          description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n\n`Optional`"
+          default: ""
+          selector:
+            text:
+        group:
+          name: "📣 Notification Group ID"
+          description: "Used for grouping different notifications together visually.  \n\n⚠️ iOS critical notifications do no support grouping.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information.  \n\n`Optional`"
+          default: ""
+          selector:
+            text:
 
-    ##############################
-    # Input: Misc Inputs
-    ##############################
-    car_ui:
-      name: "🚘 Show on Android Auto"
-      description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
-      default: false
-      selector:
-        boolean:
-    tag:
-      name: "🔖 Tag"
-      description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n\n`Optional`"
-      default: ""
-      selector:
-        text:
-    group:
-      name: "📣 Notification Group ID"
-      description: "Used for grouping different notifications together visually.  \n\n⚠️ iOS critical notifications do no support grouping.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information.  \n\n`Optional`"
-      default: ""
-      selector:
-        text:
-    channel:
-      name: "📣 Notification Channel"
-      description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`🤖 Android Only`, `Optional`"
-      default: "General"
-      selector:
-        text:
-    importance:
-      name: "❕ Notification Channel Importance"
-      description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) for more information.  \n\n`🤖 Android Only`"
-      default: default
-      selector:
-        select:
-          options:
-            - label: "Urgent (Makes a sound with heads-up notification)"
-              value: high
-            - label: "Default (Makes a sound)"
-              value: default
-            - label: "Silent (Makes no sound)"
-              value: low
-            - label: "Low (Makes no sound, doesn't appear in status bar)"
-              value: min
-    android_high_priority:
-      name: "❕ High Priority Mode"
-      description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.  \n\n`🤖 Android Only`"
-      default: true
-      selector:
-        boolean:
-    interruption_level:
-      name: "❕ Interruption Level"
-      description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
-      default: active
-      selector:
-        select:
-          options:
-            - label: "Silent (Makes no sound, does not wake screen)"
-              value: passive
-            - label: "Default"
-              value: active
-            - label: "Important (Overrides Focus)"
-              value: time-sensitive
-            - label: "Critical (Overrides Focus and Mute, restricted features)"
-              value: critical
-    visibility:
-      name: "🔏 Notification Lockscreen Visibility"
-      description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`"
-      default: "private"
-      selector:
-        select:
-          options:
-            - label: "Public: Always show content."
-              value: public
-            - label: "Private: Show content based on phone settings."
-              value: private
-            - label: "Secret: Always hide content on the lockscreen."
-              value: secret
+    ios_settings:
+      name: "iOS Specific Settings"
+      icon: mdi:apple
+      collapsed: true
+      input:
+        interruption_level:
+          name: "❕ Interruption Level"
+          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information.  \n\n` iOS Only`"
+          default: active
+          selector:
+            select:
+              options:
+                - label: "Silent (Makes no sound, does not wake screen)"
+                  value: passive
+                - label: "Default"
+                  value: active
+                - label: "Important (Overrides Focus)"
+                  value: time-sensitive
+                - label: "Critical (Overrides Focus and Mute, restricted features)"
+                  value: critical
+        badge:
+          name: "🔢 Badge"
+          description: "Number on app icon badge (0-999). Use 0 to clear.<br>Example: `1` for new alert, `0` to clear.<br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | (`🍎 iOS Only`, `Optional`)"
+          default: ""
+          selector:
+            number:
+              min: 0
+              max: 999
+              mode: box
+        thread_id:
+          name: "🧵 Thread ID"
+          description: "Groups notifications into conversation threads.<br>Example: `front-door-events` groups all front door alerts.<br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#thread-id-grouping-notifications) | (`🍎 iOS Only`, `Optional`)"
+          default: ""
+          selector:
+            text:
+        presentation_options:
+          name: "🎨 Presentation Options"
+          description: "Controls what shows when app is open. Options: banner, sound, badge, list.<br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#presentation-options) | (`🍎 iOS Only`, `Optional`)"
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: "Banner"
+                  value: "banner"
+                - label: "Sound"
+                  value: "sound"
+                - label: "Badge"
+                  value: "badge"
+                - label: "List"
+                  value: "list"
 
-##############################
-# Fields
-##############################
+    android_settings:
+      name: "Android Specific Settings"
+      icon: mdi:android
+      collapsed: true
+      input:
+        icon:
+          name: "🙂 Icon"
+          description: "Custom icon for this notification.  \n\n`🤖 Android Only`, `Optional`"
+          default: ""
+          selector:
+            icon:
+        enable_icon_color:
+          name: "🎨 Use Icon Color"
+          description: "If disabled, uses default icon color.  \n\n`🤖 Android Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+        icon_color:
+          name: "🎨 Icon Color"
+          description: "Custom icon color for this notification.  \n\n`🤖 Android Only`, `Optional`"
+          default: [3, 169, 244]
+          selector:
+            color_rgb:
+        ##############################
+        # Input: Response Options
+        ##############################
+        ## Option 1
+
+        channel:
+          name: "📣 Notification Channel"
+          description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`🤖 Android Only`, `Optional`"
+          default: "Home Assistant"
+          selector:
+            text:
+        importance:
+          name: "❕ Notification Channel Importance"
+          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) for more information.  \n\n`🤖 Android Only`"
+          default: default
+          selector:
+            select:
+              options:
+                - label: "Urgent (Makes a sound with heads-up notification)"
+                  value: high
+                - label: "Default (Makes a sound)"
+                  value: default
+                - label: "Silent (Makes no sound)"
+                  value: low
+                - label: "Low (Makes no sound, doesn't appear in status bar)"
+                  value: min
+        android_high_priority:
+          name: "❕ High Priority Mode"
+          description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.  \n\n`🤖 Android Only`"
+          default: true
+          selector:
+            boolean:
+        visibility:
+          name: "🔏 Notification Lockscreen Visibility"
+          description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`  \n\n`🤖 Android Only`"
+          default: "private"
+          selector:
+            select:
+              options:
+                - label: "Public: Always show content."
+                  value: public
+                - label: "Private: Show content based on phone settings."
+                  value: private
+                - label: "Secret: Always hide content on the lockscreen."
+                  value: secret
+
+
+        persist:
+          name: "🚩 Persistent Notification"
+          description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`  \n\n`🤖 Android Only`"
+          default: false
+          selector:
+            boolean:
+        ##############################
+        # Input: Notification Link
+        ##############################
+        car_ui:
+          name: "🚘 Show on Android Auto"
+          description: "Display notification on Android Auto interface.  \n\n`🤖 Android Only`"
+          default: false
+          selector:
+            boolean:
+        sticky:
+          name: "📌 Sticky"
+          description: "Prevents notification from being dismissed until action buttons are used. Similar to persistent but stricter.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`🤖 Android Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+        vibration_pattern:
+          name: "📳 Vibration Pattern"
+          description: "Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.<br><br>**Examples:**<br> - \"100,200,100,200\" - Quick double buzz for routine alerts<br> - \"0,500,200,500\" - Long-short-long for urgent alerts<br> - \"100,100,100,100,100,100\" - Rapid pulses for security<br><br>**Format:** wait,vibrate,wait,vibrate (in milliseconds)<br><br>📖 [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern)<br><br>`🤖 Android Only`, `Optional`"
+          default: ""
+          selector:
+            text:
+        led_color:
+          name: "💡 LED Color"
+          description: "Notification LED color for devices with LED indicators. Provides visual notification when screen is off.<br><br>**Examples:**<br> - \"red\" - Critical/security alerts<br> - \"blue\" - Information/status updates<br> - \"#00FF00\" - Success/all-clear (hex green)<br> - \"orange\" - Warnings<br><br>**Use case:** Red LED for alarm triggers, blue for routine door alerts.<br><br>📖 [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color)<br><br>⚠️ Only works on devices with notification LED<br><br>`🤖 Android Only`, `Optional`"
+          default: ""
+          selector:
+            text:
+        alert_once:
+          name: "🔕 Alert Once"
+          description: "Play sound and vibrate only for initial notification, not for updates. Prevents notification spam for frequently updating alerts.<br><br>**Use case:** Motion sensor that updates every few seconds, or temperature alerts that change gradually.<br><br>📖 [Alert Once](https://companion.home-assistant.io/docs/notifications/notifications-basic#alert-once)<br><br>`🤖 Android Only`, `Optional`"
+          default: false
+          selector:
+            boolean:
+
+
+
 fields:
   field_notify_device:
     name: "📲 Device to notify"
@@ -795,8 +715,15 @@ fields:
     default: !input subtitle
     selector:
       text:
+  field_sound:
+    name: "🔊 Sound"
+    description: "Override custom notification sound."
+    example: !input sound
+    default: !input sound
+    selector:
+      text:
   field_attachment_type:
-    name: "📸 Attachment Type"
+    name: "📸 Attachment Type"
     description: "Override the Attachment Type of the notification."
     example: !input attachment_type
     default: !input attachment_type
@@ -817,8 +744,22 @@ fields:
         filter:
           - domain: "camera"
 
+  field_image_url:
+    name: "🖼️ Image URL"
+    description: "Override direct image URL."
+    example: !input image_url
+    default: !input image_url
+    selector:
+      text:
+  field_video_url:
+    name: "🎥 Video URL"
+    description: "Override video URL."
+    example: !input video_url
+    default: !input video_url
+    selector:
+      text:
   field_option_one_enabled:
-    name: "1️⃣ Option 1"
+    name: "1️⃣ Option 1"
     description: "Override showing or hiding this option."
     example: !input confirm_enabled
     selector:
@@ -905,6 +846,68 @@ fields:
   #   default: !input timeout_action
   #   selector:
   #     action:
+  field_badge:
+    name: "🔢 Badge"
+    description: "Override app badge number. 🍎 iOS Only"
+    example: !input badge
+    default: !input badge
+    selector:
+      number:
+        min: 0
+        max: 999
+        mode: box
+  field_thread_id:
+    name: "🧵 Thread ID"
+    description: "Override thread/conversation ID. 🍎 iOS Only"
+    example: !input thread_id
+    default: !input thread_id
+    selector:
+      text:
+  field_presentation_options:
+    name: "🎨 Presentation Options"
+    description: "Override presentation options. 🍎 iOS Only"
+    example: !input presentation_options
+    default: !input presentation_options
+    selector:
+      select:
+        multiple: true
+        options:
+          - label: "Banner"
+            value: "banner"
+          - label: "Sound"
+            value: "sound"
+          - label: "Badge"
+            value: "badge"
+          - label: "List"
+            value: "list"
+  field_sticky:
+    name: "📌 Sticky"
+    description: "Override sticky notification setting. 🤖 Android Only"
+    example: !input sticky
+    default: !input sticky
+    selector:
+      boolean:
+  field_vibration_pattern:
+    name: "📳 Vibration Pattern"
+    description: "Override vibration pattern. 🤖 Android Only"
+    example: !input vibration_pattern
+    default: !input vibration_pattern
+    selector:
+      text:
+  field_led_color:
+    name: "💡 LED Color"
+    description: "Override LED color. 🤖 Android Only"
+    example: !input led_color
+    default: !input led_color
+    selector:
+      text:
+  field_alert_once:
+    name: "🔕 Alert Once"
+    description: "Override alert once setting. 🤖 Android Only"
+    example: !input alert_once
+    default: !input alert_once
+    selector:
+      boolean:
 
 sequence:
   ##############################
@@ -924,6 +927,10 @@ sequence:
       script_message: !input message
       message: "{{ iif(field_message is defined and (field_message|length), field_message, script_message) }}"
 
+      # Sound
+      script_sound: !input sound
+      sound: "{{ iif(field_sound is defined, field_sound, script_sound) }}"
+
   - alias: Common Configuration Options
     variables:
       # [Opening a URL] - https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url
@@ -932,21 +939,28 @@ sequence:
 
       # [Tag]
       custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
-      tag: "{{ iif(custom_tag|length, custom_tag, this.entity_id ~ '-' ~ context.id) }}"
+      tag: "{{ iif(custom_tag|length, custom_tag, (this.entity_id ~ '-' ~ context.id)) | truncate(64, killwords=True, end='') }}"
 
       # [Grouping]
       group: !input group
 
   - alias: Android Configuration Options
     variables:
-      # sticky: !input sticky # Unlikely to support due to potential for users thinking that notifications are stuck.
       channel: !input channel
       visibility: !input visibility
       importance: !input importance
       persist: !input persist
-      # chronometer: !input chronometer # Unlikely to support, depends on template flexibility
-      # alert_once: !input alert_once
       car_ui: !input car_ui
+      
+      # New Phase 1 features
+      script_sticky: !input sticky
+      sticky: "{{ iif(field_sticky is defined, field_sticky, script_sticky) }}"
+      script_vibration_pattern: !input vibration_pattern
+      vibration_pattern: "{{ iif(field_vibration_pattern is defined, field_vibration_pattern, script_vibration_pattern) }}"
+      script_led_color: !input led_color
+      led_color: "{{ iif(field_led_color is defined, field_led_color, script_led_color) }}"
+      script_alert_once: !input alert_once
+      alert_once: "{{ iif(field_alert_once is defined, field_alert_once, script_alert_once) }}"
 
       # [Notification Banner Icon]
       notification_icon: !input icon
@@ -958,7 +972,14 @@ sequence:
   - alias: iOS Configuration Options
     variables:
       interruption_level: !input interruption_level
-      # presentation_options: !input presentation_options
+      
+      # New Phase 1 features
+      script_badge: !input badge
+      badge: "{{ iif(field_badge is defined, field_badge, script_badge) }}"
+      script_thread_id: !input thread_id
+      thread_id: "{{ iif(field_thread_id is defined, field_thread_id, script_thread_id) }}"
+      script_presentation_options: !input presentation_options
+      presentation_options: "{{ iif(field_presentation_options is defined, field_presentation_options, script_presentation_options) }}"
       # shortcut: !input shortcut # Unlikely to be supported due to complexity.
       # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
       # critical: !input critical
@@ -982,6 +1003,13 @@ sequence:
       attachment_type: "{{ iif(field_attachment_type is defined, field_attachment_type, script_attachment_type) }}"
       script_attachment_camera_entity: !input attachment_camera_entity
       attachment_camera_entity: "{{ iif(field_attachment_camera_entity is defined, field_attachment_camera_entity, script_attachment_camera_entity) }}"
+      
+      # New Phase 1 features
+      script_image_url: !input image_url
+      image_url: "{{ iif(field_image_url is defined, field_image_url, script_image_url) }}"
+      script_video_url: !input video_url
+      video_url: "{{ iif(field_video_url is defined, field_video_url, script_video_url) }}"
+      
       camera_image_url: >-
         {% if (attachment_camera_entity|length) %}
           {% if (state_attr(attachment_camera_entity,'entity_picture')|length) %}
@@ -1133,6 +1161,12 @@ sequence:
           {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
           {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'url': notification_link }) %}{% endif %}
           {% if attachment_type == 'camera_entity' %}{% set payload.data = dict(payload.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
+          {% if sound|length %}{% set push.d = dict(push.d, **{ 'sound': sound }) %}{% endif %}
+          {% if badge is not none and badge != '' %}{% set payload.data = dict(payload.data, **{ 'badge': badge|int }) %}{% endif %}
+          {% if thread_id|length %}{% set payload.data = dict(payload.data, **{ 'thread-id': thread_id }) %}{% endif %}
+          {% if presentation_options|length %}{% set push.d = dict(push.d, **{ 'presentation-options': presentation_options }) %}{% endif %}
+          {% if image_url|length %}{% set payload.data = dict(payload.data, **{ 'image': image_url }) %}{% endif %}
+          {% if video_url|length %}{% set payload.data = dict(payload.data, **{ 'video': video_url }) %}{% endif %}
           {% set payload.data = dict(payload.data, **{ 'push': push.d }) %}
         {% else %}
           {# Android #}
@@ -1148,6 +1182,13 @@ sequence:
           {% if channel|length %}{% set payload.data = dict(payload.data, **{ 'channel': channel }) %}{% endif %}
           {% if persist %}{% set payload.data = dict(payload.data, **{ 'persistent': persist }) %}{% endif %}
           {% if car_ui %}{% set payload.data = dict(payload.data, **{ 'car_ui': car_ui }) %}{% endif %}
+          {% if sound|length %}{% set payload.data = dict(payload.data, **{ 'sound': sound }) %}{% endif %}
+          {% if sticky %}{% set payload.data = dict(payload.data, **{ 'sticky': sticky }) %}{% endif %}
+          {% if vibration_pattern|length %}{% set payload.data = dict(payload.data, **{ 'vibration_pattern': vibration_pattern }) %}{% endif %}
+          {% if led_color|length %}{% set payload.data = dict(payload.data, **{ 'led_color': led_color }) %}{% endif %}
+          {% if alert_once %}{% set payload.data = dict(payload.data, **{ 'alert_once': alert_once }) %}{% endif %}
+          {% if image_url|length %}{% set payload.data = dict(payload.data, **{ 'image': image_url }) %}{% endif %}
+          {% if video_url|length %}{% set payload.data = dict(payload.data, **{ 'video': video_url }) %}{% endif %}
         {% endif %}
         {# Common  #}
         {% set payload.data = dict(payload.data, **{ 'actions': options }) %}
