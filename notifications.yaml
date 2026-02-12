@@ -1890,11 +1890,11 @@ sequence:
         {% set response.data = dict(response.data, **{ 'result': "timeout" }) %}
         {% elif run_timeout_actions and on_manual_clear_action == 'treat_as_timeout' and wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
         {% set response.data = dict(response.data, **{ 'result': "notification_cleared" }) %}
-        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == option_one['action'] %}
+        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == first_option %}
         {% set response.data = dict(response.data, **{ 'result': "option_one" }) %}
-        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == option_two['action'] %}
+        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == second_option %}
         {% set response.data = dict(response.data, **{ 'result': "option_two" }) %}
-        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == option_three['action'] %}
+        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == third_option %}
         {% set response.data = dict(response.data, **{ 'result': "option_three" }) %}
         {%- endif %}
         {# Add device info if available #}
@@ -2055,7 +2055,7 @@ sequence:
     if:
       - alias: "Should send clear notification command? (for iOS/macOS)?"
         condition: template
-        value_template: "{{ expect_response and enable_timeout and clear_behavior_on_timeout == 'clear_this' and devices_info | selectattr('is_apple') | list | length > 0 }}"
+        value_template: "{{ user_response.result == 'timeout' and clear_behavior_on_timeout == 'clear_this' and devices_info | selectattr('is_apple') | list | length > 0 }}"
     then:
       - alias: "Send clear notification command to iOS devices"
         repeat:
