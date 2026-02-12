@@ -243,6 +243,7 @@ blueprint:
             Select multiple devices to send the same notification to all of them.
             
             📖 [Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic) | Required
+          default: []
           selector:
             device:
               multiple: true
@@ -259,6 +260,7 @@ blueprint:
             - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`
             
             📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | Required
+          default: ""
           selector:
             text:
               multiline: true
@@ -764,9 +766,9 @@ blueprint:
         **Multi-Device Response Control** - Configure how responses are handled when notifying multiple devices.
         <br><br>
         **Use Cases:**<br>
-         - Family alert: First person to respond wins, others auto-dismissed<br>
-         - Chore acceptance: One person claims task, notify others it's taken<br>
-         - Critical alerts: Ensure visibility by keeping notification on other devices<br><br>
+        - Family alert: First person to respond wins, others auto-dismissed<br>
+        - Chore acceptance: One person claims task, notify others it's taken<br>
+        - Critical alerts: Ensure visibility by keeping notification on other devices<br><br>
         **📘 Note**: Single-device notifications ignore these settings (only relevant for multiple targets).
         
       input:
