@@ -17,6 +17,8 @@ blueprint:
         <li>Action button fields renamed: <code>confirm_*</code> → <code>option_one_*</code></li>
         <li>Action button fields renamed: <code>dismiss_*</code> → <code>option_two_*</code></li>
         <li>All button configuration consolidated into single "Action Buttons" section</li>
+        <li><b>PHASE 5</b>: Clear-on-timeout options consolidated: 3 booleans → 1 dropdown (<code>clear_behavior_on_timeout</code>)</li>
+        <li><b>PHASE 5</b>: Android clear options consolidated: 3 options → 1 dropdown + action (<code>on_manual_clear_action</code>)</li>
       </ul>
       <br>
 
@@ -61,6 +63,20 @@ blueprint:
 
       <details>
       <summary>Expand/collapse changelog</summary>
+
+      ### Version 3.0.0-beta Phase 5 - Clear Options Consolidation - *Current*
+      - **BREAKING**: Consolidated 3 clear-on-timeout booleans into single dropdown `clear_behavior_on_timeout`
+      - **BREAKING**: Removed: `clear_on_timeout`, `clear_other_notifications_on_timeout`, `clear_all_notifications_on_timeout`
+      - **NEW**: `clear_behavior_on_timeout` dropdown with 4 options: keep_all, clear_this, clear_others, clear_all
+      - **BREAKING**: Consolidated 3 Android clear options into single dropdown `on_manual_clear_action`
+      - **BREAKING**: Removed: `treat_clear_as_timeout`, `run_clear_notification_actions` booleans
+      - **NEW**: `on_manual_clear_action` dropdown with 3 options: do_nothing, treat_as_timeout, run_custom
+      - **IMPROVED**: Clear logic now uses choose-based branching instead of if/then precedence
+      - **FIXED**: Issue #4 - Three separate clear-on-timeout options causing confusion
+      - **FIXED**: Issue #5 - Android clear option conflicts with overlapping behavior
+      - **FIXED**: Issue #15 - Timeout actions scattered across multiple sections
+      - **FIXED**: Issue #16 - Backwards "when disabled" logic in clear handling
+      - **FIXED**: Issue #17 - Three-way clear precedence undocumented
 
       ### Version 2.4.1 - UX Improvements - *11 Feb 2026*
       - **UX**: Reorganized sections for better user experience - merged related settings, created 'What to Send' section for required fields, reduced from 13 to 10 sections
@@ -769,22 +785,29 @@ blueprint:
           default: []
           selector:
             action:
-        clear_on_timeout:
-          name: "🧹 Clear notification on timeout"
-          description: "Dismiss the notification after action selection times out."
-          default: false
+        clear_behavior_on_timeout:
+          name: "🧹 Clear notifications on timeout"
           selector:
-            boolean:
-        clear_other_notifications_on_timeout:
-          name: "🧹 Clear Other Notifications on Timeout"
+            select:
+              options:
+                - label: "Keep all notifications visible"
+                  value: "keep_all"
+                - label: "Clear this device only"
+                  value: "clear_this"
+                - label: "Clear other devices (keep this one)"
+                  value: "clear_others"
+                - label: "Clear ALL devices"
+                  value: "clear_all"
+          default: "keep_all"
           description: >-
-            **Multi-Device Only** - When timeout occurs, automatically clear notifications on all other devices.<br><br>
-            **Use case:** Emergency alert expires, remove from all family phones to avoid confusion.<br><br>
-            **Note**: Only works reliably on iOS. Android clearing has limitations.<br><br>
-            Default: Disabled
-          default: false
-          selector:
-            boolean:
+            What to do with notifications when timeout occurs.<br><br>
+            🍎 **iOS**: Full support for all options<br>
+            🤖 **Android**: Limited clearing support<br><br>
+            **Multi-device only**: clear_others and clear_all<br><br>
+            **Use cases:**<br>
+            • Emergency alert expires → clear_all to remove from all phones<br>
+            • Time-sensitive request → clear_this to clean up after timeout<br>
+            • Multi-device coordination → clear_others to remove from non-responding devices
         notify_other_devices_on_timeout:
           name: "📢 Notify Other Devices on Timeout"
           description: >-
@@ -810,19 +833,7 @@ blueprint:
           selector:
             text:
               multiline: true
-        clear_all_notifications_on_timeout:
-          name: "🧹 Clear ALL Notifications on Timeout"
-          description: >-
-            When timeout occurs, clear notifications on ALL devices (including the one that may be viewing it).<br><br>
-            **Use case:** Time-sensitive alerts that should disappear after expiry.<br><br>
-            **Note**: iOS only. Overrides "Clear Other Notifications" when enabled.<br><br>
-            Default: Disabled
-          default: false
-          selector:
-            boolean:
-
-
-    advanced_settings:
+        notify_other_devices_on_timeout:
       name: "Advanced Settings"
       icon: mdi:cog-outline
       collapsed: true
@@ -972,31 +983,36 @@ blueprint:
           default: ""
           selector:
             text:
-        treat_clear_as_timeout:
-          name: "🧹 Treat Clear as Timeout"
-          description: "When notification is cleared/swiped away, treat it as a timeout event and run timeout actions.<br><br>**Use case:** User dismisses alarm notification → automatically logs dismissal as timeout.<br><br>**Multi-device note**: In mixed iOS/Android setups, only enable if all devices are Android, as this applies globally to all clear events.<br><br>**Note**: Replaces previous `swipe_away_as_timeout` setting with Android-specific location.<br><br>`🤖 Android Only`<br><br>Default: Disabled"
-          default: false
+        on_manual_clear_action:
+          name: "🧹🤖 When notification swiped away (Android)"
           selector:
-            boolean:
-        run_clear_notification_actions:
-          name: "⚙️ Run Clear Notification Actions"
-          description: "Execute custom actions when notification is cleared/swiped away (separate from timeout actions).<br><br>**Use case:** Log dismissals, update status, send follow-up notifications.<br><br>**Note**: These run instead of timeout actions when `treat_clear_as_timeout` is disabled.<br><br>`🤖 Android Only`<br><br>Default: Disabled"
-          default: false
-          selector:
-            boolean:
-        clear_notification_actions:
-          name: "⚙️ Clear Notification Actions"
+            select:
+              options:
+                - label: "Do nothing"
+                  value: "do_nothing"
+                - label: "Treat as timeout (run timeout actions)"
+                  value: "treat_as_timeout"
+                - label: "Run separate actions"
+                  value: "run_custom"
+          default: "do_nothing"
           description: >-
-            **Requires "Run Clear Notification Actions" enabled** - Actions to run when notification is cleared.<br><br>
+            **Android only** - What happens when user swipes notification away.<br><br>
+            **Note**: Disabled if notification is persistent or sticky.<br><br>
+            **Multi-device note**: In mixed iOS/Android setups, "treat as timeout" applies globally to all clear events.<br><br>
+            `🤖 Android Only`
+        clear_notification_actions:
+          name: "⚙️🤖 Actions on manual clear"
+          selector:
+            action:
+          default: []
+          description: >-
+            **Requires "Run separate actions" selected above** - Actions to run when notification is cleared.<br><br>
             **Available variables:**<br>
              - `user_response`: Contains response data including 'result': 'notification_cleared'<br>
              - `device_id`: ID of device that cleared the notification (if available)<br><br>
             **Example**: Log to history, update input_boolean, send analytics<br><br>
             `🤖 Android Only`<br><br>
             `Optional`
-          default: []
-          selector:
-            action:
         alert_once:
           name: "🔕 Alert Once"
           description: "Play sound and vibrate only for initial notification, not for updates. Prevents notification spam for frequently updating alerts.<br><br>**Use case:** Motion sensor that updates every few seconds, or temperature alerts that change gradually.<br><br>📖 [Alert Once](https://companion.home-assistant.io/docs/notifications/notifications-basic#alert-once)<br><br>`Optional`"
@@ -1283,9 +1299,8 @@ sequence:
       icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
       android_high_priority: !input android_high_priority
       
-      # Android clear notification handling
-      treat_clear_as_timeout: !input treat_clear_as_timeout
-      run_clear_notification_actions: !input run_clear_notification_actions
+      # Android clear notification handling (v3.0 - consolidated)
+      on_manual_clear_action: !input on_manual_clear_action
       clear_notification_actions: !input clear_notification_actions
 
   - alias: iOS Configuration Options
@@ -1308,7 +1323,7 @@ sequence:
     variables:
       script_enable_timeout: !input enable_timeout
       enable_timeout: "{{ iif(field_enable_timeout is defined, field_enable_timeout, script_enable_timeout) }}"
-      clear_on_timeout: !input clear_on_timeout
+      clear_behavior_on_timeout: !input clear_behavior_on_timeout
       script_timeout: !input timeout # Load timeout into variable for use with templates.
       timeout: "{{ iif(field_timeout is defined, field_timeout, script_timeout) }}"
       timeout_seconds: "{{ (timeout.hours * 60 + timeout.minutes) * 60 + timeout.seconds }}"
@@ -1317,10 +1332,8 @@ sequence:
 
   - alias: Timeout Response Handling Configuration
     variables:
-      clear_other_notifications_on_timeout: !input clear_other_notifications_on_timeout
       notify_other_devices_on_timeout: !input notify_other_devices_on_timeout
       other_devices_timeout_message: !input other_devices_timeout_message
-      clear_all_notifications_on_timeout: !input clear_all_notifications_on_timeout
 
   - alias: Response Handling Configuration
     variables:
@@ -1569,7 +1582,7 @@ sequence:
                 {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set payload.data = dict(payload.data, **{ 'image': media_url }) %}{% endif %}
                 {% if notification_icon|length %}{% set payload.data = dict(payload.data, **{ 'notification_icon': notification_icon }) %}{% endif %}
                 {% if enable_icon_color %}{% set payload.data = dict(payload.data, **{ 'color': icon_color_hex }) %}{% endif %}
-                {% if enable_timeout and clear_on_timeout %}{% set payload.data = dict(payload.data, **{ 'timeout': timeout_seconds }) %}{% endif %}
+                {% if enable_timeout and clear_behavior_on_timeout == 'clear_this' %}{% set payload.data = dict(payload.data, **{ 'timeout': timeout_seconds }) %}{% endif %}
                 {% if channel|length %}{% set payload.data = dict(payload.data, **{ 'channel': channel }) %}{% endif %}
                 {% if persist %}{% set payload.data = dict(payload.data, **{ 'persistent': persist }) %}{% endif %}
                 {% if car_ui %}{% set payload.data = dict(payload.data, **{ 'car_ui': car_ui }) %}{% endif %}
@@ -1653,7 +1666,7 @@ sequence:
         {% set response.data = dict(response.data, **{ 'result': "no_response" }) %}
         {% elif run_timeout_actions and wait.trigger == none %}
         {% set response.data = dict(response.data, **{ 'result': "timeout" }) %}
-        {% elif run_timeout_actions and treat_clear_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
+        {% elif run_timeout_actions and on_manual_clear_action == 'treat_as_timeout' and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
         {% set response.data = dict(response.data, **{ 'result': "notification_cleared" }) %}
         {% elif wait.trigger.event.data.action == option_one['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_one" }) %}
@@ -1746,9 +1759,9 @@ sequence:
           - "{{ is_multi_device }}"
           - "{{ user_response.result == 'timeout' }}"
         sequence:
-          # Clear notifications on other devices (or all devices)
+          # Clear notifications based on clear_behavior_on_timeout
           - choose:
-              - conditions: "{{ clear_all_notifications_on_timeout }}"
+              - conditions: "{{ clear_behavior_on_timeout == 'clear_all' }}"
                 sequence:
                   - alias: "Clear notifications on ALL devices"
                     repeat:
@@ -1759,7 +1772,7 @@ sequence:
                             message: "clear_notification"
                             data:
                               tag: "{{ tag }}"
-              - conditions: "{{ clear_other_notifications_on_timeout }}"
+              - conditions: "{{ clear_behavior_on_timeout == 'clear_others' }}"
                 sequence:
                   - alias: "Clear notifications on other devices"
                     repeat:
@@ -1802,14 +1815,13 @@ sequence:
         conditions: "{{ user_response.result == 'notification_cleared' }}"
         sequence:
           - choose:
-              # If treat_clear_as_timeout is enabled, run timeout actions
-              - conditions: "{{ treat_clear_as_timeout }}"
+              # If on_manual_clear_action is 'treat_as_timeout', run timeout actions
+              - conditions: "{{ on_manual_clear_action == 'treat_as_timeout' }}"
                 sequence: !input timeout_action
-              # If run_clear_notification_actions is enabled, run clear actions
-              - conditions: "{{ run_clear_notification_actions }}"
+              # If on_manual_clear_action is 'run_custom', run clear actions
+              - conditions: "{{ on_manual_clear_action == 'run_custom' }}"
                 sequence: !input clear_notification_actions
-            # Default: If treat_clear_as_timeout but no custom actions, run timeout actions
-            default: !input timeout_action
+            # Default: do_nothing - no actions run
       - alias: "Trigger: first_option"
         conditions: "{{ user_response.result == 'option_one' }}"
         sequence: !input option_one_action # "{{ option_one_actions }}"
@@ -1827,7 +1839,7 @@ sequence:
     if:
       - alias: "Should send clear notification command? (for iOS/macOS)?"
         condition: template
-        value_template: "{{ expect_response and enable_timeout and clear_on_timeout and notification_data.apple_device }}"
+        value_template: "{{ expect_response and enable_timeout and clear_behavior_on_timeout == 'clear_this' and notification_data.apple_device }}"
     then:
       - alias: "Send clear notification command to iOS device"
         service: "{{ notify_service }}"
