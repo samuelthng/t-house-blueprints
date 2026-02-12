@@ -11,7 +11,8 @@ blueprint:
       <h2>🔔 Notifications</h2>
       <b>Version 3.0.0-beta - Blueprint v3.0 Refactored</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
-      <br><br>
+
+
       <b>⚠️ BREAKING CHANGES in v3.0:</b>
       <ul>
         <li>Action button fields renamed: <code>confirm_*</code> → <code>option_one_*</code></li>
@@ -20,42 +21,97 @@ blueprint:
         <li><b>PHASE 5</b>: Clear-on-timeout options consolidated: 3 booleans → 1 dropdown (<code>clear_behavior_on_timeout</code>)</li>
         <li><b>PHASE 5</b>: Android clear options consolidated: 3 options → 1 dropdown + action (<code>on_manual_clear_action</code>)</li>
       </ul>
-      <br>
+
 
     ---
 
-      ### Features:
-      <details>
-      <summary>Expand/collapse features</summary>
+      ### Quick Start Guide
 
-      > 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
-      >
-      > 🔢 Multi-device support - Send to multiple devices simultaneously (NEW in v2.3.0)
-      >
-      > 🎯 Configurable response modes - First-response-wins or all-respond (NEW in v2.3.0)
-      >
-      > 🧹 Auto-clear other devices when first responds (NEW in v2.3.0)
-      >
-      >
-      > 3️⃣ Up to 3 customisable, action buttons (Previously: ✅ Confirm and ❌ Dismiss Button)
-      >
-      > ⌛️ Timeout actions with custom duration, fired if no option response received
-      >
-      > 🧹 Clear notification after timeout
-      >
-      > 📸 Camera Snapshots
-      >
-      > 🔗 Custom Notification Link
-      >
-      > 📜 Flexible [script fields](https://www.home-assistant.io/integrations/script/#fields)
-      >
-      > 🍎 Supports iOS
-      >
-      > 🤖 Supports Android
+      <details>
+      <summary>Expand/collapse quick start</summary>
+
+      1. **Install the Blueprint** - Add this blueprint to your Home Assistant
+      2. **Select Device(s)** - Choose which mobile devices to notify in Required Settings
+      3. **Write Your Message** - Enter notification text (supports templates)
+      4. **Add Action Buttons (Optional)** - Configure up to 3 buttons with custom actions
+      5. **Set Timeout (Optional)** - Define what happens if no response received
+      6. **Test It** - Run the script and verify notification appears
+
+      📖 Full documentation: [Community Post](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552)
 
       </details>
 
-      Examples can be found [here](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#example-usage-6)
+
+    ---
+
+      ### Features
+      <details>
+      <summary>Expand/collapse features</summary>
+
+      
+
+       - 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
+       - 🔢 Multi-device support - Send to multiple devices simultaneously (NEW in v2.3.0)
+       - 🎯 Configurable response modes - First-response-wins or all-respond (NEW in v2.3.0)
+       - 🧹 Auto-clear other devices when first responds (NEW in v2.3.0)
+       - 3️⃣ Up to 3 customisable, action buttons (Previously: ✅ Confirm and ❌ Dismiss Button)
+       - ⌛️ Timeout actions with custom duration, fired if no option response received
+       - 🧹 Clear notification after timeout
+       - 📸 Camera Snapshots
+       - 🔗 Custom Notification Link
+       - 📜 Flexible [script fields](https://www.home-assistant.io/integrations/script/#fields)
+       - 🍎 Supports iOS
+       - 🤖 Supports Android
+
+
+      </details>
+
+
+    ---
+
+      ### Examples
+
+      <details>
+      <summary>Expand/collapse examples</summary>
+
+      **Basic Notification:**
+      ```yaml
+      service: script.notifications
+      data:
+        notify_device: mobile_app_johns_iphone
+        message: "Front door motion detected"
+      ```
+
+      **With Action Buttons:**
+      ```yaml
+      service: script.notifications
+      data:
+        notify_device: mobile_app_johns_iphone
+        message: "Unlock front door?"
+        option_one_text: "Unlock"
+        option_two_text: "Dismiss"
+      ```
+
+      **Multi-Device with Timeout:**
+      ```yaml
+      service: script.notifications
+      data:
+        notify_device:
+          - mobile_app_johns_iphone
+          - mobile_app_janes_android
+        message: "Garage door left open"
+        timeout:
+          minutes: 5
+        timeout_action:
+          - service: cover.close_cover
+            target:
+              entity_id: cover.garage_door
+      ```
+
+      More examples: [Community Post](https://community.home-assistant.io/t/notification-with-confirm-dismiss-and-timeout/551552#example-usage-6)
+
+      </details>
+
 
     ---
 
@@ -222,7 +278,8 @@ blueprint:
         Check your scripts and automation, there might be a logical loop going on that's triggering the notification over and over again. If you need further help, feel free to drop by the [main post](https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/) and share your automation and scripts yamls.
 
       </details>
-      <br>
+      
+
 
   input:
     required_settings:
@@ -230,9 +287,12 @@ blueprint:
       icon: mdi:cog-outline
       collapsed: false
       description: >-
-        <br>
+        
+
         **Essential configuration** - Device selection and notification message.
-        <br><br>
+        
+
+
 
       input:
         notify_device:
@@ -256,7 +316,7 @@ blueprint:
             
             Examples:
             - Static: `Motion detected at front door`
-            - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`
+             - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`
             - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`
             
             📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | Required
@@ -270,50 +330,75 @@ blueprint:
       icon: mdi:palette-outline
       collapsed: true
       description: >-
-        <br>
+        
+
         **Customize notification look and feel** - Title, subtitle, sound, icon, colors, and interruption settings.
-        <br><br>
+        
+
+
 
       input:
         title:
           name: "🏷️ Title"
-          description: "Headline text at the top of notification. Supports Jinja2 templates.<br><br>Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`<br><br>`Optional`"
+          description: "Headline text at the top of notification. Supports Jinja2 templates.
+
+Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`
+
+`Optional`"
           default: ""
           selector:
             text:
         subtitle:
           name: "🏷️ Subtitle"
-          description: "Secondary text below title. Supports Jinja2 templates.<br><br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br><br>🍎 iOS Only | `Optional`"
+          description: "Secondary text below title. Supports Jinja2 templates.
+
+Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`
+
+🍎 iOS Only | `Optional`"
           default: ""
           selector:
             text:
         sound:
           name: "🔊 Sound"
-          description: "Custom sound file when notification arrives. Supports templates.<br><br>Examples: `alarm.mp3` (Android in `/local/`), `default` (iOS)<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | `Optional`"
+          description: "Custom sound file when notification arrives. Supports templates.
+
+Examples: `alarm.mp3` (Android in `/local/`), `default` (iOS)
+
+📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | `Optional`"
           default: ""
           selector:
             text:
         icon:
           name: "🙂 Icon"
-          description: "Custom icon for this notification.<br><br>🤖 Android Only | `Optional`"
+          description: "Custom icon for this notification.
+
+🤖 Android Only | `Optional`"
           default: ""
           selector:
             icon:
         enable_icon_color:
           name: "🎨 Use Icon Color"
-          description: "If disabled, uses default icon color.<br><br>🤖 Android Only | `Optional`"
+          description: "If disabled, uses default icon color.
+
+🤖 Android Only | `Optional`"
           default: false
           selector:
             boolean:
         icon_color:
           name: "🎨 Icon Color"
-          description: "Custom icon color for this notification.<br><br>🤖 Android Only | `Optional`"
+          description: "Custom icon color for this notification.
+
+🤖 Android Only | `Optional`"
           default: [3, 169, 244]
           selector:
             color_rgb:
         badge:
           name: "🔢 Badge"
-          description: "Number on app icon badge (0-999). Use 0 to clear.<br><br>Example: `1` for new alert, `0` to clear.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS Only | `Optional`"
+          description: "Number on app icon badge (0-999). Use 0 to clear.
+
+Example: `1` for new alert, `0` to clear.
+
+📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS Only | `Optional`"
           default: ""
           selector:
             number:
@@ -322,7 +407,9 @@ blueprint:
               mode: box
         interruption_level:
           name: "❕ Interruption Level"
-          description: "Controls notification priority and behavior.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) | 🍎 iOS Only | `Optional`"
+          description: "Controls notification priority and behavior.
+
+📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) | 🍎 iOS Only | `Optional`"
           default: active
           selector:
             select:
@@ -341,11 +428,16 @@ blueprint:
       icon: mdi:email-edit-outline
       collapsed: true
       description: >-
-        <br>
+        
+
         **Configure notification attachments** - Add camera snapshots, images, or videos to your notifications.
-        <br><br>
+        
+
+
         💡 **Tip**: Select attachment type first, then configure the corresponding field below.
-        <br><br>
+        
+
+
 
       input:
         attachment_type:
@@ -423,12 +515,21 @@ blueprint:
       icon: mdi:gesture-tap-button
       collapsed: true
       description: >-
-        <br>
-        Configure up to 3 action buttons on notifications for quick actions.<br><br>
-        Examples: "Unlock Door" / "View Camera" / "Dismiss"<br><br>
-        **⚠️ Android Note:** Android can't send events AND open links in one button. Choose Action(s) OR Link mode per button. iOS supports both simultaneously.<br><br>
+        
+
+        Configure up to 3 action buttons on notifications for quick actions.
+
+
+        Examples: "Unlock Door" / "View Camera" / "Dismiss"
+
+
+        **⚠️ Android Note:** Android can't send events AND open links in one button. Choose Action(s) OR Link mode per button. iOS supports both simultaneously.
+
+
         📖 [Actionable Notifications Guide](https://companion.home-assistant.io/docs/notifications/actionable-notifications)
-        <br><br>
+        
+
+
 
         
       input:
@@ -762,13 +863,21 @@ blueprint:
       icon: mdi:message-reply
       collapsed: true
       description: >-
-        <br>
+        
+
         **Multi-Device Response Control** - Configure how responses are handled when notifying multiple devices.
-        <br><br>
-        **Use Cases:**<br>
-        - Family alert: First person to respond wins, others auto-dismissed<br>
-        - Chore acceptance: One person claims task, notify others it's taken<br>
-        - Critical alerts: Ensure visibility by keeping notification on other devices<br><br>
+        
+
+
+        **Use Cases:**
+
+        - Family alert: First person to respond wins, others auto-dismissed
+
+        - Chore acceptance: One person claims task, notify others it's taken
+
+        - Critical alerts: Ensure visibility by keeping notification on other devices
+
+
         **📘 Note**: Single-device notifications ignore these settings (only relevant for multiple targets).
         
       input:
@@ -777,19 +886,24 @@ blueprint:
           description: >-
             Controls whether multiple devices can respond or only the first response is processed.
             
-            Single Response (Default):
-            - Only the first device's response is processed
-            - Subsequent responses from other devices are ignored
-            - Best for "first to claim" scenarios (unlock door, accept chore)
-            - Options below control what happens to non-responding devices
+            <details>
+            <summary>Click for mode details</summary>
+
+            **Single Response (Default):**
+             - Only the first device's response is processed
+             - Subsequent responses from other devices are ignored
+             - Best for "first to claim" scenarios (unlock door, accept chore)
+             - Options below control what happens to non-responding devices
             
-            Multi Response:
-            - Every device can respond independently
-            - All responses are processed separately
-            - Best when each person needs to take action (confirm attendance, rate service)
-            - Options below are ignored in this mode
+            **Multi Response:**
+             - Every device can respond independently
+             - All responses are processed separately
+             - Best when each person needs to take action (confirm attendance, rate service)
+             - Options below are ignored in this mode
             
             When set to "Multi Response", all single-device response options below (Auto-Clear, Notify Other Devices, Run Actions) are ignored. Single device notifications: Both modes behave identically.
+
+            </details>
             
             Default: Single Response
           default: "single"
@@ -842,20 +956,25 @@ blueprint:
           description: >-
             Requires "Notify Other Devices" enabled - Customize the message sent to non-responding devices. Supports Jinja2 templates.
             
-            Available Template Variables:
-            - `responding_device_name` - Name of the device that responded (e.g., "John's iPhone")
-            - `selected_action` - Which action button was pressed (e.g., "option_one", "option_two")
-            - `original_message` - The original notification message text
-            - `action_label` - Human-readable label of the selected action button
-            - Standard HA variables: `now()`, `states()`, etc.
+            <details>
+            <summary>Click for template details</summary>
+
+            **Available Template Variables:**
+             - `responding_device_name` - Name of the device that responded (e.g., "John's iPhone")
+             - `selected_action` - Which action button was pressed (e.g., "option_one", "option_two")
+             - `original_message` - The original notification message text
+             - `action_label` - Human-readable label of the selected action button
+             - Standard HA variables: `now()`, `states()`, etc.
             
-            Template Examples:
-            - Simple: `Action handled by {{ responding_device_name }}`
-            - With action: `{{ responding_device_name }} pressed "{{ action_label }}"`
-            - Detailed: `{{ original_message }} - {{ selected_action }} by {{ responding_device_name }}`
-            - Time-stamped: `Handled by {{ responding_device_name }} at {{ now().strftime('%H:%M') }}`
+            **Template Examples:**
+             - Simple: `Action handled by {{ responding_device_name }}`
+             - With action: `{{ responding_device_name }} pressed "{{ action_label }}"`
+             - Detailed: `{{ original_message }} - {{ selected_action }} by {{ responding_device_name }}`
+             - Time-stamped: `Handled by {{ responding_device_name }} at {{ now().strftime('%H:%M') }}`
             
             Template errors fall back to default message. Ignored in Multi Response mode.
+
+            </details>
             
             Default: "Action handled by {{ responding_device_name | default('another device') }}"
           default: "Action handled by {{ responding_device_name | default('another device') }}"
@@ -867,18 +986,23 @@ blueprint:
           description: >-
             Single Response Mode Only - Execute custom actions for devices that didn't respond when first device responds.
             
-            How it works:
-            - Device A responds → actions run once for each device (B, C, D) that didn't respond
-            - Useful for logging, tracking, or follow-up automation
-            - Actions defined in "Actions for Other Devices" below
+            <details>
+            <summary>Click for details</summary>
+
+            **How it works:**
+             - Device A responds → actions run once for each device (B, C, D) that didn't respond
+             - Useful for logging, tracking, or follow-up automation
+             - Actions defined in "Actions for Other Devices" below
             
-            Use Cases:
-            - Log which devices were notified but didn't respond
-            - Update dashboard showing who hasn't acknowledged
-            - Send reminder to specific devices after timeout
-            - Track response rates for analytics
+            **Use Cases:**
+             - Log which devices were notified but didn't respond
+             - Update dashboard showing who hasn't acknowledged
+             - Send reminder to specific devices after timeout
+             - Track response rates for analytics
             
             Tip: Combine with timeout actions for comprehensive tracking. Ignored in Multi Response mode.
+
+            </details>
             
             Default: Disabled
           default: false
@@ -889,14 +1013,17 @@ blueprint:
           description: >-
             Requires "Run Actions for Others" enabled - Define actions to execute for each non-responding device.
             
-            Available Template Variables:
-            - `responding_device_name` - Device that responded first
-            - `selected_action` - Which action button was pressed
-            - `notified_devices` - List of all device names that were notified
-            - `non_responding_device` - Current device in the loop (use in templates)
-            - `action_label` - Human-readable label of selected action
+            <details>
+            <summary>Click for template variables and examples</summary>
+
+            **Available Template Variables:**
+             - `responding_device_name` - Device that responded first
+             - `selected_action` - Which action button was pressed
+             - `notified_devices` - List of all device names that were notified
+             - `non_responding_device` - Current device in the loop (use in templates)
+             - `action_label` - Human-readable label of selected action
             
-            Action Examples:
+            **Action Examples:**
             
             Log to history:
             ```yaml
@@ -921,6 +1048,8 @@ blueprint:
             ```
             
             Ignored in Multi Response mode.
+
+            </details>
             
             Optional
           default: []
@@ -937,9 +1066,12 @@ blueprint:
       icon: mdi:timer-cog-outline
       collapsed: true
       description: >-
-        <br>
+        
+
         **Timeout Settings** - Control how long to wait for user response and what happens when time expires.
-        <br><br>
+        
+
+
 
       input:
         enable_timeout:
@@ -1051,9 +1183,12 @@ blueprint:
       icon: mdi:cog-outline
       collapsed: true
       description: >-
-        <br>
+        
+
         Configure notification link, tag, and grouping options.
-        <br><br>
+        
+
+
 
       input:
         notification_link:
@@ -1066,14 +1201,21 @@ blueprint:
             
             Supports Jinja2 templates.
             
-            Examples:
-            - Dashboard: `/lovelace/cameras` - View all cameras dashboard
-            - Dashboard: `/lovelace/security` - Security dashboard
-            - Entity view: `entityId:camera.front_door` - View front door camera
-            - Template: `/lovelace/{{ trigger.entity_id.split('.')[1] }}`
-            - Home Assistant views: `/config/updates` or `/lovelace/home`
-            - Apps: `app://<package name>`
-            - Deep links: `deep-link://<deep_link>`
+            
+            <details>
+            <summary>Click for examples</summary>
+
+            **Examples:**
+             - Dashboard: `/lovelace/cameras` - View all cameras dashboard
+             - Dashboard: `/lovelace/security` - Security dashboard
+             - Entity view: `entityId:camera.front_door` - View front door camera
+             - Template: `/lovelace/{{ trigger.entity_id.split('.')[1] }}`
+             - Home Assistant views: `/config/updates` or `/lovelace/home`
+             - Apps: `app://<package name>`
+             - Deep links: `deep-link://<deep_link>`
+            
+            
+            </details>
             
             📖 [Opening a URL Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) | Optional
           default: ""
@@ -1114,9 +1256,12 @@ blueprint:
       icon: mdi:apple
       collapsed: true
       description: >-
-        <br>
+        
+
         iOS-only features like thread ID and presentation options.
-        <br><br>
+        
+
+
 
       input:
         thread_id:
@@ -1155,9 +1300,12 @@ blueprint:
       icon: mdi:android
       collapsed: true
       description: >-
-        <br>
+        
+
         Android-only features like notification channels, LED colors, and vibration patterns.
-        <br><br>
+        
+
+
 
       input:
         on_manual_clear_action:
