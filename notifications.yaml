@@ -238,9 +238,11 @@ blueprint:
         notify_device:
           name: "📱 Device(s) to Notify"
           description: >-
-            **REQUIRED** - Select one or more devices with Home Assistant Companion app installed.<br><br>
-            Select multiple devices to send the same notification to all of them.<br><br>
-            📖 [Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic) | (🍎 iOS | 🤖 Android)
+            Select one or more devices with Home Assistant Companion app installed.
+            
+            Select multiple devices to send the same notification to all of them.
+            
+            📖 [Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic) | Required
           selector:
             device:
               multiple: true
@@ -249,13 +251,14 @@ blueprint:
         message:
           name: "💬 Message"
           description: >-
-            **REQUIRED** - Main notification text content.<br><br>
-            **Supports Jinja2 templates** and HTML formatting (🤖 Android Only).<br><br>
-            **Examples:**<br>
-             - Static: `Motion detected at front door`<br>
-             - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br>
-             - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`<br><br>
-            📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | (🍎 iOS | 🤖 Android)
+            Main notification text content. Supports Jinja2 templates and HTML formatting (Android).
+            
+            Examples:
+            - Static: `Motion detected at front door`
+            - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`
+            - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`
+            
+            📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | Required
           selector:
             text:
               multiline: true
@@ -345,15 +348,15 @@ blueprint:
       input:
         attachment_type:
           name: "📸 Attachment Type"
-          description: >
-            Choose what type of attachment to send with the notification.<br><br>
-
-            • **None** - No attachment (default)<br>
-            • **Camera** - Live camera snapshot 🍎🤖<br>
-            • **Image URL** - Static image from URL 🍎🤖<br>
-            • **Video URL** - Video file 🍎🤖 (platform support varies)<br><br>
-
-            📖 [Notification Attachments Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`
+          description: >-
+            Choose what type of attachment to send with the notification.
+            
+            • None - No attachment (default)
+            • Camera - Live camera snapshot
+            • Image URL - Static image from URL
+            • Video URL - Video file (platform support varies)
+            
+            📖 [Notification Attachments Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | Optional
           default: "none"
           selector:
             select:
@@ -369,14 +372,15 @@ blueprint:
         attachment_camera_entity:
           name: "📸 Camera Entity"
           description: >-
-            Select a camera to capture a snapshot for the notification.<br><br>
-
-            **Platform Behavior**:<br>
-            • 🍎 **iOS**: <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream">Camera Stream</a> - Displays live camera feed<br>
-            • 🤖 **Android**: <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">Automatic Snapshots</a> - Captures static snapshot<br><br>
-
-            ⚠️ **Only used when Attachment Type is set to "Camera"**<br>
-            `Optional`
+            Select a camera to capture a snapshot for the notification.
+            
+            Platform Behavior:
+            • iOS: Camera Stream - Displays live camera feed
+            • Android: Automatic Snapshots - Captures static snapshot
+            
+            Only used when Attachment Type is set to "Camera"
+            
+            📖 [iOS Camera Stream](https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream) | [Android Snapshots](https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots) | Optional
           default: ""
           selector:
             entity:
@@ -385,28 +389,29 @@ blueprint:
         image_url:
           name: "🖼️ Image URL"
           description: >-
-            URL or path to an image file to attach. 🍎🤖<br><br>
-
-            **Examples**:<br>
-            • `https://example.com/alert.jpg` (external URL)<br>
-            • `/local/images/warning.png` (local file)<br>
-            • `{{ states.weather.home.attributes.entity_picture }}` (template)<br><br>
-
-            ⚠️ **Only used when Attachment Type is set to "Image URL"**<br>
-            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`
+            URL or path to an image file to attach.
+            
+            Examples:
+            - `https://example.com/alert.jpg` (external URL)
+            - `/local/images/warning.png` (local file)
+            - `{{ states.weather.home.attributes.entity_picture }}` (template)
+            
+            Only used when Attachment Type is set to "Image URL"
+            
+            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | Optional
           default: ""
           selector:
             text:
         video_url:
           name: "🎥 Video URL"
           description: >-
-            URL or path to a video file to attach. 🍎🤖<br><br>
-
-            **Example**: `/local/videos/doorbell_clip.mp4`<br><br>
-
-            ⚠️ **Only used when Attachment Type is set to "Video URL"**<br>
-            ⚠️ **Platform support varies** - Test on your devices<br>
-            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments#video) | `Optional`
+            URL or path to a video file to attach.
+            
+            Example: `/local/videos/doorbell_clip.mp4`
+            
+            Only used when Attachment Type is set to "Video URL". Platform support varies - test on your devices.
+            
+            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments#video) | Optional
           default: ""
           selector:
             text:
@@ -426,23 +431,26 @@ blueprint:
         
       input:
         option_one_enabled:
-          name: "🍎 🤖 Option 1 - Enabled"
+          name: "Option 1 - Enabled"
           default: true
           selector:
             boolean:
         option_one_text:
-          name: "🍎 🤖 1️⃣ Title"
+          name: "1️⃣ Title"
           description: "Title to show on the first option."
           default: "Confirm"
           selector:
             text:
         option_one_mode:
-          name: "🤖 1️⃣ Mode"
+          name: "1️⃣ Mode"
           description: >-
-            Choose Action(s) or Link mode. See Android Note above.<br><br>
-            To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
-            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
-            (`🤖 Android Only`, `Optional`)
+            Choose Action(s) or Link mode.
+            
+            To do nothing: Pick Action(s) and leave Action(s) empty.
+            
+            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
+            
+            🤖 Android Only | Optional
           default: ""
           selector:
             select:
@@ -455,60 +463,79 @@ blueprint:
                 - label: "Link (🤖 Android Only)"
                   value: uri
         option_one_action:
-          name: "🍎 🤖 1️⃣ Action(s)"
-          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          name: "1️⃣ Action(s)"
+          description: >-
+            Action(s) to run when this option is selected.
+            
+            Used with Mode: Action(s) option. Script stops after actions are run. Leave empty to do nothing.
+            
+            Optional
           default: []
           selector:
             action:
         option_one_uri:
-          name: "🍎 🤖 1️⃣ Link"
+          name: "1️⃣ Link"
           description: >-
-            Open link/app when selected.<br><br>
-            Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`<br><br>
-            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url)<br><br>
-            ⚠️ Android: URI links won't stop timeout countdown. Check your timeout actions.<br><br>
-            (`Optional`)
+            Open link/app when selected.
+            
+            Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`
+            
+            Android: URI links won't stop timeout countdown. Check your timeout actions.
+            
+            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) | Optional
           default: ""
           selector:
             text:
               type: url
         option_one_icon:
-          name: "🍎 1️⃣ Icon"
-          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | ((`🍎 iOS Only`, `Optional`))"
+          name: "1️⃣ Icon"
+          description: >-
+            Custom SF Symbols icon.
+            
+            📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | 🍎 iOS Only | Optional
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         option_one_is_destructive:
-          name: "🍎 1️⃣ Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n(`🍎 iOS Only`, `Optional`)"
+          name: "1️⃣ Destructive"
+          description: >-
+            Set the action's title to be red, indicating a destructive action.
+            
+            🍎 iOS Only | Optional
           default: false
           selector:
             boolean:
         option_one_authentication_required:
-          name: "🍎 1️⃣ Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n(`🍎 iOS Only`, `Optional`)"
+          name: "1️⃣ Authentication Required"
+          description: >-
+            Require device to be unlocked to use this option.
+            
+            🍎 iOS Only | Optional
           default: false
           selector:
             boolean:
         option_two_enabled:
-          name: "🍎 🤖 Option 2 - Enabled"
+          name: "Option 2 - Enabled"
           default: true
           selector:
             boolean:
         option_two_text:
-          name: "🍎 🤖 2️⃣ Title"
+          name: "2️⃣ Title"
           description: "Title to show on the second option."
           default: "Dismiss"
           selector:
             text:
         option_two_mode:
-          name: "🤖 2️⃣ Mode"
+          name: "2️⃣ Mode"
           description: >-
-            Choose Action(s) or Link mode. See Android Note above.<br><br>
-            To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
-            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
-            (`🤖 Android Only`, `Optional`)
+            Choose Action(s) or Link mode.
+            
+            To do nothing: Pick Action(s) and leave Action(s) empty.
+            
+            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
+            
+            🤖 Android Only | Optional
           default: ""
           selector:
             select:
@@ -521,60 +548,79 @@ blueprint:
                 - label: "Link (🤖 Android Only)"
                   value: uri
         option_two_action:
-          name: "🍎 🤖 2️⃣ Action(s)"
-          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          name: "2️⃣ Action(s)"
+          description: >-
+            Action(s) to run when this option is selected.
+            
+            Used with Mode: Action(s) option. Script stops after actions are run. Leave empty to do nothing.
+            
+            Optional
           default: []
           selector:
             action:
         option_two_uri:
-          name: "🍎 🤖 2️⃣ Link"
+          name: "2️⃣ Link"
           description: >-
-            Open link/app when selected.<br><br>
-            Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`<br><br>
-            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url)<br><br>
-            ⚠️ Android: URI links won't stop timeout countdown. Check your timeout actions.<br><br>
-            (`Optional`)
+            Open link/app when selected.
+            
+            Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`
+            
+            Android: URI links won't stop timeout countdown. Check your timeout actions.
+            
+            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) | Optional
           default: ""
           selector:
             text:
               type: url
         option_two_icon:
-          name: "🍎 2️⃣ Icon"
-          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | ((`🍎 iOS Only`, `Optional`))"
+          name: "2️⃣ Icon"
+          description: >-
+            Custom SF Symbols icon.
+            
+            📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | 🍎 iOS Only | Optional
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         option_two_is_destructive:
-          name: "🍎 2️⃣ Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n(`🍎 iOS Only`, `Optional`)"
+          name: "2️⃣ Destructive"
+          description: >-
+            Set the action's title to be red, indicating a destructive action.
+            
+            🍎 iOS Only | Optional
           default: false
           selector:
             boolean:
         option_two_authentication_required:
-          name: "🍎 2️⃣ Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n(`🍎 iOS Only`, `Optional`)"
+          name: "2️⃣ Authentication Required"
+          description: >-
+            Require device to be unlocked to use this option.
+            
+            🍎 iOS Only | Optional
           default: false
           selector:
             boolean:
         option_three_enabled:
-          name: "🍎 🤖 Option 3 - Enabled"
+          name: "Option 3 - Enabled"
           default: false
           selector:
             boolean:
         option_three_text:
-          name: "🍎 🤖 3️⃣ Title"
+          name: "3️⃣ Title"
           description: "Title to show on the third option."
           default: "Option 3"
           selector:
             text:
         option_three_mode:
-          name: "🤖 3️⃣ Mode"
+          name: "3️⃣ Mode"
           description: >-
-            Choose Action(s) or Link mode. See Android Note above.<br><br>
-            To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
-            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
-            (`🤖 Android Only`, `Optional`)
+            Choose Action(s) or Link mode.
+            
+            To do nothing: Pick Action(s) and leave Action(s) empty.
+            
+            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
+            
+            🤖 Android Only | Optional
           default: ""
           selector:
             select:
@@ -587,39 +633,55 @@ blueprint:
                 - label: "Link (🤖 Android Only)"
                   value: uri
         option_three_action:
-          name: "🍎 🤖 3️⃣ Action(s)"
-          description: "Action(s) to run when this option is selected.\n\n❔ Used with `Mode: Action(s)` option\n❔ Script stops after actions are run\n❔ Leave empty to do nothing\n\n`Optional`"
+          name: "3️⃣ Action(s)"
+          description: >-
+            Action(s) to run when this option is selected.
+            
+            Used with Mode: Action(s) option. Script stops after actions are run. Leave empty to do nothing.
+            
+            Optional
           default: []
           selector:
             action:
         option_three_uri:
-          name: "🍎 🤖 3️⃣ Link"
+          name: "3️⃣ Link"
           description: >-
-            Open link/app when selected.<br><br>
-            Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`<br><br>
-            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url)<br><br>
-            ⚠️ Android: URI links won't stop timeout countdown. Check your timeout actions.<br><br>
-            (`Optional`)
+            Open link/app when selected.
+            
+            Examples: `/lovelace/dashboard`, `https://example.com`, `app://pkg.name`, `entityId:sun.sun`, `tel:123456789`
+            
+            Android: URI links won't stop timeout countdown. Check your timeout actions.
+            
+            📖 [Link Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) | Optional
           default: ""
           selector:
             text:
               type: url
         option_three_icon:
-          name: "🍎 3️⃣ Icon"
-          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | ((`🍎 iOS Only`, `Optional`))"
+          name: "3️⃣ Icon"
+          description: >-
+            Custom SF Symbols icon.
+            
+            📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | 🍎 iOS Only | Optional
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         option_three_is_destructive:
-          name: "🍎 3️⃣ Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n(`🍎 iOS Only`, `Optional`)"
+          name: "3️⃣ Destructive"
+          description: >-
+            Set the action's title to be red, indicating a destructive action.
+            
+            🍎 iOS Only | Optional
           default: false
           selector:
             boolean:
         option_three_authentication_required:
-          name: "🍎 3️⃣ Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n(`🍎 iOS Only`, `Optional`)"
+          name: "3️⃣ Authentication Required"
+          description: >-
+            Require device to be unlocked to use this option.
+            
+            🍎 iOS Only | Optional
           default: false
           selector:
             boolean:
@@ -711,19 +773,22 @@ blueprint:
         response_mode:
           name: "🎯 Response Mode"
           description: >-
-            Controls whether multiple devices can respond or only the first response is processed.<br><br>
-            **Single Response** (Default):<br>
-             - ✅ Only the first device's response is processed<br>
-             - ✅ Subsequent responses from other devices are ignored<br>
-             - ✅ Best for "first to claim" scenarios (unlock door, accept chore)<br>
-             - ✅ Options below control what happens to non-responding devices<br><br>
-            **Multi Response**:<br>
-             - ✅ Every device can respond independently<br>
-             - ✅ All responses are processed separately<br>
-             - ✅ Best when each person needs to take action (confirm attendance, rate service)<br>
-             - ⚠️ Options below are ignored in this mode<br><br>
-            **⚙️ Validation**: When set to "Multi Response", all single-device response options below (Auto-Clear, Notify Other Devices, Run Actions) are ignored.<br><br>
-            💡 **Single device notifications**: Both modes behave identically.<br><br>
+            Controls whether multiple devices can respond or only the first response is processed.
+            
+            Single Response (Default):
+            - Only the first device's response is processed
+            - Subsequent responses from other devices are ignored
+            - Best for "first to claim" scenarios (unlock door, accept chore)
+            - Options below control what happens to non-responding devices
+            
+            Multi Response:
+            - Every device can respond independently
+            - All responses are processed separately
+            - Best when each person needs to take action (confirm attendance, rate service)
+            - Options below are ignored in this mode
+            
+            When set to "Multi Response", all single-device response options below (Auto-Clear, Notify Other Devices, Run Actions) are ignored. Single device notifications: Both modes behave identically.
+            
             Default: Single Response
           default: "single"
           selector:
@@ -736,15 +801,17 @@ blueprint:
         clear_other_notifications:
           name: "🧹 Auto-Clear Other Devices"
           description: >-
-            **⚙️ Single Response Mode Only** - When first device responds, automatically dismiss notifications on all other devices.<br><br>
-            **How it works:**<br>
-             - Device A responds → notifications on devices B, C, D are cleared<br>
-             - Only applies to devices that haven't responded yet<br>
-             - Works in conjunction with "Notify Other Devices" below<br><br>
-            **Use case:** Family alert - Mom responds to unlock door, notification auto-clears from Dad's and kids' phones.<br><br>
-            **🍎 iOS**: Reliable clearing support<br>
-            **🤖 Android**: Limited - may require user to manually clear in some cases<br><br>
-            ⚠️ **Ignored in Multi Response mode**<br><br>
+            Single Response Mode Only - When first device responds, automatically dismiss notifications on all other devices.
+            
+            How it works:
+            - Device A responds → notifications on devices B, C, D are cleared
+            - Only applies to devices that haven't responded yet
+            - Works in conjunction with "Notify Other Devices" below
+            
+            Use case: Family alert - Mom responds to unlock door, notification auto-clears from Dad's and kids' phones.
+            
+            iOS: Reliable clearing support. Android: Limited - may require user to manually clear in some cases. Ignored in Multi Response mode.
+            
             Default: Enabled
           default: true
           selector:
@@ -752,15 +819,18 @@ blueprint:
         notify_other_devices_on_response:
           name: "📢 Notify Other Devices on Response"
           description: >-
-            **⚙️ Single Response Mode Only** - Send informational notification to other devices when first device responds.<br><br>
-            **How it works:**<br>
-             - Device A responds → new notification sent to devices B, C, D<br>
-             - Original notification may be cleared (see "Auto-Clear" above)<br>
-             - New notification shows who responded and which action they took<br>
-             - Message content customizable via template below<br><br>
-            **Use case:** "Front door unlocked by John's iPhone" sent to other family members for awareness.<br><br>
-            **💡 Tip**: Combine with "Auto-Clear" for best user experience (remove old, show new).<br><br>
-            ⚠️ **Ignored in Multi Response mode**<br><br>
+            Single Response Mode Only - Send informational notification to other devices when first device responds.
+            
+            How it works:
+            - Device A responds → new notification sent to devices B, C, D
+            - Original notification may be cleared (see "Auto-Clear" above)
+            - New notification shows who responded and which action they took
+            - Message content customizable via template below
+            
+            Use case: "Front door unlocked by John's iPhone" sent to other family members for awareness.
+            
+            Tip: Combine with "Auto-Clear" for best user experience (remove old, show new). Ignored in Multi Response mode.
+            
             Default: Disabled
           default: false
           selector:
@@ -768,20 +838,23 @@ blueprint:
         other_devices_message_template:
           name: "💬 Other Devices Message Template"
           description: >-
-            **📝 Requires "Notify Other Devices" enabled** - Customize the message sent to non-responding devices. Supports Jinja2 templates.<br><br>
-            **Available Template Variables:**<br>
-             - `responding_device_name` - Name of the device that responded (e.g., "John's iPhone")<br>
-             - `selected_action` - Which action button was pressed (e.g., "option_one", "option_two")<br>
-             - `original_message` - The original notification message text<br>
-             - `action_label` - Human-readable label of the selected action button<br>
-             - Standard HA variables: `now()`, `states()`, etc.<br><br>
-            **Template Examples:**<br>
-             - **Simple**: `Action handled by {{ responding_device_name }}`<br>
-             - **With action**: `{{ responding_device_name }} pressed "{{ action_label }}"`<br>
-             - **Detailed**: `{{ original_message }} - {{ selected_action }} by {{ responding_device_name }}`<br>
-             - **Time-stamped**: `Handled by {{ responding_device_name }} at {{ now().strftime('%H:%M') }}`<br><br>
-            **📘 Note**: Template errors fall back to default message.<br><br>
-            ⚠️ **Ignored in Multi Response mode**<br><br>
+            Requires "Notify Other Devices" enabled - Customize the message sent to non-responding devices. Supports Jinja2 templates.
+            
+            Available Template Variables:
+            - `responding_device_name` - Name of the device that responded (e.g., "John's iPhone")
+            - `selected_action` - Which action button was pressed (e.g., "option_one", "option_two")
+            - `original_message` - The original notification message text
+            - `action_label` - Human-readable label of the selected action button
+            - Standard HA variables: `now()`, `states()`, etc.
+            
+            Template Examples:
+            - Simple: `Action handled by {{ responding_device_name }}`
+            - With action: `{{ responding_device_name }} pressed "{{ action_label }}"`
+            - Detailed: `{{ original_message }} - {{ selected_action }} by {{ responding_device_name }}`
+            - Time-stamped: `Handled by {{ responding_device_name }} at {{ now().strftime('%H:%M') }}`
+            
+            Template errors fall back to default message. Ignored in Multi Response mode.
+            
             Default: "Action handled by {{ responding_device_name | default('another device') }}"
           default: "Action handled by {{ responding_device_name | default('another device') }}"
           selector:
@@ -790,18 +863,21 @@ blueprint:
         run_actions_for_others_on_response:
           name: "⚙️ Run Actions for Other Devices"
           description: >-
-            **⚙️ Single Response Mode Only** - Execute custom actions for devices that didn't respond when first device responds.<br><br>
-            **How it works:**<br>
-             - Device A responds → actions run once for each device (B, C, D) that didn't respond<br>
-             - Useful for logging, tracking, or follow-up automation<br>
-             - Actions defined in "Actions for Other Devices" below<br><br>
-            **Use Cases:**<br>
-             - Log which devices were notified but didn't respond<br>
-             - Update dashboard showing who hasn't acknowledged<br>
-             - Send reminder to specific devices after timeout<br>
-             - Track response rates for analytics<br><br>
-            **💡 Tip**: Combine with timeout actions for comprehensive tracking.<br><br>
-            ⚠️ **Ignored in Multi Response mode**<br><br>
+            Single Response Mode Only - Execute custom actions for devices that didn't respond when first device responds.
+            
+            How it works:
+            - Device A responds → actions run once for each device (B, C, D) that didn't respond
+            - Useful for logging, tracking, or follow-up automation
+            - Actions defined in "Actions for Other Devices" below
+            
+            Use Cases:
+            - Log which devices were notified but didn't respond
+            - Update dashboard showing who hasn't acknowledged
+            - Send reminder to specific devices after timeout
+            - Track response rates for analytics
+            
+            Tip: Combine with timeout actions for comprehensive tracking. Ignored in Multi Response mode.
+            
             Default: Disabled
           default: false
           selector:
@@ -809,35 +885,42 @@ blueprint:
         other_devices_actions:
           name: "⚙️ Actions for Other Devices"
           description: >-
-            **📝 Requires "Run Actions for Others" enabled** - Define actions to execute for each non-responding device.<br><br>
-            **Available Template Variables:**<br>
-             - `responding_device_name` - Device that responded first<br>
-             - `selected_action` - Which action button was pressed<br>
-             - `notified_devices` - List of all device names that were notified<br>
-             - `non_responding_device` - Current device in the loop (use in templates)<br>
-             - `action_label` - Human-readable label of selected action<br><br>
-            **Action Examples:**<br><br>
-            **Log to history:**<br>
-            ```yaml<br>
-            - service: logbook.log<br>
-              data:<br>
-                name: "Notification Response"<br>
-                message: "{{ non_responding_device }} did not respond. Handled by {{ responding_device_name }}"<br>
-            ```<br><br>
-            **Update input boolean:**<br>
-            ```yaml<br>
-            - service: input_boolean.turn_on<br>
-              target:<br>
-                entity_id: input_boolean.{{ non_responding_device | slugify }}_missed_alert<br>
-            ```<br><br>
-            **Send follow-up notification:**<br>
-            ```yaml<br>
-            - service: notify.mobile_app_{{ non_responding_device | slugify }}<br>
-              data:<br>
-                message: "Alert was handled by {{ responding_device_name }}"<br>
-            ```<br><br>
-            ⚠️ **Ignored in Multi Response mode**<br><br>
-            `Optional`
+            Requires "Run Actions for Others" enabled - Define actions to execute for each non-responding device.
+            
+            Available Template Variables:
+            - `responding_device_name` - Device that responded first
+            - `selected_action` - Which action button was pressed
+            - `notified_devices` - List of all device names that were notified
+            - `non_responding_device` - Current device in the loop (use in templates)
+            - `action_label` - Human-readable label of selected action
+            
+            Action Examples:
+            
+            Log to history:
+            ```yaml
+            - service: logbook.log
+              data:
+                name: "Notification Response"
+                message: "{{ non_responding_device }} did not respond. Handled by {{ responding_device_name }}"
+            ```
+            
+            Update input boolean:
+            ```yaml
+            - service: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.{{ non_responding_device | slugify }}_missed_alert
+            ```
+            
+            Send follow-up notification:
+            ```yaml
+            - service: notify.mobile_app_{{ non_responding_device | slugify }}
+              data:
+                message: "Alert was handled by {{ responding_device_name }}"
+            ```
+            
+            Ignored in Multi Response mode.
+            
+            Optional
           default: []
           selector:
             action:
@@ -859,13 +942,23 @@ blueprint:
       input:
         enable_timeout:
           name: "⌛️ Enable Timeout"
-          description: "Require script to stop listening after the set duration.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will wait for response indefinitely until the next time it is triggered."
+          description: >-
+            Require script to stop listening after the set duration.
+            
+            Recommended to enable. If disabled, script will wait for response indefinitely until the next time it is triggered.
           default: true # Default `true` for backward compatibility.
           selector:
             boolean:
         timeout:
           name: "⌛️ Timeout Duration"
-          description: "How long to wait for user response before executing timeout actions.<br><br>**Use case:** Wait 5 minutes for response to door unlock request, 30 seconds for garage closing confirmation.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)<br><br>👍🏻 Recommended: ≥1 minute for reliable notification delivery<br>Default: 15 minutes"
+          description: >-
+            How long to wait for user response before executing timeout actions.
+            
+            Use case: Wait 5 minutes for response to door unlock request, 30 seconds for garage closing confirmation.
+            
+            Recommended: ≥1 minute for reliable notification delivery.
+            
+            📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications) | Default: 15 minutes
           default:
             hours: 0
             minutes: 15
@@ -875,13 +968,23 @@ blueprint:
               enable_day: false
         run_timeout_actions:
           name: "⌛️ Enable Timeout Action(s)"
-          description: "Run timeout actions upon a timeout event.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will timeout without executing any timeout actions."
+          description: >-
+            Run timeout actions upon a timeout event.
+            
+            Recommended to enable. If disabled, script will timeout without executing any timeout actions.
           default: true # Default `true` for backward compatibility.
           selector:
             boolean:
         timeout_action:
           name: "⌛️ Timeout Action(s)"
-          description: "Action to run when notification response is timed out.  \n\n❔ Leave empty if no actions should be run  \n\n⚠️ Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\n❔ Android Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
+          description: >-
+            Action to run when notification response is timed out.
+            
+            Leave empty if no actions should be run.
+            
+            Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option. Workaround: you may disable Run timeout action(s) when notification cleared and manually clear the notification after selecting your URI option.
+            
+            Optional
           default: []
           selector:
             action:
@@ -900,19 +1003,23 @@ blueprint:
                   value: "clear_all"
           default: "keep_all"
           description: >-
-            What to do with notifications when timeout occurs.<br><br>
-            🍎 **iOS**: Full support for all options<br>
-            🤖 **Android**: Limited clearing support<br><br>
-            **Multi-device only**: clear_others and clear_all<br><br>
-            **Use cases:**<br>
-            • Emergency alert expires → clear_all to remove from all phones<br>
-            • Time-sensitive request → clear_this to clean up after timeout<br>
+            What to do with notifications when timeout occurs.
+            
+            iOS: Full support for all options. Android: Limited clearing support.
+            
+            Multi-device only: clear_others and clear_all
+            
+            Use cases:
+            • Emergency alert expires → clear_all to remove from all phones
+            • Time-sensitive request → clear_this to clean up after timeout
             • Multi-device coordination → clear_others to remove from non-responding devices
         notify_other_devices_on_timeout:
           name: "📢 Notify Other Devices on Timeout"
           description: >-
-            **Multi-Device Only** - Send informational notification to all devices when timeout occurs.<br><br>
-            **Example**: "Door unlock request timed out - no response received" sent to all family members.<br><br>
+            Multi-Device Only - Send informational notification to all devices when timeout occurs.
+            
+            Example: "Door unlock request timed out - no response received" sent to all family members.
+            
             Default: Disabled
           default: false
           selector:
@@ -920,14 +1027,17 @@ blueprint:
         other_devices_timeout_message:
           name: "💬 Other Devices Timeout Message"
           description: >-
-            **Requires "Notify Other Devices on Timeout" enabled** - Message sent when timeout occurs. Supports Jinja2 templates.<br><br>
-            **Available variables:**<br>
-             - `original_message`: The original notification message<br>
-             - `timeout_seconds`: Duration of the timeout in seconds<br>
-             - `notified_devices`: List of all notified device names<br><br>
-            **Examples:**<br>
-             - Simple: `No response received - request timed out`<br>
-             - Detailed: `{{ original_message }} - Timed out after {{ timeout_seconds // 60 }} minutes`<br><br>
+            Requires "Notify Other Devices on Timeout" enabled - Message sent when timeout occurs. Supports Jinja2 templates.
+            
+            Available variables:
+            - `original_message`: The original notification message
+            - `timeout_seconds`: Duration of the timeout in seconds
+            - `notified_devices`: List of all notified device names
+            
+            Examples:
+            - Simple: `No response received - request timed out`
+            - Detailed: `{{ original_message }} - Timed out after {{ timeout_seconds // 60 }} minutes`
+            
             Default: "No response received - timed out"
           default: "No response received - timed out"
           selector:
@@ -946,7 +1056,24 @@ blueprint:
       input:
         notification_link:
           name: "🔗 Notification Link"
-          description: "Link to navigate to when tapping the notification **without using action buttons**.<br><br>**When this is used:** Opens when user taps the notification body (not the action buttons).<br>**Note:** Action buttons use separate `option_*_uri` fields for their links.<br><br>**Supports Jinja2 templates.**<br><br>**Examples:**<br> - Dashboard: `/lovelace/cameras` - View all cameras dashboard<br> - Dashboard: `/lovelace/security` - Security dashboard<br> - Entity view: `entityId:camera.front_door` - View front door camera<br> - Template: `/lovelace/{{ trigger.entity_id.split('.')[1] }}`<br> - Home Assistant views: `/config/updates` or `/lovelace/home`<br> - Apps: `app://<package name>`<br> - Deep links: `deep-link://<deep_link>`<br><br>📖 [Opening a URL Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url)<br><br>🍎 iOS | 🤖 Android | `Optional`"
+          description: >-
+            Link to navigate to when tapping the notification without using action buttons.
+            
+            When this is used: Opens when user taps the notification body (not the action buttons).
+            Note: Action buttons use separate `option_*_uri` fields for their links.
+            
+            Supports Jinja2 templates.
+            
+            Examples:
+            - Dashboard: `/lovelace/cameras` - View all cameras dashboard
+            - Dashboard: `/lovelace/security` - Security dashboard
+            - Entity view: `entityId:camera.front_door` - View front door camera
+            - Template: `/lovelace/{{ trigger.entity_id.split('.')[1] }}`
+            - Home Assistant views: `/config/updates` or `/lovelace/home`
+            - Apps: `app://<package name>`
+            - Deep links: `deep-link://<deep_link>`
+            
+            📖 [Opening a URL Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url) | Optional
           default: ""
           selector:
             text:
@@ -955,13 +1082,27 @@ blueprint:
         ##############################
         tag:
           name: "🔖 Tag"
-          description: "Used to uniquely identify the notification.  \n\nUse tag if you are using this script with other notification services.  \nLeave empty otherwise.  \n\nExample: `my_awesome_notification_for_device_X`  \n\n👍🏻 Recommended to leave empty\n\n`Optional`"
+          description: >-
+            Used to uniquely identify the notification.
+            
+            Use tag if you are using this script with other notification services. Leave empty otherwise.
+            
+            Example: `my_awesome_notification_for_device_X`
+            
+            Recommended to leave empty.
+            
+            Optional
           default: ""
           selector:
             text:
         group:
           name: "📣 Notification Group ID"
-          description: "Used for grouping different notifications together visually.  \n\n⚠️ iOS critical notifications do no support grouping.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) for more information.  \n\n`Optional`"
+          description: >-
+            Used for grouping different notifications together visually.
+            
+            iOS critical notifications do not support grouping.
+            
+            📖 [Documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#grouping) | Optional
           default: ""
           selector:
             text:
@@ -978,13 +1119,21 @@ blueprint:
       input:
         thread_id:
           name: "🧵 Thread ID"
-          description: "Groups notifications into conversation threads.<br><br>Example: `front-door-events` groups all front door alerts.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#thread-id-grouping-notifications) | `Optional`"
+          description: >-
+            Groups notifications into conversation threads.
+            
+            Example: `front-door-events` groups all front door alerts.
+            
+            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#thread-id-grouping-notifications) | 🍎 iOS Only | Optional
           default: ""
           selector:
             text:
         presentation_options:
           name: "🎨 Presentation Options"
-          description: "Controls what shows when app is open. Options: banner, sound, badge, list.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#presentation-options) | `Optional`"
+          description: >-
+            Controls what shows when app is open. Options: banner, sound, badge, list.
+            
+            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#presentation-options) | 🍎 iOS Only | Optional
           default: []
           selector:
             select:
@@ -1011,13 +1160,19 @@ blueprint:
       input:
         channel:
           name: "📣 Notification Channel"
-          description: "**🤖 Android Only**<br><br>Defines the notification channel on Android. Used with importance setting to control notification behavior.<br><br>📖 [Notification Channels](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channels)<br><br>`Optional`"
+          description: >-
+            Defines the notification channel on Android. Used with importance setting to control notification behavior.
+            
+            📖 [Notification Channels](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channels) | 🤖 Android Only | Optional
           default: "Home Assistant"
           selector:
             text:
         importance:
           name: "❕ Notification Channel Importance"
-          description: "**🤖 Android Only**<br><br>Controls notification priority on Android. Similar to iOS interruption_level but for Android platform.<br><br>📖 [Notification Channel Importance](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance)<br><br>`Optional`"
+          description: >-
+            Controls notification priority on Android. Similar to iOS interruption_level but for Android platform.
+            
+            📖 [Notification Channel Importance](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) | 🤖 Android Only | Optional
           default: default
           selector:
             select:
@@ -1032,13 +1187,19 @@ blueprint:
                   value: min
         android_high_priority:
           name: "❕ High Priority Mode"
-          description: "**🤖 Android Only**<br><br>Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.<br><br>`Optional`"
+          description: >-
+            Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.
+            
+            🤖 Android Only | Optional
           default: true
           selector:
             boolean:
         visibility:
           name: "🔏 Notification Lockscreen Visibility"
-          description: "**🤖 Android Only**<br><br>Show or hide notification content on the lockscreen.<br><br>📖 [Lockscreen Visibility](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility)<br><br>Default: `Private` | `Optional`"
+          description: >-
+            Show or hide notification content on the lockscreen.
+            
+            📖 [Lockscreen Visibility](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) | 🤖 Android Only | Default: Private | Optional
           default: "private"
           selector:
             select:
@@ -1053,7 +1214,18 @@ blueprint:
 
         persist:
           name: "🚩 Persistent Notification"
-          description: "**🤖 Android Only**<br><br>Makes notification non-dismissible - cannot be swiped away by user at all.<br><br>**Difference from Sticky:**<br> - **Persistent**: Cannot be dismissed (this option)<br> - **Sticky**: Can be dismissed only via action buttons (below)<br><br>**⚙️ Validation**: When enabled, manual clear action handling is disabled. The `🧹🤖 When notification swiped away` setting is ignored.<br><br>**Use case:** System-critical alerts that must remain until resolved programmatically.<br><br>📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification)<br><br>`Optional`"
+          description: >-
+            Makes notification non-dismissible - cannot be swiped away by user at all.
+            
+            Difference from Sticky:
+            - Persistent: Cannot be dismissed (this option)
+            - Sticky: Can be dismissed only via action buttons (below)
+            
+            When enabled, manual clear action handling is disabled. The "When notification swiped away" setting is ignored.
+            
+            Use case: System-critical alerts that must remain until resolved programmatically.
+            
+            📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification) | 🤖 Android Only | Optional
           default: false
           selector:
             boolean:
@@ -1062,25 +1234,62 @@ blueprint:
         ##############################
         car_ui:
           name: "🚘 Show on Android Auto"
-          description: "**🤖 Android Only**<br><br>Display notification on Android Auto interface when connected to vehicle.<br><br>`Optional`"
+          description: >-
+            Display notification on Android Auto interface when connected to vehicle.
+            
+            🤖 Android Only | Optional
           default: false
           selector:
             boolean:
         sticky:
           name: "📌 Sticky"
-          description: "**🤖 Android Only**<br><br>Prevents notification from being dismissed until action buttons are used.<br><br>**Difference from Persistent:**<br> - **Sticky**: Can be dismissed only via action buttons (this option)<br> - **Persistent**: Cannot be dismissed at all (above)<br><br>**⚙️ Validation**: When enabled, manual clear action handling is disabled. The `🧹🤖 When notification swiped away` setting is ignored.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment via action buttons.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`Optional`"
+          description: >-
+            Prevents notification from being dismissed until action buttons are used.
+            
+            Difference from Persistent:
+            - Sticky: Can be dismissed only via action buttons (this option)
+            - Persistent: Cannot be dismissed at all (above)
+            
+            When enabled, manual clear action handling is disabled. The "When notification swiped away" setting is ignored.
+            
+            Use case: "Water Leak Detected" or "Smoke Alarm" notifications that require explicit acknowledgment via action buttons.
+            
+            📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky) | 🤖 Android Only | Optional
           default: false
           selector:
             boolean:
         vibration_pattern:
           name: "📳 Vibration Pattern"
-          description: "Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.<br><br>**Examples:**<br><br> - \"100,200,100,200\" - Quick double buzz for routine alerts<br> - \"0,500,200,500\" - Long-short-long for urgent alerts<br> - \"100,100,100,100,100,100\" - Rapid pulses for security<br><br>**Format:** wait,vibrate,wait,vibrate (in milliseconds)<br><br>📖 [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern)<br><br>`Optional`"
+          description: >-
+            Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.
+            
+            Examples:
+            - "100,200,100,200" - Quick double buzz for routine alerts
+            - "0,500,200,500" - Long-short-long for urgent alerts
+            - "100,100,100,100,100,100" - Rapid pulses for security
+            
+            Format: wait,vibrate,wait,vibrate (in milliseconds)
+            
+            📖 [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern) | 🤖 Android Only | Optional
           default: ""
           selector:
             text:
         led_color:
           name: "💡 LED Color"
-          description: "Notification LED color for devices with LED indicators. Provides visual notification when screen is off.<br><br>**Examples:**<br><br> - \"red\" - Critical/security alerts<br> - \"blue\" - Information/status updates<br> - \"#00FF00\" - Success/all-clear (hex green)<br> - \"orange\" - Warnings<br><br>**Use case:** Red LED for alarm triggers, blue for routine door alerts.<br><br>📖 [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color)<br><br>⚠️ Only works on devices with notification LED<br><br>`Optional`"
+          description: >-
+            Notification LED color for devices with LED indicators. Provides visual notification when screen is off.
+            
+            Examples:
+            - "red" - Critical/security alerts
+            - "blue" - Information/status updates
+            - "#00FF00" - Success/all-clear (hex green)
+            - "orange" - Warnings
+            
+            Use case: Red LED for alarm triggers, blue for routine door alerts.
+            
+            Only works on devices with notification LED.
+            
+            📖 [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color) | 🤖 Android Only | Optional
           default: ""
           selector:
             text:
@@ -1097,26 +1306,36 @@ blueprint:
                   value: "run_custom"
           default: "do_nothing"
           description: >-
-            **Android only** - What happens when user swipes notification away.<br><br>
-            **⚙️ Validation**: This setting is ignored (disabled) when notification is persistent OR sticky.<br><br>
-            **Multi-device note**: In mixed iOS/Android setups, "treat as timeout" applies globally to all clear events.<br><br>
-            `🤖 Android Only`
+            What happens when user swipes notification away.
+            
+            This setting is ignored (disabled) when notification is persistent OR sticky.
+            
+            Multi-device note: In mixed iOS/Android setups, "treat as timeout" applies globally to all clear events.
+            
+            🤖 Android Only
         clear_notification_actions:
           name: "⚙️🤖 Actions on manual clear"
           selector:
             action:
           default: []
           description: >-
-            **⚙️ Validation**: Only used when "When notification swiped away" is set to "Run separate actions". Ignored for all other values.<br><br>
-            **Available variables:**<br>
-             - `user_response`: Contains response data including 'result': 'notification_cleared'<br>
-             - `device_id`: ID of device that cleared the notification (if available)<br><br>
-            **Example**: Log to history, update input_boolean, send analytics<br><br>
-            `🤖 Android Only`<br><br>
-            `Optional`
+            Only used when "When notification swiped away" is set to "Run separate actions". Ignored for all other values.
+            
+            Available variables:
+            - `user_response`: Contains response data including 'result': 'notification_cleared'
+            - `device_id`: ID of device that cleared the notification (if available)
+            
+            Example: Log to history, update input_boolean, send analytics
+            
+            🤖 Android Only | Optional
         alert_once:
           name: "🔕 Alert Once"
-          description: "Play sound and vibrate only for initial notification, not for updates. Prevents notification spam for frequently updating alerts.<br><br>**Use case:** Motion sensor that updates every few seconds, or temperature alerts that change gradually.<br><br>📖 [Alert Once](https://companion.home-assistant.io/docs/notifications/notifications-basic#alert-once)<br><br>`Optional`"
+          description: >-
+            Play sound and vibrate only for initial notification, not for updates. Prevents notification spam for frequently updating alerts.
+            
+            Use case: Motion sensor that updates every few seconds, or temperature alerts that change gradually.
+            
+            📖 [Alert Once](https://companion.home-assistant.io/docs/notifications/notifications-basic#alert-once) | 🤖 Android Only | Optional
           default: false
           selector:
             boolean:
