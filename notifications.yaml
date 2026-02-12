@@ -172,13 +172,13 @@ blueprint:
       <br>
 
   input:
-    what_to_send:
-      name: "What to Send"
-      icon: mdi:email-edit-outline
+    required_settings:
+      name: "Required Settings"
+      icon: mdi:cog-outline
       collapsed: false
       description: >-
         <br>
-        **Configure your notification content** - Required fields and message customization.
+        **Essential configuration** - Device selection and notification message (🍎 iOS | 🤖 Android).
         <br><br>
 
       input:
@@ -202,28 +202,92 @@ blueprint:
              - Static: `Motion detected at front door`<br>
              - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br>
              - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`<br><br>
-            📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)
+            📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | (🍎 iOS | 🤖 Android)
           selector:
             text:
               multiline: true
+
+    notification_appearance:
+      name: "Notification Appearance"
+      icon: mdi:palette-outline
+      collapsed: true
+      description: >-
+        <br>
+        **Customize notification look and feel** - Title, subtitle, sound, icon, colors, and interruption settings.
+        <br><br>
+
+      input:
         title:
           name: "🏷️ Title"
-          description: "Headline text at the top of notification. Supports Jinja2 templates.<br><br>Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`<br><br>`Optional`"
+          description: "Headline text at the top of notification. Supports Jinja2 templates.<br><br>Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`<br><br>🍎 iOS | 🤖 Android | `Optional`"
           default: ""
           selector:
             text:
         subtitle:
           name: "🏷️ Subtitle"
-          description: "Secondary text below title. Supports Jinja2 templates.<br><br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br><br>(`🍎 iOS Only`, `Optional`)"
+          description: "Secondary text below title. Supports Jinja2 templates.<br><br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br><br>🍎 iOS only | `Optional`"
           default: ""
           selector:
             text:
         sound:
           name: "🔊 Sound"
-          description: "Custom sound file when notification arrives. Supports templates.<br><br>Examples: `alarm.mp3` (Android in `/local/`), `default` (iOS)<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | `Optional`"
+          description: "Custom sound file when notification arrives. Supports templates.<br><br>Examples: `alarm.mp3` (🤖 Android in `/local/`), `default` (🍎 iOS)<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | 🍎 iOS | 🤖 Android | `Optional`"
           default: ""
           selector:
             text:
+        icon:
+          name: "🙂 Icon"
+          description: "Custom icon for this notification.<br><br>🤖 Android only | `Optional`"
+          default: ""
+          selector:
+            icon:
+        enable_icon_color:
+          name: "🎨 Use Icon Color"
+          description: "If disabled, uses default icon color.<br><br>🤖 Android only | `Optional`"
+          default: false
+          selector:
+            boolean:
+        icon_color:
+          name: "🎨 Icon Color"
+          description: "Custom icon color for this notification.<br><br>🤖 Android only | `Optional`"
+          default: [3, 169, 244]
+          selector:
+            color_rgb:
+        badge:
+          name: "🔢 Badge"
+          description: "Number on app icon badge (0-999). Use 0 to clear.<br><br>Example: `1` for new alert, `0` to clear.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS only | `Optional`"
+          default: ""
+          selector:
+            number:
+              min: 0
+              max: 999
+              mode: box
+        interruption_level:
+          name: "❕ Interruption Level"
+          description: "Controls notification priority and behavior.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) | 🍎 iOS only | `Optional`"
+          default: active
+          selector:
+            select:
+              options:
+                - label: "Silent (Makes no sound, does not wake screen)"
+                  value: passive
+                - label: "Default"
+                  value: active
+                - label: "Important (Overrides Focus)"
+                  value: time-sensitive
+                - label: "Critical (Overrides Focus and Mute, restricted features)"
+                  value: critical
+
+    what_to_send:
+      name: "What to Send"
+      icon: mdi:email-edit-outline
+      collapsed: true
+      description: >-
+        <br>
+        **Configure notification attachments** - Camera snapshots, images, and videos.
+        <br><br>
+
+      input:
         attachment_type:
           name: "📸 Attachment Type"
           description: >
@@ -731,34 +795,10 @@ blueprint:
       collapsed: true
       description: >-
         <br>
-        iOS-only features like interruption level, badge, thread ID, and presentation options.
+        iOS-only features like thread ID and presentation options.
         <br><br>
 
       input:
-        interruption_level:
-          name: "❕ Interruption Level"
-          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) for more information."
-          default: active
-          selector:
-            select:
-              options:
-                - label: "Silent (Makes no sound, does not wake screen)"
-                  value: passive
-                - label: "Default"
-                  value: active
-                - label: "Important (Overrides Focus)"
-                  value: time-sensitive
-                - label: "Critical (Overrides Focus and Mute, restricted features)"
-                  value: critical
-        badge:
-          name: "🔢 Badge"
-          description: "Number on app icon badge (0-999). Use 0 to clear.<br><br>Example: `1` for new alert, `0` to clear.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | `Optional`"
-          default: ""
-          selector:
-            number:
-              min: 0
-              max: 999
-              mode: box
         thread_id:
           name: "🧵 Thread ID"
           description: "Groups notifications into conversation threads.<br><br>Example: `front-door-events` groups all front door alerts.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#thread-id-grouping-notifications) | `Optional`"
@@ -788,33 +828,10 @@ blueprint:
       collapsed: true
       description: >-
         <br>
-        Android-only features like custom icons, notification channels, LED colors, and vibration patterns.
+        Android-only features like notification channels, LED colors, and vibration patterns.
         <br><br>
 
       input:
-        icon:
-          name: "🙂 Icon"
-          description: "Custom icon for this notification.  \n\n`Optional`"
-          default: ""
-          selector:
-            icon:
-        enable_icon_color:
-          name: "🎨 Use Icon Color"
-          description: "If disabled, uses default icon color.  \n\n`Optional`"
-          default: false
-          selector:
-            boolean:
-        icon_color:
-          name: "🎨 Icon Color"
-          description: "Custom icon color for this notification.  \n\n`Optional`"
-          default: [3, 169, 244]
-          selector:
-            color_rgb:
-        ##############################
-        # Input: Response Options
-        ##############################
-        ## Option 1
-
         channel:
           name: "📣 Notification Channel"
           description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`Optional`"
