@@ -1931,9 +1931,11 @@ sequence:
       option_one_icon_value: !input option_one_icon
       option_one_icon: >-
         {% if 'sfsymbols:' in option_one_icon_value %}
-        {{ option_one_icon_value }}
+          {{ option_one_icon_value }}
         {% elif option_one_icon_value | length %}
-        {{ "sfsymbols:{icon}".format(icon=option_one_icon_value) }}
+          {{ "sfsymbols:{icon}".format(icon=option_one_icon_value) }}
+        {% else %}
+          {{ "" }}
         {%- endif %}
       option_one_is_destructive: !input option_one_is_destructive
       option_one_auth_required: !input option_one_authentication_required
@@ -1944,7 +1946,7 @@ sequence:
         {{ first_option }}
         {% endif %}
       option_one: >-
-        {{ {
+        {% set opt = {
           'enabled': option_one_enabled,
           'action': option_one_action,
           'title': option_one_title,
@@ -1952,8 +1954,9 @@ sequence:
           'icon': option_one_icon,
           'destructive': option_one_is_destructive,
           'authenticationRequired': option_one_auth_required,
-          "{}".format('uri' if option_one_uri|length else ''): option_one_uri,
-        } }}
+        } %}
+        {% if option_one_uri|length %}{% set opt = dict(opt, **{'uri': option_one_uri}) %}{% endif %}
+        {{ opt }}
 
   - alias: Option 2
 
@@ -1967,9 +1970,11 @@ sequence:
       option_two_icon_value: !input option_two_icon
       option_two_icon: >-
         {% if 'sfsymbols:' in option_two_icon_value %}
-        {{ option_two_icon_value }}
+          {{ option_two_icon_value }}
         {% elif option_two_icon_value | length %}
-        {{ "sfsymbols:{icon}".format(icon=option_two_icon_value) }}
+          {{ "sfsymbols:{icon}".format(icon=option_two_icon_value) }}
+        {% else %}
+          {{ "" }}
         {%- endif %}
       option_two_is_destructive: !input option_two_is_destructive
       option_two_auth_required: !input option_two_authentication_required
@@ -1980,7 +1985,7 @@ sequence:
         {{ second_option }}
         {% endif %}
       option_two: >-
-        {{ {
+        {% set opt = {
           'enabled': option_two_enabled,
           'action': option_two_action,
           'title': option_two_title,
@@ -1988,8 +1993,9 @@ sequence:
           'icon': option_two_icon,
           'destructive': option_two_is_destructive,
           'authenticationRequired': option_two_auth_required,
-          "{}".format('uri' if option_two_uri|length else ''): option_two_uri,
-        } }}
+        } %}
+        {% if option_two_uri|length %}{% set opt = dict(opt, **{'uri': option_two_uri}) %}{% endif %}
+        {{ opt }}
 
   - alias: Option 3
 
@@ -2003,9 +2009,11 @@ sequence:
       option_three_icon_value: !input option_three_icon
       option_three_icon: >-
         {% if 'sfsymbols:' in option_three_icon_value %}
-        {{ option_three_icon_value }}
+          {{ option_three_icon_value }}
         {% elif option_three_icon_value | length %}
-        {{ "sfsymbols:{icon}".format(icon=option_three_icon_value) }}
+          {{ "sfsymbols:{icon}".format(icon=option_three_icon_value) }}
+        {% else %}
+          {{ "" }}
         {%- endif %}
       option_three_is_destructive: !input option_three_is_destructive
       option_three_auth_required: !input option_three_authentication_required
@@ -2016,7 +2024,7 @@ sequence:
         {{ third_option }}
         {% endif %}
       option_three: >-
-        {{ {
+        {% set opt = {
           'enabled': option_three_enabled,
           'action': option_three_action,
           'title': option_three_title,
@@ -2024,8 +2032,9 @@ sequence:
           'icon': option_three_icon,
           'destructive': option_three_is_destructive,
           'authenticationRequired': option_three_auth_required,
-          "{}".format('uri' if option_three_uri|length else ''): option_three_uri,
-        } }}
+        } %}
+        {% if option_three_uri|length %}{% set opt = dict(opt, **{'uri': option_three_uri}) %}{% endif %}
+        {{ opt }}
 
   - alias: Setup Payload
 
@@ -2058,7 +2067,7 @@ sequence:
             service_name: "{{ repeat.item.service_name }}"
             # Build platform-specific payload for this device
             notification_data: >-
-              {% set payload = namespace(data=common_data.copy()) %}
+              {% set payload = namespace(data=dict(common_data)) %}
               {% set payload.data = dict(payload.data, **{ 'apple_device': is_apple }) %}
               {% if is_apple %}
                 {# iOS - Filter action fields to only include iOS-compatible fields #}
