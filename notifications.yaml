@@ -2078,7 +2078,7 @@ sequence:
                 {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'url': notification_link }) %}{% endif %}
                 {% if attachment_type == 'camera_entity' %}{% set payload.data = dict(payload.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
                 {% if sound|length %}{% set push.d = dict(push.d, **{ 'sound': sound }) %}{% endif %}
-                {% if badge is not none and badge != '' %}{% set payload.data = dict(payload.data, **{ 'badge': badge|int }) %}{% endif %}
+                {% if badge is not none and badge != '' %}{% set push.d = dict(push.d, **{ 'badge': badge|int }) %}{% endif %}
                 {% if thread_id|length %}{% set payload.data = dict(payload.data, **{ 'thread-id': thread_id }) %}{% endif %}
                 {% if presentation_options|length %}{% set push.d = dict(push.d, **{ 'presentation-options': presentation_options }) %}{% endif %}
                 {% if image_url|length %}{% set payload.data = dict(payload.data, **{ 'image': image_url }) %}{% endif %}
