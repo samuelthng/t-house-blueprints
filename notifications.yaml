@@ -48,8 +48,6 @@ blueprint:
       <details>
       <summary>Expand/collapse features</summary>
 
-
-
        - 📲 Sends notification to [Home Assistant Companion](https://companion.home-assistant.io/)
        - 🔢 Multi-device support - Send to multiple devices simultaneously (NEW in v2.3.0)
        - 🎯 Configurable response modes - First-response-wins or all-respond (NEW in v2.3.0)
@@ -62,7 +60,6 @@ blueprint:
        - 📜 Flexible [script fields](https://www.home-assistant.io/integrations/script/#fields)
        - 🍎 Supports iOS
        - 🤖 Supports Android
-
 
       </details>
 
@@ -1213,7 +1210,6 @@ Example: `1` for new alert, `0` to clear.
              - Home Assistant views: `/config/updates` or `/lovelace/home`
              - Apps: `app://<package name>`
              - Deep links: `deep-link://<deep_link>`
-
 
             </details>
 
