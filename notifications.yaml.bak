@@ -64,27 +64,7 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 3.0.0-beta - Blueprint v3.0 Complete Refactoring - *Current*
-      
-      **⚠️ BREAKING CHANGES - Migration Required:**
-      
-      **Phase 1-3: Action Button Refactoring**
-      - **BREAKING**: Renamed `confirm_*` fields → `option_one_*` (all confirm button settings)
-      - **BREAKING**: Renamed `dismiss_*` fields → `option_two_*` (all dismiss button settings)
-      - **BREAKING**: Removed standalone `fields` section - no longer supported
-      - **NEW**: Three configurable action buttons (Option 1, Option 2, Option 3)
-      - **IMPROVED**: All action button configs consolidated into single "Action Buttons" section
-      - **MIGRATION**: Update automations/scripts referencing old field names
-      
-      **Phase 4: Section Reorganization**
-      - **IMPROVED**: Reduced 13 sections → 10 sections for better UX
-      - **IMPROVED**: Created "Required Settings" section (devices, message at top)
-      - **IMPROVED**: Created "Notification Appearance" section (all visual settings)
-      - **IMPROVED**: Created "What to Send" section (attachments consolidated)
-      - **IMPROVED**: Merged timeout_settings + timeout_response_config → "Timeout Configuration"
-      - **IMPROVED**: Renamed "Links & Behavior" → "Advanced Settings"
-      
-      **Phase 5: Clear Options Consolidation**
+      ### Version 3.0.0-beta Phase 5 - Clear Options Consolidation - *Current*
       - **BREAKING**: Consolidated 3 clear-on-timeout booleans into single dropdown `clear_behavior_on_timeout`
       - **BREAKING**: Removed: `clear_on_timeout`, `clear_other_notifications_on_timeout`, `clear_all_notifications_on_timeout`
       - **NEW**: `clear_behavior_on_timeout` dropdown with 4 options: keep_all, clear_this, clear_others, clear_all
@@ -92,21 +72,11 @@ blueprint:
       - **BREAKING**: Removed: `treat_clear_as_timeout`, `run_clear_notification_actions` booleans
       - **NEW**: `on_manual_clear_action` dropdown with 3 options: do_nothing, treat_as_timeout, run_custom
       - **IMPROVED**: Clear logic now uses choose-based branching instead of if/then precedence
-      
-      **Issues Fixed:**
-      - Issue #4 - Three separate clear-on-timeout options causing confusion
-      - Issue #5 - Android clear option conflicts with overlapping behavior
-      - Issue #15 - Timeout actions scattered across multiple sections
-      - Issue #16 - Backwards "when disabled" logic in clear handling
-      - Issue #17 - Three-way clear precedence undocumented
-      - Issue #29 - No validation preventing invalid configs (documentation improved)
-      - Issue #30 - Template variables scattered (now consolidated in field descriptions)
-      
-      **Migration Guide:**
-      1. **Action Buttons**: Rename `confirm_*` → `option_one_*`, `dismiss_*` → `option_two_*`
-      2. **Clear on Timeout**: Replace boolean flags with `clear_behavior_on_timeout` dropdown
-      3. **Android Clear**: Replace `treat_clear_as_timeout` + `run_clear_notification_actions` with `on_manual_clear_action`
-      4. **Remove Fields**: Delete any `fields:` section usage (no longer supported)
+      - **FIXED**: Issue #4 - Three separate clear-on-timeout options causing confusion
+      - **FIXED**: Issue #5 - Android clear option conflicts with overlapping behavior
+      - **FIXED**: Issue #15 - Timeout actions scattered across multiple sections
+      - **FIXED**: Issue #16 - Backwards "when disabled" logic in clear handling
+      - **FIXED**: Issue #17 - Three-way clear precedence undocumented
 
       ### Version 2.4.1 - UX Improvements - *11 Feb 2026*
       - **UX**: Reorganized sections for better user experience - merged related settings, created 'What to Send' section for required fields, reduced from 13 to 10 sections
@@ -250,7 +220,7 @@ blueprint:
           name: "💬 Message"
           description: >-
             **REQUIRED** - Main notification text content.<br><br>
-            **Supports Jinja2 templates** and HTML formatting (🤖 Android Only).<br><br>
+            **Supports Jinja2 templates** and HTML formatting (🤖 Android only).<br><br>
             **Examples:**<br>
              - Static: `Motion detected at front door`<br>
              - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br>
@@ -278,7 +248,7 @@ blueprint:
             text:
         subtitle:
           name: "🏷️ Subtitle"
-          description: "Secondary text below title. Supports Jinja2 templates.<br><br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br><br>🍎 iOS Only | `Optional`"
+          description: "Secondary text below title. Supports Jinja2 templates.<br><br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br><br>🍎 iOS only | `Optional`"
           default: ""
           selector:
             text:
@@ -290,25 +260,25 @@ blueprint:
             text:
         icon:
           name: "🙂 Icon"
-          description: "Custom icon for this notification.<br><br>🤖 Android Only | `Optional`"
+          description: "Custom icon for this notification.<br><br>🤖 Android only | `Optional`"
           default: ""
           selector:
             icon:
         enable_icon_color:
           name: "🎨 Use Icon Color"
-          description: "If disabled, uses default icon color.<br><br>🤖 Android Only | `Optional`"
+          description: "If disabled, uses default icon color.<br><br>🤖 Android only | `Optional`"
           default: false
           selector:
             boolean:
         icon_color:
           name: "🎨 Icon Color"
-          description: "Custom icon color for this notification.<br><br>🤖 Android Only | `Optional`"
+          description: "Custom icon color for this notification.<br><br>🤖 Android only | `Optional`"
           default: [3, 169, 244]
           selector:
             color_rgb:
         badge:
           name: "🔢 Badge"
-          description: "Number on app icon badge (0-999). Use 0 to clear.<br><br>Example: `1` for new alert, `0` to clear.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS Only | `Optional`"
+          description: "Number on app icon badge (0-999). Use 0 to clear.<br><br>Example: `1` for new alert, `0` to clear.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS only | `Optional`"
           default: ""
           selector:
             number:
@@ -317,7 +287,7 @@ blueprint:
               mode: box
         interruption_level:
           name: "❕ Interruption Level"
-          description: "Controls notification priority and behavior.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) | 🍎 iOS Only | `Optional`"
+          description: "Controls notification priority and behavior.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) | 🍎 iOS only | `Optional`"
           default: active
           selector:
             select:
@@ -441,7 +411,6 @@ blueprint:
           description: >-
             Choose Action(s) or Link mode. See Android Note above.<br><br>
             To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
-            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
             (`🤖 Android Only`, `Optional`)
           default: ""
           selector:
@@ -507,7 +476,6 @@ blueprint:
           description: >-
             Choose Action(s) or Link mode. See Android Note above.<br><br>
             To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
-            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
             (`🤖 Android Only`, `Optional`)
           default: ""
           selector:
@@ -573,7 +541,6 @@ blueprint:
           description: >-
             Choose Action(s) or Link mode. See Android Note above.<br><br>
             To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
-            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
             (`🤖 Android Only`, `Optional`)
           default: ""
           selector:
@@ -624,72 +591,6 @@ blueprint:
           selector:
             boolean:
     
-    ##############################
-    # Template Variables Reference
-    ##############################
-    # 
-    # The following template variables are available in various fields throughout this blueprint.
-    # Use them in Jinja2 templates to create dynamic, context-aware notifications.
-    #
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    # RESPONSE HANDLING CONTEXT (when another device responds first):
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    #   • responding_device_name - Name of the device that responded (e.g., "John's iPhone")
-    #   • selected_action - Which action was selected ("option_one", "option_two", "option_three")
-    #   • action_label - Human-readable label of selected action (e.g., "Confirm", "Dismiss")
-    #   • original_message - The original notification message text
-    #   • notified_devices - List of all device names that were notified
-    #   • non_responding_device - Current device in loop (for actions iterating over devices)
-    #
-    #   Available in fields:
-    #     - other_devices_message_template (Response Handling section)
-    #     - other_devices_actions (Response Handling section)
-    #
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    # TIMEOUT CONTEXT (when no response received within timeout duration):
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    #   • original_message - The original notification message text
-    #   • timeout_seconds - Duration of timeout in seconds
-    #   • notified_devices - List of all device names that were notified
-    #
-    #   Available in fields:
-    #     - other_devices_timeout_message (Timeout Configuration section)
-    #
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    # MANUAL CLEAR CONTEXT (when Android user swipes notification away):
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    #   • user_response - Contains response data including 'result': 'notification_cleared'
-    #   • device_id - ID of device that cleared the notification (if available)
-    #
-    #   Available in fields:
-    #     - clear_notification_actions (Android Settings section)
-    #
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    # GENERAL TEMPLATE VARIABLES (available everywhere):
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    #   Standard Home Assistant template variables:
-    #     - now() - Current datetime
-    #     - states('entity.id') - Get entity state
-    #     - state_attr('entity.id', 'attribute') - Get entity attribute
-    #     - trigger.* - Access automation trigger data
-    #     - And all other Jinja2 template functions
-    #
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    # EXAMPLE TEMPLATES:
-    # ═══════════════════════════════════════════════════════════════════════════════════
-    #
-    #   Response notification:
-    #     "{{ responding_device_name }} pressed '{{ action_label }}' at {{ now().strftime('%H:%M') }}"
-    #
-    #   Timeout notification:
-    #     "{{ original_message }} - Timed out after {{ timeout_seconds // 60 }} minutes"
-    #
-    #   Clear action logging:
-    #     service: logbook.log
-    #     data:
-    #       message: "Notification cleared from {{ device_id }}"
-    #
-    # ═══════════════════════════════════════════════════════════════════════════════════
 
     # Input: Response Handling
     ##############################
@@ -722,7 +623,6 @@ blueprint:
              - ✅ All responses are processed separately<br>
              - ✅ Best when each person needs to take action (confirm attendance, rate service)<br>
              - ⚠️ Options below are ignored in this mode<br><br>
-            **⚙️ Validation**: When set to "Multi Response", all single-device response options below (Auto-Clear, Notify Other Devices, Run Actions) are ignored.<br><br>
             💡 **Single device notifications**: Both modes behave identically.<br><br>
             Default: Single Response
           default: "single"
@@ -1011,13 +911,13 @@ blueprint:
       input:
         channel:
           name: "📣 Notification Channel"
-          description: "**🤖 Android Only**<br><br>Defines the notification channel on Android. Used with importance setting to control notification behavior.<br><br>📖 [Notification Channels](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channels)<br><br>`Optional`"
+          description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`Optional`"
           default: "Home Assistant"
           selector:
             text:
         importance:
           name: "❕ Notification Channel Importance"
-          description: "**🤖 Android Only**<br><br>Controls notification priority on Android. Similar to iOS interruption_level but for Android platform.<br><br>📖 [Notification Channel Importance](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance)<br><br>`Optional`"
+          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) for more information."
           default: default
           selector:
             select:
@@ -1032,13 +932,13 @@ blueprint:
                   value: min
         android_high_priority:
           name: "❕ High Priority Mode"
-          description: "**🤖 Android Only**<br><br>Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.<br><br>`Optional`"
+          description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`."
           default: true
           selector:
             boolean:
         visibility:
           name: "🔏 Notification Lockscreen Visibility"
-          description: "**🤖 Android Only**<br><br>Show or hide notification content on the lockscreen.<br><br>📖 [Lockscreen Visibility](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility)<br><br>Default: `Private` | `Optional`"
+          description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`"
           default: "private"
           selector:
             select:
@@ -1053,7 +953,7 @@ blueprint:
 
         persist:
           name: "🚩 Persistent Notification"
-          description: "**🤖 Android Only**<br><br>Makes notification non-dismissible - cannot be swiped away by user at all.<br><br>**Difference from Sticky:**<br> - **Persistent**: Cannot be dismissed (this option)<br> - **Sticky**: Can be dismissed only via action buttons (below)<br><br>**⚙️ Validation**: When enabled, manual clear action handling is disabled. The `🧹🤖 When notification swiped away` setting is ignored.<br><br>**Use case:** System-critical alerts that must remain until resolved programmatically.<br><br>📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification)<br><br>`Optional`"
+          description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`"
           default: false
           selector:
             boolean:
@@ -1062,13 +962,13 @@ blueprint:
         ##############################
         car_ui:
           name: "🚘 Show on Android Auto"
-          description: "**🤖 Android Only**<br><br>Display notification on Android Auto interface when connected to vehicle.<br><br>`Optional`"
+          description: "Display notification on Android Auto interface."
           default: false
           selector:
             boolean:
         sticky:
           name: "📌 Sticky"
-          description: "**🤖 Android Only**<br><br>Prevents notification from being dismissed until action buttons are used.<br><br>**Difference from Persistent:**<br> - **Sticky**: Can be dismissed only via action buttons (this option)<br> - **Persistent**: Cannot be dismissed at all (above)<br><br>**⚙️ Validation**: When enabled, manual clear action handling is disabled. The `🧹🤖 When notification swiped away` setting is ignored.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment via action buttons.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`Optional`"
+          description: "Prevents notification from being dismissed until action buttons are used. Similar to persistent but stricter.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`Optional`"
           default: false
           selector:
             boolean:
@@ -1098,7 +998,7 @@ blueprint:
           default: "do_nothing"
           description: >-
             **Android only** - What happens when user swipes notification away.<br><br>
-            **⚙️ Validation**: This setting is ignored (disabled) when notification is persistent OR sticky.<br><br>
+            **Note**: Disabled if notification is persistent or sticky.<br><br>
             **Multi-device note**: In mixed iOS/Android setups, "treat as timeout" applies globally to all clear events.<br><br>
             `🤖 Android Only`
         clear_notification_actions:
@@ -1107,7 +1007,7 @@ blueprint:
             action:
           default: []
           description: >-
-            **⚙️ Validation**: Only used when "When notification swiped away" is set to "Run separate actions". Ignored for all other values.<br><br>
+            **Requires "Run separate actions" selected above** - Actions to run when notification is cleared.<br><br>
             **Available variables:**<br>
              - `user_response`: Contains response data including 'result': 'notification_cleared'<br>
              - `device_id`: ID of device that cleared the notification (if available)<br><br>
@@ -1121,6 +1021,225 @@ blueprint:
           selector:
             boolean:
 
+
+
+fields:
+  field_notify_device:
+    name: "📲 Device to notify"
+    description: Override device to be notified.
+    default: !input notify_device
+    selector:
+      device:
+        filter:
+          - integration: mobile_app
+  field_title:
+    name: "🏷️ Title"
+    description: "Override title of the notification."
+    example: !input title
+    default: !input title
+    selector:
+      text:
+  field_message:
+    name: "💬 Message"
+    description: "Override message body to display on the notification."
+    example: !input message
+    default: !input message
+    selector:
+      text:
+  field_subtitle:
+    name: "🏷️ Subtitle"
+    description: "Override subtitle of the notification."
+    example: !input subtitle
+    default: !input subtitle
+    selector:
+      text:
+  field_sound:
+    name: "🔊 Sound"
+    description: "Override custom notification sound."
+    example: !input sound
+    default: !input sound
+    selector:
+      text:
+  field_attachment_type:
+    name: "📸 Attachment Type"
+    description: "Override the Attachment Type of the notification."
+    example: !input attachment_type
+    default: !input attachment_type
+    selector:
+      select:
+        options:
+          - label: "None"
+            value: "none"
+          - label: "Camera"
+            value: "camera_entity"
+  field_attachment_camera_entity:
+    name: "📸 Attachment: Camera Entity"
+    description: "Override camera entity if your script has attachment type set to Camera."
+    example: !input attachment_camera_entity
+    default: !input attachment_camera_entity
+    selector:
+      entity:
+        filter:
+          - domain: "camera"
+
+  field_image_url:
+    name: "🖼️ Image URL"
+    description: "Override direct image URL."
+    example: !input image_url
+    default: !input image_url
+    selector:
+      text:
+  field_video_url:
+    name: "🎥 Video URL"
+    description: "Override video URL."
+    example: !input video_url
+    default: !input video_url
+    selector:
+      text:
+  field_option_one_enabled:
+    name: "1️⃣ Option 1"
+    description: "Override showing or hiding this option."
+    example: !input option_one_enabled
+    selector:
+      boolean:
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_option_one_action:
+  #   name: "1️⃣ Option 1 - Action(s)"
+  #   description: "Override actions for this option."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input option_one_action
+  #   selector:
+  #     action:
+  field_option_two_enabled:
+    name: "2️⃣ Option 2"
+    description: "Override showing or hiding this option."
+    example: !input option_two_enabled
+    selector:
+      boolean:
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_option_two_action:
+  #   name: "1️⃣ Option 2 - Action(s)"
+  #   description: "Override actions for this option."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input option_two_action
+  #   selector:
+  #     action:
+  field_option_three_enabled:
+    name: "3️⃣ Option 3"
+    description: "Override showing or hiding this option."
+    example: !input option_three_enabled
+    selector:
+      boolean:
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_option_three_action:
+  #   name: "1️⃣ Option 3 - Action(s)"
+  #   description: "Override actions for this option."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input option_three_action
+  #   selector:
+  #     action:
+  field_enable_timeout:
+    name: "⌛️ Enable Timeout"
+    description: "Override timeout feature."
+    example: !input enable_timeout
+    selector:
+      boolean:
+
+  field_timeout:
+    name: "⌛️ Timeout Duration"
+    description: "Override timeout duration"
+    default: !input timeout
+    selector:
+      duration:
+        enable_day: false
+
+  field_run_timeout_actions:
+    name: "⌛️ Enable Timeout Action(s)"
+    description: "Override running timeout actions"
+    example: !input run_timeout_actions
+    selector:
+      boolean:
+
+  field_notification_link:
+    name: "🔗 Notification Link"
+    description: "Override notification link"
+    example: !input notification_link
+    default: !input notification_link
+    selector:
+      text:
+
+  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
+  # field_timeout_action:
+  #   name: "⌛️ Timeout Action(s)"
+  #   description: "Override timeout action."
+  #   example: >-
+  #     - alias: This is an example action
+  #       service: homeassistant.check_config
+  #   default: !input timeout_action
+  #   selector:
+  #     action:
+  field_badge:
+    name: "🔢 Badge"
+    description: "Override app badge number. 🍎 iOS Only"
+    default: !input badge
+    selector:
+      number:
+        min: 0
+        max: 999
+        mode: box
+  field_thread_id:
+    name: "🧵 Thread ID"
+    description: "Override thread/conversation ID. 🍎 iOS Only"
+    default: !input thread_id
+    selector:
+      text:
+  field_presentation_options:
+    name: "🎨 Presentation Options"
+    description: "Override presentation options. 🍎 iOS Only"
+    default: !input presentation_options
+    selector:
+      select:
+        multiple: true
+        options:
+          - label: "Banner"
+            value: "banner"
+          - label: "Sound"
+            value: "sound"
+          - label: "Badge"
+            value: "badge"
+          - label: "List"
+            value: "list"
+  field_sticky:
+    name: "📌 Sticky"
+    description: "Override sticky notification setting. 🤖 Android Only"
+    default: !input sticky
+    selector:
+      boolean:
+  field_vibration_pattern:
+    name: "📳 Vibration Pattern"
+    description: "Override vibration pattern. 🤖 Android Only"
+    default: !input vibration_pattern
+    selector:
+      text:
+  field_led_color:
+    name: "💡 LED Color"
+    description: "Override LED color. 🤖 Android Only"
+    default: !input led_color
+    selector:
+      text:
+  field_alert_once:
+    name: "🔕 Alert Once"
+    description: "Override alert once setting. 🤖 Android Only"
+    default: !input alert_once
+    selector:
+      boolean:
+
 sequence:
   ##############################
   # Setup Variables
@@ -1128,21 +1247,26 @@ sequence:
   - alias: Basic Notification Content
     variables:
       # Title
-      title: !input title
+      script_title: !input title
+      title: "{{ iif(field_title is defined, field_title, script_title) }}"
 
       # Subtitle
-      subtitle: !input subtitle
+      script_subtitle: !input subtitle
+      subtitle: "{{ iif(field_subtitle is defined, field_subtitle, script_subtitle) }}"
 
       # Message
-      message: !input message
+      script_message: !input message
+      message: "{{ iif(field_message is defined and (field_message|length), field_message, script_message) }}"
 
       # Sound
-      sound: !input sound
+      script_sound: !input sound
+      sound: "{{ iif(field_sound is defined, field_sound, script_sound) }}"
 
   - alias: Common Configuration Options
     variables:
       # [Opening a URL] - https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url
-      notification_link: !input notification_link
+      script_notification_link: !input notification_link
+      notification_link: "{{ iif(field_notification_link is defined, field_notification_link, script_notification_link) }}"
 
       # [Tag]
       custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
@@ -1160,10 +1284,14 @@ sequence:
       car_ui: !input car_ui
       
       # New Phase 1 features
-      sticky: !input sticky
-      vibration_pattern: !input vibration_pattern
-      led_color: !input led_color
-      alert_once: !input alert_once
+      script_sticky: !input sticky
+      sticky: "{{ iif(field_sticky is defined, field_sticky, script_sticky) }}"
+      script_vibration_pattern: !input vibration_pattern
+      vibration_pattern: "{{ iif(field_vibration_pattern is defined, field_vibration_pattern, script_vibration_pattern) }}"
+      script_led_color: !input led_color
+      led_color: "{{ iif(field_led_color is defined, field_led_color, script_led_color) }}"
+      script_alert_once: !input alert_once
+      alert_once: "{{ iif(field_alert_once is defined, field_alert_once, script_alert_once) }}"
 
       # [Notification Banner Icon]
       notification_icon: !input icon
@@ -1181,9 +1309,12 @@ sequence:
       interruption_level: !input interruption_level
       
       # New Phase 1 features
-      badge: !input badge
-      thread_id: !input thread_id
-      presentation_options: !input presentation_options
+      script_badge: !input badge
+      badge: "{{ iif(field_badge is defined, field_badge, script_badge) }}"
+      script_thread_id: !input thread_id
+      thread_id: "{{ iif(field_thread_id is defined, field_thread_id, script_thread_id) }}"
+      script_presentation_options: !input presentation_options
+      presentation_options: "{{ iif(field_presentation_options is defined, field_presentation_options, script_presentation_options) }}"
       # shortcut: !input shortcut # Unlikely to be supported due to complexity.
       # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
       # critical: !input critical
@@ -1191,11 +1322,14 @@ sequence:
 
   - alias: Timeout
     variables:
-      enable_timeout: !input enable_timeout
+      script_enable_timeout: !input enable_timeout
+      enable_timeout: "{{ iif(field_enable_timeout is defined, field_enable_timeout, script_enable_timeout) }}"
       clear_behavior_on_timeout: !input clear_behavior_on_timeout
-      timeout: !input timeout
+      script_timeout: !input timeout # Load timeout into variable for use with templates.
+      timeout: "{{ iif(field_timeout is defined, field_timeout, script_timeout) }}"
       timeout_seconds: "{{ (timeout.hours * 60 + timeout.minutes) * 60 + timeout.seconds }}"
-      run_timeout_actions: !input run_timeout_actions
+      script_run_timeout_actions: !input run_timeout_actions
+      run_timeout_actions: "{{ iif(field_run_timeout_actions is defined, field_run_timeout_actions, script_run_timeout_actions) }}"
 
   - alias: Timeout Response Handling Configuration
     variables:
@@ -1217,12 +1351,16 @@ sequence:
 
   - alias: Attachments
     variables:
-      attachment_type: !input attachment_type
-      attachment_camera_entity: !input attachment_camera_entity
+      script_attachment_type: !input attachment_type
+      attachment_type: "{{ iif(field_attachment_type is defined, field_attachment_type, script_attachment_type) }}"
+      script_attachment_camera_entity: !input attachment_camera_entity
+      attachment_camera_entity: "{{ iif(field_attachment_camera_entity is defined, field_attachment_camera_entity, script_attachment_camera_entity) }}"
       
       # New Phase 1 features
-      image_url: !input image_url
-      video_url: !input video_url
+      script_image_url: !input image_url
+      image_url: "{{ iif(field_image_url is defined, field_image_url, script_image_url) }}"
+      script_video_url: !input video_url
+      video_url: "{{ iif(field_video_url is defined, field_video_url, script_video_url) }}"
       
       camera_image_url: >-
         {% if (attachment_camera_entity|length) %}
@@ -1242,7 +1380,8 @@ sequence:
 
   - alias: Device Configuration
     variables:
-      notify_device: !input notify_device
+      script_notify_device: !input notify_device
+      notify_device: "{{ iif(field_notify_device is defined, field_notify_device, script_notify_device) }}"
       # Multi-device support: Convert single device or list of devices to a proper list
       notify_devices_list: >-
         {% if notify_device is string %}
@@ -1281,10 +1420,13 @@ sequence:
   - alias: Option 1
     variables:
       first_option: "{{ 'FIRST_' ~ context.id }}"
-      option_one_enabled: !input option_one_enabled
-      option_one_title: !input option_one_text
+      script_option_one_enabled: !input option_one_enabled
+      option_one_enabled: "{{ iif(field_option_one_enabled is defined, field_option_one_enabled, script_option_one_enabled) }}"
+      script_option_one_title: !input option_one_text
+      option_one_title: "{{ iif(field_option_one_text is defined, field_option_one_text, script_option_one_title) }}"
       option_one_mode: !input option_one_mode
-      option_one_actions: !input option_one_action
+      script_option_one_actions: !input option_one_action
+      option_one_actions: "{{ iif(field_option_one_action is defined, field_option_one_action, script_option_one_actions) }}"
       option_one_uri: !input option_one_uri
       option_one_icon_value: !input option_one_icon
       option_one_icon: >-
@@ -1316,10 +1458,12 @@ sequence:
   - alias: Option 2
     variables:
       second_option: "{{ 'SECOND_' ~ context.id }}"
-      option_two_enabled: !input option_two_enabled
+      script_option_two_enabled: !input option_two_enabled
+      option_two_enabled: "{{ iif(field_option_two_enabled is defined, field_option_two_enabled, script_option_two_enabled) }}"
       option_two_title: !input option_two_text
       option_two_mode: !input option_two_mode
-      option_two_actions: !input option_two_action
+      script_option_two_actions: !input option_two_action
+      option_two_actions: "{{ iif(field_option_two_action is defined, field_option_two_action, script_option_two_actions) }}"
       option_two_uri: !input option_two_uri
       option_two_icon_value: !input option_two_icon
       option_two_icon: >-
@@ -1351,10 +1495,12 @@ sequence:
   - alias: Option 3
     variables:
       third_option: "{{ 'THIRD_' ~ context.id }}"
-      option_three_enabled: !input option_three_enabled
+      script_option_three_enabled: !input option_three_enabled
+      option_three_enabled: "{{ iif(field_option_three_enabled is defined, field_option_three_enabled, script_option_three_enabled) }}"
       option_three_title: !input option_three_text
       option_three_mode: !input option_three_mode
-      option_three_actions: !input option_three_action
+      script_option_three_actions: !input option_three_action
+      option_three_actions: "{{ iif(field_option_three_action is defined, field_option_three_action, script_option_three_actions) }}"
       option_three_uri: !input option_three_uri
       option_three_icon_value: !input option_three_icon
       option_three_icon: >-

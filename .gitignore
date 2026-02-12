@@ -1,0 +1,17 @@
+# Temporary files
+*.pyc
+__pycache__/
+*.tmp
+*.backup
+*_backup.yaml
+temp_*.yaml
+create_*.py
+reorganize_*.py
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
