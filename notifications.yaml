@@ -1569,19 +1569,6 @@ sequence:
       notify_other_devices_on_timeout: !input notify_other_devices_on_timeout
       other_devices_timeout_message: !input other_devices_timeout_message
 
-  - alias: Response Handling Configuration
-    variables:
-      response_mode: !input response_mode
-      clear_other_notifications: !input clear_other_notifications
-      notify_other_devices_on_response: !input notify_other_devices_on_response
-      other_devices_message_template: !input other_devices_message_template
-      run_actions_for_others_on_response: !input run_actions_for_others_on_response
-      other_devices_actions: !input other_devices_actions
-      # Track if we're in multi-device scenario
-      is_multi_device: "{{ devices_info | length > 1 }}"
-      # For single response mode, we'll track the responding device
-      responding_device_name: ""
-
   - alias: Attachments
     variables:
       attachment_type: !input attachment_type
@@ -1644,6 +1631,19 @@ sequence:
         {% else %}
           {{ "notify.mobile_app_{id}".format(id=device_attr(notify_devices_list[0],'name')|slugify) }}
         {% endif %}
+
+  - alias: Response Handling Configuration
+    variables:
+      response_mode: !input response_mode
+      clear_other_notifications: !input clear_other_notifications
+      notify_other_devices_on_response: !input notify_other_devices_on_response
+      other_devices_message_template: !input other_devices_message_template
+      run_actions_for_others_on_response: !input run_actions_for_others_on_response
+      other_devices_actions: !input other_devices_actions
+      # Track if we're in multi-device scenario
+      is_multi_device: "{{ devices_info | length > 1 }}"
+      # For single response mode, we'll track the responding device
+      responding_device_name: ""
 
   - alias: Option 1
     variables:
