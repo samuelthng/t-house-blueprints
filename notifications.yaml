@@ -1337,7 +1337,7 @@ sequence:
         {{ second_option }}
         {% endif %}
       option_two: >-
-        {{{
+        {{ {
           'enabled': option_two_enabled,
           'action': option_two_action,
           'title': option_two_title,
@@ -1346,7 +1346,7 @@ sequence:
           'destructive': option_two_is_destructive,
           'authenticationRequired': option_two_auth_required,
           "{}".format('uri' if option_two_uri|length else ''): option_two_uri,
-        }}}
+        } }}
 
   - alias: Option 3
     variables:
@@ -1372,7 +1372,7 @@ sequence:
         {{ third_option }}
         {% endif %}
       option_three: >-
-        {{{
+        {{ {
           'enabled': option_three_enabled,
           'action': option_three_action,
           'title': option_three_title,
@@ -1381,7 +1381,7 @@ sequence:
           'destructive': option_three_is_destructive,
           'authenticationRequired': option_three_auth_required,
           "{}".format('uri' if option_three_uri|length else ''): option_three_uri,
-        }}}
+        } }}
 
   - alias: Setup Payload
     variables:
