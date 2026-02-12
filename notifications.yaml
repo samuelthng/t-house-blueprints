@@ -1791,7 +1791,14 @@ sequence:
                 {% if video_url|length %}{% set payload.data = dict(payload.data, **{ 'video': video_url }) %}{% endif %}
                 {% set payload.data = dict(payload.data, **{ 'push': push.d }) %}
               {% else %}
-                {# Android #}
+                {# Android - Filter out iOS-only action fields #}
+                {% set android_actions = [] %}
+                {% for action in payload.data.actions %}
+                  {% set android_action = {'action': action.action, 'title': action.title} %}
+                  {% if action.uri is defined and action.uri|length %}{% set android_action = dict(android_action, **{'uri': action.uri}) %}{% endif %}
+                  {% set android_actions = android_actions + [android_action] %}
+                {% endfor %}
+                {% set payload.data = dict(payload.data, **{ 'actions': android_actions }) %}
                 {% set payload.data = dict(payload.data, **{ 'subject': subtitle }) %}
                 {% set payload.data = dict(payload.data, **{ 'visibility': visibility }) %}
                 {% set payload.data = dict(payload.data, **{ 'importance': importance }) %}
