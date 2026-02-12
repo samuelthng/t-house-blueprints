@@ -386,13 +386,16 @@ blueprint:
           description: >-
             Main notification text content. Supports Jinja2 templates and HTML formatting (Android).
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - Static: `Motion detected at front door`
 
              - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`
 
              - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`
+
+            </details>
 
             📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | Required
           default: ""
@@ -417,11 +420,14 @@ blueprint:
           name: "🏷️ Title"
           description: "Headline text at the top of notification. Supports Jinja2 templates.
 
-Examples:
+<details>
+<summary>Click to view examples</summary>
 
  - Static: `Front Door Alert`
 
  - Template: `{{ trigger.to_state.attributes.friendly_name }}`
+
+</details>
 
 `Optional`"
           default: ""
@@ -431,11 +437,14 @@ Examples:
           name: "🏷️ Subtitle"
           description: "Secondary text below title. Supports Jinja2 templates.
 
-Examples:
+<details>
+<summary>Click to view examples</summary>
 
  - Static: `Person detected`
 
  - Template: `{{ now().strftime('%I:%M %p') }}`
+
+</details>
 
 🍎 iOS Only | `Optional`"
           default: ""
@@ -445,11 +454,14 @@ Examples:
           name: "🔊 Sound"
           description: "Custom sound file when notification arrives. Supports templates.
 
-Examples:
+<details>
+<summary>Click to view examples</summary>
 
  - `alarm.mp3` (Android in `/local/`)
 
  - `default` (iOS)
+
+</details>
 
 📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | `Optional`"
           default: ""
@@ -483,11 +495,14 @@ Examples:
           name: "🔢 Badge"
           description: "Number on app icon badge (0-999). Use 0 to clear.
 
-Examples:
+<details>
+<summary>Click to view examples</summary>
 
  - `1` for new alert
 
  - `0` to clear
+
+</details>
 
 📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS Only | `Optional`"
           default: ""
@@ -585,13 +600,16 @@ Examples:
           description: >-
             URL or path to an image file to attach.
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - `https://example.com/alert.jpg` (external URL)
 
              - `/local/images/warning.png` (local file)
 
              - `{{ states.weather.home.attributes.entity_picture }}` (template)
+
+            </details>
 
             Only used when Attachment Type is set to "Image URL"
 
@@ -622,13 +640,16 @@ Examples:
 
         Configure up to 3 action buttons on notifications for quick actions.
 
-        Examples:
+        <details>
+        <summary>Click to view examples</summary>
 
          - "Unlock Door"
 
          - "View Camera"
 
          - "Dismiss"
+
+        </details>
 
         **⚠️ Android Note:** Android can't send events AND open links in one button. Choose Action(s) OR Link mode per button. iOS supports both simultaneously.
 
@@ -666,7 +687,8 @@ Examples:
           description: >-
             Open link/app when selected.
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - `/lovelace/dashboard`
 
@@ -677,6 +699,8 @@ Examples:
              - `entityId:sun.sun`
 
              - `tel:123456789`
+
+            </details>
 
             Android: URI links won't stop timeout countdown. Check your timeout actions.
 
@@ -764,7 +788,8 @@ Examples:
           description: >-
             Open link/app when selected.
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - `/lovelace/dashboard`
 
@@ -775,6 +800,8 @@ Examples:
              - `entityId:sun.sun`
 
              - `tel:123456789`
+
+            </details>
 
             Android: URI links won't stop timeout countdown. Check your timeout actions.
 
@@ -862,7 +889,8 @@ Examples:
           description: >-
             Open link/app when selected.
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - `/lovelace/dashboard`
 
@@ -873,6 +901,8 @@ Examples:
              - `entityId:sun.sun`
 
              - `tel:123456789`
+
+            </details>
 
             Android: URI links won't stop timeout countdown. Check your timeout actions.
 
@@ -1353,11 +1383,14 @@ Examples:
 
              - `notified_devices`: List of all notified device names
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - Simple: `No response received - request timed out`
 
              - Detailed: `{{ original_message }} - Timed out after {{ timeout_seconds // 60 }} minutes`
+
+            </details>
 
             Default: "No response received - timed out"
           default: "No response received - timed out"
@@ -1541,13 +1574,16 @@ Examples:
 
             - `device_id`: ID of device that cleared the notification (if available)
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - Log to history
 
              - Update input_boolean
 
              - Send analytics
+
+            </details>
 
             🤖 Android Only | Optional
         importance:
@@ -1652,13 +1688,16 @@ Examples:
           description: >-
             Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - "100,200,100,200" - Quick double buzz for routine alerts
 
              - "0,500,200,500" - Long-short-long for urgent alerts
 
              - "100,100,100,100,100,100" - Rapid pulses for security
+
+            </details>
 
             Format: wait,vibrate,wait,vibrate (in milliseconds)
 
@@ -1671,7 +1710,8 @@ Examples:
           description: >-
             Notification LED color for devices with LED indicators. Provides visual notification when screen is off.
 
-            Examples:
+            <details>
+            <summary>Click to view examples</summary>
 
              - "red" - Critical/security alerts
 
@@ -1680,6 +1720,8 @@ Examples:
              - "#00FF00" - Success/all-clear (hex green)
 
              - "orange" - Warnings
+
+            </details>
 
             Use case: Red LED for alarm triggers, blue for routine door alerts.
 
