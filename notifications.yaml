@@ -590,14 +590,24 @@ blueprint:
          - Family alert: First person to respond wins, others auto-dismissed<br>
          - Chore acceptance: One person claims task, notify others it's taken<br>
          - Critical alerts: Ensure visibility by keeping notification on other devices<br><br>
+        **📘 Note**: Single-device notifications ignore these settings (only relevant for multiple targets).
         
       input:
         response_mode:
           name: "🎯 Response Mode"
           description: >-
-            **Single Response**: Only first device's response is processed, others ignored. Useful when one person should handle the request.<br><br>
-            **Multi Response**: All devices can respond independently. Useful when each person should take action.<br><br>
-            💡 **Tip**: For single device, both modes work identically.<br><br>
+            Controls whether multiple devices can respond or only the first response is processed.<br><br>
+            **Single Response** (Default):<br>
+             - ✅ Only the first device's response is processed<br>
+             - ✅ Subsequent responses from other devices are ignored<br>
+             - ✅ Best for "first to claim" scenarios (unlock door, accept chore)<br>
+             - ✅ Options below control what happens to non-responding devices<br><br>
+            **Multi Response**:<br>
+             - ✅ Every device can respond independently<br>
+             - ✅ All responses are processed separately<br>
+             - ✅ Best when each person needs to take action (confirm attendance, rate service)<br>
+             - ⚠️ Options below are ignored in this mode<br><br>
+            💡 **Single device notifications**: Both modes behave identically.<br><br>
             Default: Single Response
           default: "single"
           selector:
@@ -610,9 +620,15 @@ blueprint:
         clear_other_notifications:
           name: "🧹 Auto-Clear Other Devices"
           description: >-
-            **Single Response Mode Only** - When first device responds, automatically clear notifications on all other devices.<br><br>
-            **Use case:** Family sees "Door unlocked by Mom", notification cleared from Dad's & kids' phones.<br><br>
-            **Note**: Only works reliably on iOS. Android clearing has limitations.<br><br>
+            **⚙️ Single Response Mode Only** - When first device responds, automatically dismiss notifications on all other devices.<br><br>
+            **How it works:**<br>
+             - Device A responds → notifications on devices B, C, D are cleared<br>
+             - Only applies to devices that haven't responded yet<br>
+             - Works in conjunction with "Notify Other Devices" below<br><br>
+            **Use case:** Family alert - Mom responds to unlock door, notification auto-clears from Dad's and kids' phones.<br><br>
+            **🍎 iOS**: Reliable clearing support<br>
+            **🤖 Android**: Limited - may require user to manually clear in some cases<br><br>
+            ⚠️ **Ignored in Multi Response mode**<br><br>
             Default: Enabled
           default: true
           selector:
@@ -620,8 +636,15 @@ blueprint:
         notify_other_devices_on_response:
           name: "📢 Notify Other Devices on Response"
           description: >-
-            **Single Response Mode Only** - Send informational notification to other devices when first device responds.<br><br>
-            **Example**: "Front door unlocked by John's iPhone" sent to other family members.<br><br>
+            **⚙️ Single Response Mode Only** - Send informational notification to other devices when first device responds.<br><br>
+            **How it works:**<br>
+             - Device A responds → new notification sent to devices B, C, D<br>
+             - Original notification may be cleared (see "Auto-Clear" above)<br>
+             - New notification shows who responded and which action they took<br>
+             - Message content customizable via template below<br><br>
+            **Use case:** "Front door unlocked by John's iPhone" sent to other family members for awareness.<br><br>
+            **💡 Tip**: Combine with "Auto-Clear" for best user experience (remove old, show new).<br><br>
+            ⚠️ **Ignored in Multi Response mode**<br><br>
             Default: Disabled
           default: false
           selector:
@@ -629,15 +652,21 @@ blueprint:
         other_devices_message_template:
           name: "💬 Other Devices Message Template"
           description: >-
-            **Requires "Notify Other Devices" enabled** - Message sent to other devices. Supports Jinja2 templates.<br><br>
-            **Available variables:**<br>
-             - `responding_device_name`: Name of device that responded (e.g., "John's iPhone")<br>
-             - `selected_action`: Which button was pressed<br>
-             - `original_message`: The original notification message<br><br>
-            **Examples:**<br>
-             - Simple: `Action handled by {{ responding_device_name }}`<br>
-             - Detailed: `{{ original_message }} - Responded by {{ responding_device_name }}`<br><br>
-            Default: "Action handled by another device"
+            **📝 Requires "Notify Other Devices" enabled** - Customize the message sent to non-responding devices. Supports Jinja2 templates.<br><br>
+            **Available Template Variables:**<br>
+             - `responding_device_name` - Name of the device that responded (e.g., "John's iPhone")<br>
+             - `selected_action` - Which action button was pressed (e.g., "option_one", "option_two")<br>
+             - `original_message` - The original notification message text<br>
+             - `action_label` - Human-readable label of the selected action button<br>
+             - Standard HA variables: `now()`, `states()`, etc.<br><br>
+            **Template Examples:**<br>
+             - **Simple**: `Action handled by {{ responding_device_name }}`<br>
+             - **With action**: `{{ responding_device_name }} pressed "{{ action_label }}"`<br>
+             - **Detailed**: `{{ original_message }} - {{ selected_action }} by {{ responding_device_name }}`<br>
+             - **Time-stamped**: `Handled by {{ responding_device_name }} at {{ now().strftime('%H:%M') }}`<br><br>
+            **📘 Note**: Template errors fall back to default message.<br><br>
+            ⚠️ **Ignored in Multi Response mode**<br><br>
+            Default: "Action handled by {{ responding_device_name | default('another device') }}"
           default: "Action handled by {{ responding_device_name | default('another device') }}"
           selector:
             text:
@@ -645,8 +674,18 @@ blueprint:
         run_actions_for_others_on_response:
           name: "⚙️ Run Actions for Other Devices"
           description: >-
-            **Single Response Mode Only** - Execute actions for devices that didn't respond when first device responds.<br><br>
-            **Use case:** Log which devices were notified but didn't respond, update dashboard, send follow-up.<br><br>
+            **⚙️ Single Response Mode Only** - Execute custom actions for devices that didn't respond when first device responds.<br><br>
+            **How it works:**<br>
+             - Device A responds → actions run once for each device (B, C, D) that didn't respond<br>
+             - Useful for logging, tracking, or follow-up automation<br>
+             - Actions defined in "Actions for Other Devices" below<br><br>
+            **Use Cases:**<br>
+             - Log which devices were notified but didn't respond<br>
+             - Update dashboard showing who hasn't acknowledged<br>
+             - Send reminder to specific devices after timeout<br>
+             - Track response rates for analytics<br><br>
+            **💡 Tip**: Combine with timeout actions for comprehensive tracking.<br><br>
+            ⚠️ **Ignored in Multi Response mode**<br><br>
             Default: Disabled
           default: false
           selector:
@@ -654,11 +693,34 @@ blueprint:
         other_devices_actions:
           name: "⚙️ Actions for Other Devices"
           description: >-
-            **Requires "Run Actions for Others" enabled** - Actions to run for each non-responding device.<br><br>
-            **Available variables:**<br>
-             - `responding_device_name`: Device that responded<br>
-             - `notified_devices`: List of all notified device names<br><br>
-            **Example**: Log to history, update input_boolean, send follow-up notification<br><br>
+            **📝 Requires "Run Actions for Others" enabled** - Define actions to execute for each non-responding device.<br><br>
+            **Available Template Variables:**<br>
+             - `responding_device_name` - Device that responded first<br>
+             - `selected_action` - Which action button was pressed<br>
+             - `notified_devices` - List of all device names that were notified<br>
+             - `non_responding_device` - Current device in the loop (use in templates)<br>
+             - `action_label` - Human-readable label of selected action<br><br>
+            **Action Examples:**<br><br>
+            **Log to history:**<br>
+            ```yaml<br>
+            - service: logbook.log<br>
+              data:<br>
+                name: "Notification Response"<br>
+                message: "{{ non_responding_device }} did not respond. Handled by {{ responding_device_name }}"<br>
+            ```<br><br>
+            **Update input boolean:**<br>
+            ```yaml<br>
+            - service: input_boolean.turn_on<br>
+              target:<br>
+                entity_id: input_boolean.{{ non_responding_device | slugify }}_missed_alert<br>
+            ```<br><br>
+            **Send follow-up notification:**<br>
+            ```yaml<br>
+            - service: notify.mobile_app_{{ non_responding_device | slugify }}<br>
+              data:<br>
+                message: "Alert was handled by {{ responding_device_name }}"<br>
+            ```<br><br>
+            ⚠️ **Ignored in Multi Response mode**<br><br>
             `Optional`
           default: []
           selector:
