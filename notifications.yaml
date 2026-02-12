@@ -1888,13 +1888,13 @@ sequence:
         {% set response.data = dict(response.data, **{ 'result': "no_response" }) %}
         {% elif run_timeout_actions and wait.trigger == none %}
         {% set response.data = dict(response.data, **{ 'result': "timeout" }) %}
-        {% elif run_timeout_actions and on_manual_clear_action == 'treat_as_timeout' and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
+        {% elif run_timeout_actions and on_manual_clear_action == 'treat_as_timeout' and wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
         {% set response.data = dict(response.data, **{ 'result': "notification_cleared" }) %}
-        {% elif wait.trigger.event.data.action == option_one['action'] %}
+        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == option_one['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_one" }) %}
-        {% elif wait.trigger.event.data.action == option_two['action'] %}
+        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == option_two['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_two" }) %}
-        {% elif wait.trigger.event.data.action == option_three['action'] %}
+        {% elif wait.trigger is not none and wait.trigger.event is not none and wait.trigger.event.data is not none and wait.trigger.event.data.action == option_three['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_three" }) %}
         {%- endif %}
         {# Add device info if available #}
@@ -1996,15 +1996,9 @@ sequence:
                               tag: "{{ tag }}"
               - conditions: "{{ clear_behavior_on_timeout == 'clear_others' }}"
                 sequence:
-                  - alias: "Clear notifications on other devices"
-                    repeat:
-                      for_each: "{{ devices_info }}"
-                      sequence:
-                        - service: "{{ repeat.item.service_name }}"
-                          data:
-                            message: "clear_notification"
-                            data:
-                              tag: "{{ tag }}"
+                  # clear_others not applicable in timeout scenario (no responding device to exclude)
+                  # This behaves as keep_all - notifications remain on all devices
+                  []
 
           # Notify devices about timeout
           - choose:
@@ -2061,14 +2055,17 @@ sequence:
     if:
       - alias: "Should send clear notification command? (for iOS/macOS)?"
         condition: template
-        value_template: "{{ expect_response and enable_timeout and clear_behavior_on_timeout == 'clear_this' and notification_data.apple_device }}"
+        value_template: "{{ expect_response and enable_timeout and clear_behavior_on_timeout == 'clear_this' and devices_info | selectattr('is_apple') | list | length > 0 }}"
     then:
-      - alias: "Send clear notification command to iOS device"
-        service: "{{ notify_service }}"
-        data:
-          message: "clear_notification"
-          data:
-            tag: "{{ tag }}"
+      - alias: "Send clear notification command to iOS devices"
+        repeat:
+          for_each: "{{ devices_info | selectattr('is_apple') | list }}"
+          sequence:
+            - service: "{{ repeat.item.service_name }}"
+              data:
+                message: "clear_notification"
+                data:
+                  tag: "{{ tag }}"
 
   ##############################
   # Return user response
