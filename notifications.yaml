@@ -1021,225 +1021,6 @@ blueprint:
           selector:
             boolean:
 
-
-
-fields:
-  field_notify_device:
-    name: "📲 Device to notify"
-    description: Override device to be notified.
-    default: !input notify_device
-    selector:
-      device:
-        filter:
-          - integration: mobile_app
-  field_title:
-    name: "🏷️ Title"
-    description: "Override title of the notification."
-    example: !input title
-    default: !input title
-    selector:
-      text:
-  field_message:
-    name: "💬 Message"
-    description: "Override message body to display on the notification."
-    example: !input message
-    default: !input message
-    selector:
-      text:
-  field_subtitle:
-    name: "🏷️ Subtitle"
-    description: "Override subtitle of the notification."
-    example: !input subtitle
-    default: !input subtitle
-    selector:
-      text:
-  field_sound:
-    name: "🔊 Sound"
-    description: "Override custom notification sound."
-    example: !input sound
-    default: !input sound
-    selector:
-      text:
-  field_attachment_type:
-    name: "📸 Attachment Type"
-    description: "Override the Attachment Type of the notification."
-    example: !input attachment_type
-    default: !input attachment_type
-    selector:
-      select:
-        options:
-          - label: "None"
-            value: "none"
-          - label: "Camera"
-            value: "camera_entity"
-  field_attachment_camera_entity:
-    name: "📸 Attachment: Camera Entity"
-    description: "Override camera entity if your script has attachment type set to Camera."
-    example: !input attachment_camera_entity
-    default: !input attachment_camera_entity
-    selector:
-      entity:
-        filter:
-          - domain: "camera"
-
-  field_image_url:
-    name: "🖼️ Image URL"
-    description: "Override direct image URL."
-    example: !input image_url
-    default: !input image_url
-    selector:
-      text:
-  field_video_url:
-    name: "🎥 Video URL"
-    description: "Override video URL."
-    example: !input video_url
-    default: !input video_url
-    selector:
-      text:
-  field_option_one_enabled:
-    name: "1️⃣ Option 1"
-    description: "Override showing or hiding this option."
-    example: !input option_one_enabled
-    selector:
-      boolean:
-  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
-  # field_option_one_action:
-  #   name: "1️⃣ Option 1 - Action(s)"
-  #   description: "Override actions for this option."
-  #   example: >-
-  #     - alias: This is an example action
-  #       service: homeassistant.check_config
-  #   default: !input option_one_action
-  #   selector:
-  #     action:
-  field_option_two_enabled:
-    name: "2️⃣ Option 2"
-    description: "Override showing or hiding this option."
-    example: !input option_two_enabled
-    selector:
-      boolean:
-  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
-  # field_option_two_action:
-  #   name: "1️⃣ Option 2 - Action(s)"
-  #   description: "Override actions for this option."
-  #   example: >-
-  #     - alias: This is an example action
-  #       service: homeassistant.check_config
-  #   default: !input option_two_action
-  #   selector:
-  #     action:
-  field_option_three_enabled:
-    name: "3️⃣ Option 3"
-    description: "Override showing or hiding this option."
-    example: !input option_three_enabled
-    selector:
-      boolean:
-  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
-  # field_option_three_action:
-  #   name: "1️⃣ Option 3 - Action(s)"
-  #   description: "Override actions for this option."
-  #   example: >-
-  #     - alias: This is an example action
-  #       service: homeassistant.check_config
-  #   default: !input option_three_action
-  #   selector:
-  #     action:
-  field_enable_timeout:
-    name: "⌛️ Enable Timeout"
-    description: "Override timeout feature."
-    example: !input enable_timeout
-    selector:
-      boolean:
-
-  field_timeout:
-    name: "⌛️ Timeout Duration"
-    description: "Override timeout duration"
-    default: !input timeout
-    selector:
-      duration:
-        enable_day: false
-
-  field_run_timeout_actions:
-    name: "⌛️ Enable Timeout Action(s)"
-    description: "Override running timeout actions"
-    example: !input run_timeout_actions
-    selector:
-      boolean:
-
-  field_notification_link:
-    name: "🔗 Notification Link"
-    description: "Override notification link"
-    example: !input notification_link
-    default: !input notification_link
-    selector:
-      text:
-
-  # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
-  # field_timeout_action:
-  #   name: "⌛️ Timeout Action(s)"
-  #   description: "Override timeout action."
-  #   example: >-
-  #     - alias: This is an example action
-  #       service: homeassistant.check_config
-  #   default: !input timeout_action
-  #   selector:
-  #     action:
-  field_badge:
-    name: "🔢 Badge"
-    description: "Override app badge number. 🍎 iOS Only"
-    default: !input badge
-    selector:
-      number:
-        min: 0
-        max: 999
-        mode: box
-  field_thread_id:
-    name: "🧵 Thread ID"
-    description: "Override thread/conversation ID. 🍎 iOS Only"
-    default: !input thread_id
-    selector:
-      text:
-  field_presentation_options:
-    name: "🎨 Presentation Options"
-    description: "Override presentation options. 🍎 iOS Only"
-    default: !input presentation_options
-    selector:
-      select:
-        multiple: true
-        options:
-          - label: "Banner"
-            value: "banner"
-          - label: "Sound"
-            value: "sound"
-          - label: "Badge"
-            value: "badge"
-          - label: "List"
-            value: "list"
-  field_sticky:
-    name: "📌 Sticky"
-    description: "Override sticky notification setting. 🤖 Android Only"
-    default: !input sticky
-    selector:
-      boolean:
-  field_vibration_pattern:
-    name: "📳 Vibration Pattern"
-    description: "Override vibration pattern. 🤖 Android Only"
-    default: !input vibration_pattern
-    selector:
-      text:
-  field_led_color:
-    name: "💡 LED Color"
-    description: "Override LED color. 🤖 Android Only"
-    default: !input led_color
-    selector:
-      text:
-  field_alert_once:
-    name: "🔕 Alert Once"
-    description: "Override alert once setting. 🤖 Android Only"
-    default: !input alert_once
-    selector:
-      boolean:
-
 sequence:
   ##############################
   # Setup Variables
@@ -1247,26 +1028,21 @@ sequence:
   - alias: Basic Notification Content
     variables:
       # Title
-      script_title: !input title
-      title: "{{ iif(field_title is defined, field_title, script_title) }}"
+      title: !input title
 
       # Subtitle
-      script_subtitle: !input subtitle
-      subtitle: "{{ iif(field_subtitle is defined, field_subtitle, script_subtitle) }}"
+      subtitle: !input subtitle
 
       # Message
-      script_message: !input message
-      message: "{{ iif(field_message is defined and (field_message|length), field_message, script_message) }}"
+      message: !input message
 
       # Sound
-      script_sound: !input sound
-      sound: "{{ iif(field_sound is defined, field_sound, script_sound) }}"
+      sound: !input sound
 
   - alias: Common Configuration Options
     variables:
       # [Opening a URL] - https://companion.home-assistant.io/docs/notifications/notifications-basic/#opening-a-url
-      script_notification_link: !input notification_link
-      notification_link: "{{ iif(field_notification_link is defined, field_notification_link, script_notification_link) }}"
+      notification_link: !input notification_link
 
       # [Tag]
       custom_tag: !input tag # No need for manual definition anymore, treat existing definitions as custom tags.
@@ -1284,14 +1060,10 @@ sequence:
       car_ui: !input car_ui
       
       # New Phase 1 features
-      script_sticky: !input sticky
-      sticky: "{{ iif(field_sticky is defined, field_sticky, script_sticky) }}"
-      script_vibration_pattern: !input vibration_pattern
-      vibration_pattern: "{{ iif(field_vibration_pattern is defined, field_vibration_pattern, script_vibration_pattern) }}"
-      script_led_color: !input led_color
-      led_color: "{{ iif(field_led_color is defined, field_led_color, script_led_color) }}"
-      script_alert_once: !input alert_once
-      alert_once: "{{ iif(field_alert_once is defined, field_alert_once, script_alert_once) }}"
+      sticky: !input sticky
+      vibration_pattern: !input vibration_pattern
+      led_color: !input led_color
+      alert_once: !input alert_once
 
       # [Notification Banner Icon]
       notification_icon: !input icon
@@ -1309,12 +1081,9 @@ sequence:
       interruption_level: !input interruption_level
       
       # New Phase 1 features
-      script_badge: !input badge
-      badge: "{{ iif(field_badge is defined, field_badge, script_badge) }}"
-      script_thread_id: !input thread_id
-      thread_id: "{{ iif(field_thread_id is defined, field_thread_id, script_thread_id) }}"
-      script_presentation_options: !input presentation_options
-      presentation_options: "{{ iif(field_presentation_options is defined, field_presentation_options, script_presentation_options) }}"
+      badge: !input badge
+      thread_id: !input thread_id
+      presentation_options: !input presentation_options
       # shortcut: !input shortcut # Unlikely to be supported due to complexity.
       # [Critical Notifications] - https://companion.home-assistant.io/docs/notifications/critical-notifications
       # critical: !input critical
@@ -1322,14 +1091,11 @@ sequence:
 
   - alias: Timeout
     variables:
-      script_enable_timeout: !input enable_timeout
-      enable_timeout: "{{ iif(field_enable_timeout is defined, field_enable_timeout, script_enable_timeout) }}"
+      enable_timeout: !input enable_timeout
       clear_behavior_on_timeout: !input clear_behavior_on_timeout
-      script_timeout: !input timeout # Load timeout into variable for use with templates.
-      timeout: "{{ iif(field_timeout is defined, field_timeout, script_timeout) }}"
+      timeout: !input timeout
       timeout_seconds: "{{ (timeout.hours * 60 + timeout.minutes) * 60 + timeout.seconds }}"
-      script_run_timeout_actions: !input run_timeout_actions
-      run_timeout_actions: "{{ iif(field_run_timeout_actions is defined, field_run_timeout_actions, script_run_timeout_actions) }}"
+      run_timeout_actions: !input run_timeout_actions
 
   - alias: Timeout Response Handling Configuration
     variables:
@@ -1351,16 +1117,12 @@ sequence:
 
   - alias: Attachments
     variables:
-      script_attachment_type: !input attachment_type
-      attachment_type: "{{ iif(field_attachment_type is defined, field_attachment_type, script_attachment_type) }}"
-      script_attachment_camera_entity: !input attachment_camera_entity
-      attachment_camera_entity: "{{ iif(field_attachment_camera_entity is defined, field_attachment_camera_entity, script_attachment_camera_entity) }}"
+      attachment_type: !input attachment_type
+      attachment_camera_entity: !input attachment_camera_entity
       
       # New Phase 1 features
-      script_image_url: !input image_url
-      image_url: "{{ iif(field_image_url is defined, field_image_url, script_image_url) }}"
-      script_video_url: !input video_url
-      video_url: "{{ iif(field_video_url is defined, field_video_url, script_video_url) }}"
+      image_url: !input image_url
+      video_url: !input video_url
       
       camera_image_url: >-
         {% if (attachment_camera_entity|length) %}
@@ -1380,8 +1142,7 @@ sequence:
 
   - alias: Device Configuration
     variables:
-      script_notify_device: !input notify_device
-      notify_device: "{{ iif(field_notify_device is defined, field_notify_device, script_notify_device) }}"
+      notify_device: !input notify_device
       # Multi-device support: Convert single device or list of devices to a proper list
       notify_devices_list: >-
         {% if notify_device is string %}
@@ -1420,13 +1181,10 @@ sequence:
   - alias: Option 1
     variables:
       first_option: "{{ 'FIRST_' ~ context.id }}"
-      script_option_one_enabled: !input option_one_enabled
-      option_one_enabled: "{{ iif(field_option_one_enabled is defined, field_option_one_enabled, script_option_one_enabled) }}"
-      script_option_one_title: !input option_one_text
-      option_one_title: "{{ iif(field_option_one_text is defined, field_option_one_text, script_option_one_title) }}"
+      option_one_enabled: !input option_one_enabled
+      option_one_title: !input option_one_text
       option_one_mode: !input option_one_mode
-      script_option_one_actions: !input option_one_action
-      option_one_actions: "{{ iif(field_option_one_action is defined, field_option_one_action, script_option_one_actions) }}"
+      option_one_actions: !input option_one_action
       option_one_uri: !input option_one_uri
       option_one_icon_value: !input option_one_icon
       option_one_icon: >-
@@ -1458,12 +1216,10 @@ sequence:
   - alias: Option 2
     variables:
       second_option: "{{ 'SECOND_' ~ context.id }}"
-      script_option_two_enabled: !input option_two_enabled
-      option_two_enabled: "{{ iif(field_option_two_enabled is defined, field_option_two_enabled, script_option_two_enabled) }}"
+      option_two_enabled: !input option_two_enabled
       option_two_title: !input option_two_text
       option_two_mode: !input option_two_mode
-      script_option_two_actions: !input option_two_action
-      option_two_actions: "{{ iif(field_option_two_action is defined, field_option_two_action, script_option_two_actions) }}"
+      option_two_actions: !input option_two_action
       option_two_uri: !input option_two_uri
       option_two_icon_value: !input option_two_icon
       option_two_icon: >-
@@ -1495,12 +1251,10 @@ sequence:
   - alias: Option 3
     variables:
       third_option: "{{ 'THIRD_' ~ context.id }}"
-      script_option_three_enabled: !input option_three_enabled
-      option_three_enabled: "{{ iif(field_option_three_enabled is defined, field_option_three_enabled, script_option_three_enabled) }}"
+      option_three_enabled: !input option_three_enabled
       option_three_title: !input option_three_text
       option_three_mode: !input option_three_mode
-      script_option_three_actions: !input option_three_action
-      option_three_actions: "{{ iif(field_option_three_action is defined, field_option_three_action, script_option_three_actions) }}"
+      option_three_actions: !input option_three_action
       option_three_uri: !input option_three_uri
       option_three_icon_value: !input option_three_icon
       option_three_icon: >-
