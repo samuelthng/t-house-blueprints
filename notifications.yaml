@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 2.4.0 - Multi-Device + Timeout Response)
+  name: 🔔 Notifications (Version 2.4.1 - Multi-Device + Timeout Response)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2024.6.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 2.4.0 - Multi-Device + Timeout Response</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 2.4.1 - Multi-Device + Timeout Response</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
       <br>
 
@@ -54,6 +54,13 @@ blueprint:
 
       <details>
       <summary>Expand/collapse changelog</summary>
+
+      ### Version 2.4.1 - UX Improvements - *11 Feb 2026*
+      - **UX**: Reorganized sections for better user experience - merged related settings, created 'What to Send' section for required fields, reduced from 13 to 10 sections
+      - **IMPROVED**: Required fields (devices, message) now in prominent "What to Send" section with all content options
+      - **IMPROVED**: Merged timeout_settings and timeout_response_config into unified "Timeout Configuration" section
+      - **IMPROVED**: Renamed "Links & Behavior" to "Advanced Settings" for clarity
+      - **IMPROVED**: Merged notification_content and attachments into "What to Send" section
 
       ### Version 2.4.0 - Timeout Response Handling - *11 Feb 2026*
       - **MAJOR**: Added timeout response handling for multi-device scenarios
@@ -165,42 +172,40 @@ blueprint:
       <br>
 
   input:
-    notify_device:
-      name: "📱 Device(s) to Notify"
-      description: >-
-        **REQUIRED** - Select one or more devices with Home Assistant Companion app installed.<br><br>
-        Select multiple devices to send the same notification to all of them.<br><br>
-        📖 [Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic) | (🍎 iOS | 🤖 Android)
-      selector:
-        device:
-          multiple: true
-          filter:
-            - integration: mobile_app
-            
-    message:
-      name: "💬 Message"
-      description: >-
-        **REQUIRED** - Main notification text content.<br><br>
-        **Supports Jinja2 templates** and HTML formatting (🤖 Android only).<br><br>
-        **Examples:**<br>
-         - Static: `Motion detected at front door`<br>
-         - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br>
-         - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`<br><br>
-        📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)
-      selector:
-        text:
-          multiline: true
-
-    notification_content:
-      name: "Notification Content"
-      icon: mdi:message-text
-      collapsed: true
+    what_to_send:
+      name: "What to Send"
+      icon: mdi:email-edit-outline
+      collapsed: false
       description: >-
         <br>
-        Configure the title, subtitle, and sound for your notification.
+        **Configure your notification content** - Required fields and message customization.
         <br><br>
 
       input:
+        notify_device:
+          name: "📱 Device(s) to Notify"
+          description: >-
+            **REQUIRED** - Select one or more devices with Home Assistant Companion app installed.<br><br>
+            Select multiple devices to send the same notification to all of them.<br><br>
+            📖 [Setup Guide](https://companion.home-assistant.io/docs/notifications/notifications-basic) | (🍎 iOS | 🤖 Android)
+          selector:
+            device:
+              multiple: true
+              filter:
+                - integration: mobile_app
+        message:
+          name: "💬 Message"
+          description: >-
+            **REQUIRED** - Main notification text content.<br><br>
+            **Supports Jinja2 templates** and HTML formatting (🤖 Android only).<br><br>
+            **Examples:**<br>
+             - Static: `Motion detected at front door`<br>
+             - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br>
+             - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`<br><br>
+            📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic)
+          selector:
+            text:
+              multiline: true
         title:
           name: "🏷️ Title"
           description: "Headline text at the top of notification. Supports Jinja2 templates.<br><br>Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`<br><br>`Optional`"
@@ -216,6 +221,48 @@ blueprint:
         sound:
           name: "🔊 Sound"
           description: "Custom sound file when notification arrives. Supports templates.<br><br>Examples: `alarm.mp3` (Android in `/local/`), `default` (iOS)<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | `Optional`"
+          default: ""
+          selector:
+            text:
+        attachment_type:
+          name: "📸 Attachment Type"
+          description: >
+            Choose to send an attachment along with the notification.<br>
+            `Optional`
+          default: "none"
+          selector:
+            select:
+              options:
+                - label: "None"
+                  value: "none"
+                - label: "Camera"
+                  value: "camera_entity"
+                - label: "Image URL"
+                  value: "image_url"
+                - label: "Video URL"
+                  value: "video_url"
+        attachment_camera_entity:
+          name: "📸 Attachment: Camera Entity"
+          description: >-
+            Camera Entity to display snapshots of on the notification.<br>
+            Please note, iOS and Android have differing behaviours, as specified in the documentation.
+            See the links below for more information.
+            <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">🤖 Automatic Snapshots</a></td></tr></table><br>
+            ❔ Only used with `Attachment Type: Camera`
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: "camera"
+        image_url:
+          name: "🖼️ Image URL"
+          description: "Image URL to attach.<br><br>Examples: `https://example.com/image.jpg`, `/local/images/alert.png`<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`"
+          default: ""
+          selector:
+            text:
+        video_url:
+          name: "🎥 Video URL"
+          description: "Video URL to attach.<br><br>Example: `/local/videos/clip.mp4`<br><br>⚠️ Platform support varies.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments#video) | `Optional`"
           default: ""
           selector:
             text:
@@ -555,21 +602,50 @@ blueprint:
     # Input: Timeout Response Handling
     ##############################
 
-    timeout_response_config:
-      name: "Timeout Response Handling"
-      icon: mdi:clock-alert-outline
+    timeout_configuration:
+      name: "Timeout Configuration"
+      icon: mdi:timer-cog-outline
       collapsed: true
       description: >-
         <br>
-        **Multi-Device Timeout Response** - Configure what happens on other devices when a timeout occurs.
+        **Timeout Settings** - Control how long to wait for user response and what happens when time expires.
         <br><br>
-        **Use Cases:**<br>
-         - Clear stale notifications from all devices when timeout expires<br>
-         - Notify family members that no one responded to an alert<br>
-         - Execute cleanup actions across all notified devices<br><br>
-        **Note:** These options only apply when notifying multiple devices.<br><br>
-        
+
       input:
+        enable_timeout:
+          name: "⌛️ Enable Timeout"
+          description: "Require script to stop listening after the set duration.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will wait for response indefinitely until the next time it is triggered."
+          default: true # Default `true` for backward compatibility.
+          selector:
+            boolean:
+        timeout:
+          name: "⌛️ Timeout Duration"
+          description: "How long to wait for user response before executing timeout actions.<br><br>**Use case:** Wait 5 minutes for response to door unlock request, 30 seconds for garage closing confirmation.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)<br><br>👍🏻 Recommended: ≥1 minute for reliable notification delivery<br>Default: 15 minutes"
+          default:
+            hours: 0
+            minutes: 15
+            seconds: 0
+          selector:
+            duration:
+              enable_day: false
+        run_timeout_actions:
+          name: "⌛️ Enable Timeout Action(s)"
+          description: "Run timeout actions upon a timeout event.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will timeout without executing any timeout actions."
+          default: true # Default `true` for backward compatibility.
+          selector:
+            boolean:
+        timeout_action:
+          name: "⌛️ Timeout Action(s)"
+          description: "Action to run when notification response is timed out.  \n\n❔ Leave empty if no actions should be run  \n\n⚠️ Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\n❔ Android Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
+          default: []
+          selector:
+            action:
+        clear_on_timeout:
+          name: "🧹 Clear notification on timeout"
+          description: "Dismiss the notification after action selection times out."
+          default: false
+          selector:
+            boolean:
         clear_other_notifications_on_timeout:
           name: "🧹 Clear Other Notifications on Timeout"
           description: >-
@@ -616,117 +692,10 @@ blueprint:
           selector:
             boolean:
 
-    ##############################
-    # Input: Timeout Options
-    ##############################
 
-
-    timeout_settings:
-      name: "Timeout Settings"
-      icon: mdi:timer-outline
-      collapsed: true
-      description: >-
-        <br>
-        Control how long to wait for user response and what happens when time expires.
-        <br><br>
-
-      input:
-        enable_timeout:
-          name: "⌛️ Enable Timeout"
-          description: "Require script to stop listening after the set duration.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will wait for response indefinitely until the next time it is triggered."
-          default: true # Default `true` for backward compatibility.
-          selector:
-            boolean:
-        timeout:
-          name: "⌛️ Timeout Duration"
-          description: "How long to wait for user response before executing timeout actions.<br><br>**Use case:** Wait 5 minutes for response to door unlock request, 30 seconds for garage closing confirmation.<br><br>📖 [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)<br><br>👍🏻 Recommended: ≥1 minute for reliable notification delivery<br>Default: 15 minutes"
-          default:
-            hours: 0
-            minutes: 15
-            seconds: 0
-          selector:
-            duration:
-              enable_day: false
-        run_timeout_actions:
-          name: "⌛️ Enable Timeout Action(s)"
-          description: "Run timeout actions upon a timeout event.<br><br>👍🏻 Recommended to enable.<br>⚠️ If disabled, script will timeout without executing any timeout actions."
-          default: true # Default `true` for backward compatibility.
-          selector:
-            boolean:
-        timeout_action:
-          name: "⌛️ Timeout Action(s)"
-          description: "Action to run when notification response is timed out.  \n\n❔ Leave empty if no actions should be run  \n\n⚠️ Android Users: Note, URI options do not stop the timeout countdown. This action could be run after pressing the URI option.\n❔ Android Users: Workaround for the above, you may disable `⌛️ Run timeout action(s) when notification cleared` and manually clear the notification after selecting your URI option. \n\n`Optional`"
-          default: []
-          selector:
-            action:
-        clear_on_timeout:
-          name: "🧹 Clear notification on timeout"
-          description: "Dismiss the notification after action selection times out."
-          default: false
-          selector:
-            boolean:
-
-
-    attachments:
-      name: "Attachments"
-      icon: mdi:camera
-      collapsed: true
-      description: >-
-        <br>
-        Add images, videos, or camera snapshots to your notification.
-        <br><br>
-
-      input:
-        attachment_type:
-          name: "📸 Attachment Type"
-          description: >
-            Choose to send an attachment along with the notification.<br>
-            `Optional`
-          default: "none"
-          selector:
-            select:
-              options:
-                - label: "None"
-                  value: "none"
-                - label: "Camera"
-                  value: "camera_entity"
-                - label: "Image URL"
-                  value: "image_url"
-                - label: "Video URL"
-                  value: "video_url"
-        attachment_camera_entity:
-          name: "📸 Attachment: Camera Entity"
-          description: >-
-            Camera Entity to display snapshots of on the notification.<br>
-            Please note, iOS and Android have differing behaviours, as specified in the documentation.
-            See the links below for more information.
-            <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">🤖 Automatic Snapshots</a></td></tr></table><br>
-            ❔ Only used with `Attachment Type: Camera`
-          default: ""
-          selector:
-            entity:
-              filter:
-                - domain: "camera"
-        image_url:
-          name: "🖼️ Image URL"
-          description: "Image URL to attach.<br><br>Examples: `https://example.com/image.jpg`, `/local/images/alert.png`<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`"
-          default: ""
-          selector:
-            text:
-        video_url:
-          name: "🎥 Video URL"
-          description: "Video URL to attach.<br><br>Example: `/local/videos/clip.mp4`<br><br>⚠️ Platform support varies.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments#video) | `Optional`"
-          default: ""
-          selector:
-            text:
-        ##############################
-        # Input: Misc Inputs
-        ##############################
-
-
-    links_and_behavior:
-      name: "Links & Behavior"
-      icon: mdi:link-variant
+    advanced_settings:
+      name: "Advanced Settings"
+      icon: mdi:cog-outline
       collapsed: true
       description: >-
         <br>
