@@ -220,7 +220,7 @@ blueprint:
           name: "💬 Message"
           description: >-
             **REQUIRED** - Main notification text content.<br><br>
-            **Supports Jinja2 templates** and HTML formatting (🤖 Android only).<br><br>
+            **Supports Jinja2 templates** and HTML formatting (🤖 Android Only).<br><br>
             **Examples:**<br>
              - Static: `Motion detected at front door`<br>
              - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`<br>
@@ -248,7 +248,7 @@ blueprint:
             text:
         subtitle:
           name: "🏷️ Subtitle"
-          description: "Secondary text below title. Supports Jinja2 templates.<br><br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br><br>🍎 iOS only | `Optional`"
+          description: "Secondary text below title. Supports Jinja2 templates.<br><br>Example: `Person detected` or `{{ now().strftime('%I:%M %p') }}`<br><br>🍎 iOS Only | `Optional`"
           default: ""
           selector:
             text:
@@ -260,25 +260,25 @@ blueprint:
             text:
         icon:
           name: "🙂 Icon"
-          description: "Custom icon for this notification.<br><br>🤖 Android only | `Optional`"
+          description: "Custom icon for this notification.<br><br>🤖 Android Only | `Optional`"
           default: ""
           selector:
             icon:
         enable_icon_color:
           name: "🎨 Use Icon Color"
-          description: "If disabled, uses default icon color.<br><br>🤖 Android only | `Optional`"
+          description: "If disabled, uses default icon color.<br><br>🤖 Android Only | `Optional`"
           default: false
           selector:
             boolean:
         icon_color:
           name: "🎨 Icon Color"
-          description: "Custom icon color for this notification.<br><br>🤖 Android only | `Optional`"
+          description: "Custom icon color for this notification.<br><br>🤖 Android Only | `Optional`"
           default: [3, 169, 244]
           selector:
             color_rgb:
         badge:
           name: "🔢 Badge"
-          description: "Number on app icon badge (0-999). Use 0 to clear.<br><br>Example: `1` for new alert, `0` to clear.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS only | `Optional`"
+          description: "Number on app icon badge (0-999). Use 0 to clear.<br><br>Example: `1` for new alert, `0` to clear.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic#badge) | 🍎 iOS Only | `Optional`"
           default: ""
           selector:
             number:
@@ -287,7 +287,7 @@ blueprint:
               mode: box
         interruption_level:
           name: "❕ Interruption Level"
-          description: "Controls notification priority and behavior.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) | 🍎 iOS only | `Optional`"
+          description: "Controls notification priority and behavior.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/#interruption-level) | 🍎 iOS Only | `Optional`"
           default: active
           selector:
             select:
