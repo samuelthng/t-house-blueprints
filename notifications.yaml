@@ -441,27 +441,6 @@ blueprint:
           default: "Confirm"
           selector:
             text:
-        option_one_mode:
-          name: "1️⃣ Mode"
-          description: >-
-            Choose Action(s) or Link mode.
-            
-            To do nothing: Pick Action(s) and leave Action(s) empty.
-            
-            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
-            
-            🤖 Android Only | Optional
-          default: ""
-          selector:
-            select:
-              mode: dropdown
-              options:
-                - label: ""
-                  value: ""
-                - label: Action(s)
-                  value: action
-                - label: "Link (🤖 Android Only)"
-                  value: uri
         option_one_action:
           name: "1️⃣ Action(s)"
           description: >-
@@ -487,6 +466,27 @@ blueprint:
           selector:
             text:
               type: url
+        option_one_mode:
+          name: "1️⃣ Mode"
+          description: >-
+            Choose Action(s) or Link mode.
+            
+            To do nothing: Pick Action(s) and leave Action(s) empty.
+            
+            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
+            
+            🤖 Android Only | Optional
+          default: ""
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: ""
+                  value: ""
+                - label: Action(s)
+                  value: action
+                - label: "Link (🤖 Android Only)"
+                  value: uri
         option_one_icon:
           name: "1️⃣ Icon"
           description: >-
@@ -526,27 +526,6 @@ blueprint:
           default: "Dismiss"
           selector:
             text:
-        option_two_mode:
-          name: "2️⃣ Mode"
-          description: >-
-            Choose Action(s) or Link mode.
-            
-            To do nothing: Pick Action(s) and leave Action(s) empty.
-            
-            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
-            
-            🤖 Android Only | Optional
-          default: ""
-          selector:
-            select:
-              mode: dropdown
-              options:
-                - label: ""
-                  value: ""
-                - label: Action(s)
-                  value: action
-                - label: "Link (🤖 Android Only)"
-                  value: uri
         option_two_action:
           name: "2️⃣ Action(s)"
           description: >-
@@ -572,6 +551,27 @@ blueprint:
           selector:
             text:
               type: url
+        option_two_mode:
+          name: "2️⃣ Mode"
+          description: >-
+            Choose Action(s) or Link mode.
+            
+            To do nothing: Pick Action(s) and leave Action(s) empty.
+            
+            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
+            
+            🤖 Android Only | Optional
+          default: ""
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: ""
+                  value: ""
+                - label: Action(s)
+                  value: action
+                - label: "Link (🤖 Android Only)"
+                  value: uri
         option_two_icon:
           name: "2️⃣ Icon"
           description: >-
@@ -611,27 +611,6 @@ blueprint:
           default: "Option 3"
           selector:
             text:
-        option_three_mode:
-          name: "3️⃣ Mode"
-          description: >-
-            Choose Action(s) or Link mode.
-            
-            To do nothing: Pick Action(s) and leave Action(s) empty.
-            
-            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
-            
-            🤖 Android Only | Optional
-          default: ""
-          selector:
-            select:
-              mode: dropdown
-              options:
-                - label: ""
-                  value: ""
-                - label: Action(s)
-                  value: action
-                - label: "Link (🤖 Android Only)"
-                  value: uri
         option_three_action:
           name: "3️⃣ Action(s)"
           description: >-
@@ -657,6 +636,27 @@ blueprint:
           selector:
             text:
               type: url
+        option_three_mode:
+          name: "3️⃣ Mode"
+          description: >-
+            Choose Action(s) or Link mode.
+            
+            To do nothing: Pick Action(s) and leave Action(s) empty.
+            
+            When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.
+            
+            🤖 Android Only | Optional
+          default: ""
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: ""
+                  value: ""
+                - label: Action(s)
+                  value: action
+                - label: "Link (🤖 Android Only)"
+                  value: uri
         option_three_icon:
           name: "3️⃣ Icon"
           description: >-
@@ -1158,141 +1158,6 @@ blueprint:
         <br><br>
 
       input:
-        channel:
-          name: "📣 Notification Channel"
-          description: >-
-            Defines the notification channel on Android. Used with importance setting to control notification behavior.
-            
-            📖 [Notification Channels](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channels) | 🤖 Android Only | Optional
-          default: "Home Assistant"
-          selector:
-            text:
-        importance:
-          name: "❕ Notification Channel Importance"
-          description: >-
-            Controls notification priority on Android. Similar to iOS interruption_level but for Android platform.
-            
-            📖 [Notification Channel Importance](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) | 🤖 Android Only | Optional
-          default: default
-          selector:
-            select:
-              options:
-                - label: "Urgent (Makes a sound with heads-up notification)"
-                  value: high
-                - label: "Default (Makes a sound)"
-                  value: default
-                - label: "Silent (Makes no sound)"
-                  value: low
-                - label: "Low (Makes no sound, doesn't appear in status bar)"
-                  value: min
-        android_high_priority:
-          name: "❕ High Priority Mode"
-          description: >-
-            Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.
-            
-            🤖 Android Only | Optional
-          default: true
-          selector:
-            boolean:
-        visibility:
-          name: "🔏 Notification Lockscreen Visibility"
-          description: >-
-            Show or hide notification content on the lockscreen.
-            
-            📖 [Lockscreen Visibility](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) | 🤖 Android Only | Default: Private | Optional
-          default: "private"
-          selector:
-            select:
-              options:
-                - label: "Public: Always show content."
-                  value: public
-                - label: "Private: Show content based on phone settings."
-                  value: private
-                - label: "Secret: Always hide content on the lockscreen."
-                  value: secret
-
-
-        persist:
-          name: "🚩 Persistent Notification"
-          description: >-
-            Makes notification non-dismissible - cannot be swiped away by user at all.
-            
-            Difference from Sticky:
-            - Persistent: Cannot be dismissed (this option)
-            - Sticky: Can be dismissed only via action buttons (below)
-            
-            When enabled, manual clear action handling is disabled. The "When notification swiped away" setting is ignored.
-            
-            Use case: System-critical alerts that must remain until resolved programmatically.
-            
-            📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification) | 🤖 Android Only | Optional
-          default: false
-          selector:
-            boolean:
-        ##############################
-        # Input: Notification Link
-        ##############################
-        car_ui:
-          name: "🚘 Show on Android Auto"
-          description: >-
-            Display notification on Android Auto interface when connected to vehicle.
-            
-            🤖 Android Only | Optional
-          default: false
-          selector:
-            boolean:
-        sticky:
-          name: "📌 Sticky"
-          description: >-
-            Prevents notification from being dismissed until action buttons are used.
-            
-            Difference from Persistent:
-            - Sticky: Can be dismissed only via action buttons (this option)
-            - Persistent: Cannot be dismissed at all (above)
-            
-            When enabled, manual clear action handling is disabled. The "When notification swiped away" setting is ignored.
-            
-            Use case: "Water Leak Detected" or "Smoke Alarm" notifications that require explicit acknowledgment via action buttons.
-            
-            📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky) | 🤖 Android Only | Optional
-          default: false
-          selector:
-            boolean:
-        vibration_pattern:
-          name: "📳 Vibration Pattern"
-          description: >-
-            Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.
-            
-            Examples:
-            - "100,200,100,200" - Quick double buzz for routine alerts
-            - "0,500,200,500" - Long-short-long for urgent alerts
-            - "100,100,100,100,100,100" - Rapid pulses for security
-            
-            Format: wait,vibrate,wait,vibrate (in milliseconds)
-            
-            📖 [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern) | 🤖 Android Only | Optional
-          default: ""
-          selector:
-            text:
-        led_color:
-          name: "💡 LED Color"
-          description: >-
-            Notification LED color for devices with LED indicators. Provides visual notification when screen is off.
-            
-            Examples:
-            - "red" - Critical/security alerts
-            - "blue" - Information/status updates
-            - "#00FF00" - Success/all-clear (hex green)
-            - "orange" - Warnings
-            
-            Use case: Red LED for alarm triggers, blue for routine door alerts.
-            
-            Only works on devices with notification LED.
-            
-            📖 [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color) | 🤖 Android Only | Optional
-          default: ""
-          selector:
-            text:
         on_manual_clear_action:
           name: "🧹🤖 When notification swiped away (Android)"
           selector:
@@ -1328,6 +1193,129 @@ blueprint:
             Example: Log to history, update input_boolean, send analytics
             
             🤖 Android Only | Optional
+        importance:
+          name: "❕ Notification Channel Importance"
+          description: >-
+            Controls notification priority on Android. Similar to iOS interruption_level but for Android platform.
+            
+            📖 [Notification Channel Importance](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) | 🤖 Android Only | Optional
+          default: default
+          selector:
+            select:
+              options:
+                - label: "Urgent (Makes a sound with heads-up notification)"
+                  value: high
+                - label: "Default (Makes a sound)"
+                  value: default
+                - label: "Silent (Makes no sound)"
+                  value: low
+                - label: "Low (Makes no sound, doesn't appear in status bar)"
+                  value: min
+        channel:
+          name: "📣 Notification Channel"
+          description: >-
+            Defines the notification channel on Android. Used with importance setting to control notification behavior.
+            
+            📖 [Notification Channels](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channels) | 🤖 Android Only | Optional
+          default: "Home Assistant"
+          selector:
+            text:
+        android_high_priority:
+          name: "❕ High Priority Mode"
+          description: >-
+            Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.
+            
+            🤖 Android Only | Optional
+          default: true
+          selector:
+            boolean:
+        sticky:
+          name: "📌 Sticky"
+          description: >-
+            Prevents notification from being dismissed until action buttons are used.
+            
+            Difference from Persistent:
+            - Sticky: Can be dismissed only via action buttons (this option)
+            - Persistent: Cannot be dismissed at all (above)
+            
+            When enabled, manual clear action handling is disabled. The "When notification swiped away" setting is ignored.
+            
+            Use case: "Water Leak Detected" or "Smoke Alarm" notifications that require explicit acknowledgment via action buttons.
+            
+            📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky) | 🤖 Android Only | Optional
+          default: false
+          selector:
+            boolean:
+        persist:
+          name: "🚩 Persistent Notification"
+          description: >-
+            Makes notification non-dismissible - cannot be swiped away by user at all.
+            
+            Difference from Sticky:
+            - Persistent: Cannot be dismissed (this option)
+            - Sticky: Can be dismissed only via action buttons (below)
+            
+            When enabled, manual clear action handling is disabled. The "When notification swiped away" setting is ignored.
+            
+            Use case: System-critical alerts that must remain until resolved programmatically.
+            
+            📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification) | 🤖 Android Only | Optional
+          default: false
+          selector:
+            boolean:
+        visibility:
+          name: "🔏 Notification Lockscreen Visibility"
+          description: >-
+            Show or hide notification content on the lockscreen.
+            
+            📖 [Lockscreen Visibility](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) | 🤖 Android Only | Default: Private | Optional
+          default: "private"
+          selector:
+            select:
+              options:
+                - label: "Public: Always show content."
+                  value: public
+                - label: "Private: Show content based on phone settings."
+                  value: private
+                - label: "Secret: Always hide content on the lockscreen."
+                  value: secret
+
+
+        vibration_pattern:
+          name: "📳 Vibration Pattern"
+          description: >-
+            Custom vibration sequence in milliseconds. Helps identify notification type without looking at phone.
+            
+            Examples:
+            - "100,200,100,200" - Quick double buzz for routine alerts
+            - "0,500,200,500" - Long-short-long for urgent alerts
+            - "100,100,100,100,100,100" - Rapid pulses for security
+            
+            Format: wait,vibrate,wait,vibrate (in milliseconds)
+            
+            📖 [Vibration Patterns](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-vibration-pattern) | 🤖 Android Only | Optional
+          default: ""
+          selector:
+            text:
+        led_color:
+          name: "💡 LED Color"
+          description: >-
+            Notification LED color for devices with LED indicators. Provides visual notification when screen is off.
+            
+            Examples:
+            - "red" - Critical/security alerts
+            - "blue" - Information/status updates
+            - "#00FF00" - Success/all-clear (hex green)
+            - "orange" - Warnings
+            
+            Use case: Red LED for alarm triggers, blue for routine door alerts.
+            
+            Only works on devices with notification LED.
+            
+            📖 [LED Color](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-led-color) | 🤖 Android Only | Optional
+          default: ""
+          selector:
+            text:
         alert_once:
           name: "🔕 Alert Once"
           description: >-
@@ -1336,6 +1324,16 @@ blueprint:
             Use case: Motion sensor that updates every few seconds, or temperature alerts that change gradually.
             
             📖 [Alert Once](https://companion.home-assistant.io/docs/notifications/notifications-basic#alert-once) | 🤖 Android Only | Optional
+          default: false
+          selector:
+            boolean:
+
+        car_ui:
+          name: "🚘 Show on Android Auto"
+          description: >-
+            Display notification on Android Auto interface when connected to vehicle.
+            
+            🤖 Android Only | Optional
           default: false
           selector:
             boolean:
