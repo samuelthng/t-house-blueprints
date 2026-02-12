@@ -55,7 +55,23 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 2.4.0 - Multi-Device + Timeout Response - *11 Feb 2026*
+      ### Version 2.4.0 - Timeout Response Handling - *11 Feb 2026*
+      - **MAJOR**: Added timeout response handling for multi-device scenarios
+      - **NEW**: Timeout Response Config section - handle timeout events across devices
+      - Added: Clear other notifications on timeout (multi-device cleanup)
+      - Added: Notify other devices on timeout with customizable message template
+      - Added: Clear all notifications on timeout option
+      - Added: Run actions for other devices on timeout
+      - **REORGANIZED**: Renamed "message_content" → "notification_content" (clearer naming)
+      - **ANDROID**: Moved clear notification handling to Android-specific section
+      - **ANDROID**: Added treat_clear_as_timeout option (replaces swipe_away_as_timeout)
+      - **ANDROID**: Added run_clear_notification_actions option
+      - **ANDROID**: Added clear_notification_actions for custom clear behavior
+      - Removed: swipe_away_as_timeout from timeout_settings (moved to Android section)
+      - Enhanced: Timeout handling now supports multi-device coordination
+      - Enhanced: Template variables for timeout scenarios (original_message, timeout_seconds, notified_devices)
+
+      ### Version 2.3.0 - Multi-Device Support - *11 Feb 2026*
       - **MAJOR**: Added multi-device support - send to multiple devices simultaneously
       - **MAJOR**: Added response handling configuration section
       - Added: Single response mode (first device wins, others auto-cleared)
@@ -643,12 +659,6 @@ blueprint:
           default: []
           selector:
             action:
-        swipe_away_as_timeout:
-          name: "⌛️ Run timeout action(s) when notification cleared"
-          description: "If enabled, swiping the notification away will immediately trigger timeout actions.  \n\n`🤖 Android Only`"
-          default: false
-          selector:
-            boolean:
         clear_on_timeout:
           name: "🧹 Clear notification on timeout"
           description: "Dismiss the notification after action selection times out."
@@ -913,7 +923,7 @@ blueprint:
             text:
         treat_clear_as_timeout:
           name: "🧹 Treat Clear as Timeout"
-          description: "When notification is cleared/swiped away, treat it as a timeout event and run timeout actions.<br><br>**Use case:** User dismisses alarm notification → automatically logs dismissal as timeout.<br><br>**Note**: Replaces previous `swipe_away_as_timeout` setting with Android-specific location.<br><br>`🤖 Android Only`<br><br>Default: Disabled"
+          description: "When notification is cleared/swiped away, treat it as a timeout event and run timeout actions.<br><br>**Use case:** User dismisses alarm notification → automatically logs dismissal as timeout.<br><br>**Multi-device note**: In mixed iOS/Android setups, only enable if all devices are Android, as this applies globally to all clear events.<br><br>**Note**: Replaces previous `swipe_away_as_timeout` setting with Android-specific location.<br><br>`🤖 Android Only`<br><br>Default: Disabled"
           default: false
           selector:
             boolean:
