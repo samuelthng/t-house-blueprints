@@ -291,15 +291,23 @@ blueprint:
       collapsed: true
       description: >-
         <br>
-        **Configure notification attachments** - Camera snapshots, images, and videos.
+        **Configure notification attachments** - Add camera snapshots, images, or videos to your notifications.
+        <br><br>
+        💡 **Tip**: Select attachment type first, then configure the corresponding field below.
         <br><br>
 
       input:
         attachment_type:
           name: "📸 Attachment Type"
           description: >
-            Choose to send an attachment along with the notification.<br>
-            `Optional`
+            Choose what type of attachment to send with the notification.<br><br>
+
+            • **None** - No attachment (default)<br>
+            • **Camera** - Live camera snapshot 🍎🤖<br>
+            • **Image URL** - Static image from URL 🍎🤖<br>
+            • **Video URL** - Video file 🍎🤖 (platform support varies)<br><br>
+
+            📖 [Notification Attachments Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`
           default: "none"
           selector:
             select:
@@ -313,13 +321,16 @@ blueprint:
                 - label: "Video URL"
                   value: "video_url"
         attachment_camera_entity:
-          name: "📸 Attachment: Camera Entity"
+          name: "📸 Camera Entity"
           description: >-
-            Camera Entity to display snapshots of on the notification.<br>
-            Please note, iOS and Android have differing behaviours, as specified in the documentation.
-            See the links below for more information.
-            <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">🤖 Automatic Snapshots</a></td></tr></table><br>
-            ❔ Only used with `Attachment Type: Camera`
+            Select a camera to capture a snapshot for the notification.<br><br>
+
+            **Platform Behavior**:<br>
+            • 🍎 **iOS**: <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream">Camera Stream</a> - Displays live camera feed<br>
+            • 🤖 **Android**: <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">Automatic Snapshots</a> - Captures static snapshot<br><br>
+
+            ⚠️ **Only used when Attachment Type is set to "Camera"**<br>
+            `Optional`
           default: ""
           selector:
             entity:
@@ -327,13 +338,29 @@ blueprint:
                 - domain: "camera"
         image_url:
           name: "🖼️ Image URL"
-          description: "Image URL to attach.<br><br>Examples: `https://example.com/image.jpg`, `/local/images/alert.png`<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`"
+          description: >-
+            URL or path to an image file to attach. 🍎🤖<br><br>
+
+            **Examples**:<br>
+            • `https://example.com/alert.jpg` (external URL)<br>
+            • `/local/images/warning.png` (local file)<br>
+            • `{{ states.weather.home.attributes.entity_picture }}` (template)<br><br>
+
+            ⚠️ **Only used when Attachment Type is set to "Image URL"**<br>
+            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments) | `Optional`
           default: ""
           selector:
             text:
         video_url:
           name: "🎥 Video URL"
-          description: "Video URL to attach.<br><br>Example: `/local/videos/clip.mp4`<br><br>⚠️ Platform support varies.<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments#video) | `Optional`"
+          description: >-
+            URL or path to a video file to attach. 🍎🤖<br><br>
+
+            **Example**: `/local/videos/doorbell_clip.mp4`<br><br>
+
+            ⚠️ **Only used when Attachment Type is set to "Video URL"**<br>
+            ⚠️ **Platform support varies** - Test on your devices<br>
+            📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-attachments#video) | `Optional`
           default: ""
           selector:
             text:
