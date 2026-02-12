@@ -698,7 +698,7 @@ blueprint:
           name: "📸 Attachment: Camera Entity"
           description: >-
             Camera Entity to display snapshots of on the notification.<br>
-            Please note, iOS and Android have differing vehaviours, as specified in the documentation.
+            Please note, iOS and Android have differing behaviours, as specified in the documentation.
             See the links below for more information.
             <table><tr><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/dynamic-content#camera-stream"> Camera Stream</a></td><td> <a target="_blank" href="https://companion.home-assistant.io/docs/notifications/notification-attachments#automatic-snapshots">🤖 Automatic Snapshots</a></td></tr></table><br>
             ❔ Only used with `Attachment Type: Camera`
