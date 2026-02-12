@@ -1,6 +1,6 @@
 mode: restart
 blueprint:
-  name: 🔔 Notifications (Version 3.0.0b1)
+  name: 🔔 Notifications (Version 3.0.0b2)
   source_url: https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml
   homeassistant:
     min_version: 2024.6.0
@@ -9,7 +9,7 @@ blueprint:
   description: >-
     <div>
       <h2>🔔 Notifications</h2>
-      <b>Version 3.0.0b1 - Blueprint v3.0 Refactored</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
+      <b>Version 3.0.0b2 - Blueprint v3.0 Refactored</b> | 🔗 <a href="https://github.com/samuelthng/t-house-blueprints/blob/main/notifications.yaml" target="_blank">Github Link</a> | 💬 <a href="https://community.home-assistant.io/t/notifications-actionable-mobile-notifications-script-with-optional-timeout-feature-and-camera-snapshots-works-with-ios-android/551552" target="_blank">Community Post</a>
       </div>
 
 
@@ -2067,7 +2067,7 @@ sequence:
             service_name: "{{ repeat.item.service_name }}"
             # Build platform-specific payload for this device
             notification_data: >-
-              {% set base_actions = common_data.actions %}
+              {% set base_actions = options %}
               {% set result = namespace(data={'tag': tag, 'apple_device': is_apple}) %}
               {% if group|length %}{% set result.data = dict(result.data, **{'group': group}) %}{% endif %}
               {% if is_apple %}
