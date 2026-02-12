@@ -2067,12 +2067,13 @@ sequence:
             service_name: "{{ repeat.item.service_name }}"
             # Build platform-specific payload for this device
             notification_data: >-
-              {% set payload = namespace(data=dict(common_data)) %}
-              {% set payload.data = dict(payload.data, **{ 'apple_device': is_apple }) %}
+              {% set base_actions = common_data.actions %}
+              {% set result = namespace(data={'tag': tag, 'apple_device': is_apple}) %}
+              {% if group|length %}{% set result.data = dict(result.data, **{'group': group}) %}{% endif %}
               {% if is_apple %}
                 {# iOS - Filter action fields to only include iOS-compatible fields #}
                 {% set ios_actions = [] %}
-                {% for action in payload.data.actions %}
+                {% for action in base_actions %}
                   {% set ios_action = {'action': action.action, 'title': action.title} %}
                   {% if action.icon is defined and action.icon|length %}{% set ios_action = dict(ios_action, **{'icon': action.icon}) %}{% endif %}
                   {% if action.destructive is defined %}{% set ios_action = dict(ios_action, **{'destructive': action.destructive}) %}{% endif %}
@@ -2080,49 +2081,49 @@ sequence:
                   {% if action.uri is defined and action.uri|length %}{% set ios_action = dict(ios_action, **{'uri': action.uri}) %}{% endif %}
                   {% set ios_actions = ios_actions + [ios_action] %}
                 {% endfor %}
-                {% set payload.data = dict(payload.data, **{ 'actions': ios_actions }) %}
+                {% set result.data = dict(result.data, **{'actions': ios_actions}) %}
                 {% set push = namespace(d={}) %}
-                {% set payload.data = dict(payload.data, **{ 'subtitle': subtitle }) %}
-                {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
-                {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'url': notification_link }) %}{% endif %}
-                {% if attachment_type == 'camera_entity' %}{% set payload.data = dict(payload.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
-                {% if sound|length %}{% set push.d = dict(push.d, **{ 'sound': sound }) %}{% endif %}
-                {% if badge is not none and badge != '' %}{% set push.d = dict(push.d, **{ 'badge': badge|int }) %}{% endif %}
-                {% if thread_id|length %}{% set payload.data = dict(payload.data, **{ 'thread-id': thread_id }) %}{% endif %}
-                {% if presentation_options|length %}{% set push.d = dict(push.d, **{ 'presentation-options': presentation_options }) %}{% endif %}
-                {% if image_url|length %}{% set payload.data = dict(payload.data, **{ 'image': image_url }) %}{% endif %}
-                {% if video_url|length %}{% set payload.data = dict(payload.data, **{ 'video': video_url }) %}{% endif %}
-                {% set payload.data = dict(payload.data, **{ 'push': push.d }) %}
+                {% set result.data = dict(result.data, **{'subtitle': subtitle}) %}
+                {% set push.d = dict(push.d, **{'interruption-level': interruption_level}) %}
+                {% if notification_link|length %}{% set result.data = dict(result.data, **{'url': notification_link}) %}{% endif %}
+                {% if attachment_type == 'camera_entity' %}{% set result.data = dict(result.data, **{'entity_id': attachment_camera_entity}) %}{% endif %}
+                {% if sound|length %}{% set push.d = dict(push.d, **{'sound': sound}) %}{% endif %}
+                {% if badge is not none and badge != '' %}{% set push.d = dict(push.d, **{'badge': badge|int}) %}{% endif %}
+                {% if thread_id|length %}{% set result.data = dict(result.data, **{'thread-id': thread_id}) %}{% endif %}
+                {% if presentation_options|length %}{% set push.d = dict(push.d, **{'presentation-options': presentation_options}) %}{% endif %}
+                {% if image_url|length %}{% set result.data = dict(result.data, **{'image': image_url}) %}{% endif %}
+                {% if video_url|length %}{% set result.data = dict(result.data, **{'video': video_url}) %}{% endif %}
+                {% set result.data = dict(result.data, **{'push': push.d}) %}
               {% else %}
                 {# Android - Filter out iOS-only action fields #}
                 {% set android_actions = [] %}
-                {% for action in payload.data.actions %}
+                {% for action in base_actions %}
                   {% set android_action = {'action': action.action, 'title': action.title} %}
                   {% if action.uri is defined and action.uri|length %}{% set android_action = dict(android_action, **{'uri': action.uri}) %}{% endif %}
                   {% set android_actions = android_actions + [android_action] %}
                 {% endfor %}
-                {% set payload.data = dict(payload.data, **{ 'actions': android_actions }) %}
-                {% set payload.data = dict(payload.data, **{ 'subject': subtitle }) %}
-                {% set payload.data = dict(payload.data, **{ 'visibility': visibility }) %}
-                {% set payload.data = dict(payload.data, **{ 'importance': importance }) %}
-                {% if android_high_priority %}{% set payload.data = dict(payload.data, **{ 'priority': 'high', 'ttl': 0 }) %}{% endif %}
-                {% if notification_link|length %}{% set payload.data = dict(payload.data, **{ 'clickAction': notification_link }) %}{% endif %}
-                {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set payload.data = dict(payload.data, **{ 'image': media_url }) %}{% endif %}
-                {% if notification_icon|length %}{% set payload.data = dict(payload.data, **{ 'notification_icon': notification_icon }) %}{% endif %}
-                {% if enable_icon_color %}{% set payload.data = dict(payload.data, **{ 'color': icon_color_hex }) %}{% endif %}
-                {% if enable_timeout and clear_behavior_on_timeout == 'clear_this' %}{% set payload.data = dict(payload.data, **{ 'timeout': timeout_seconds }) %}{% endif %}
-                {% if channel|length %}{% set payload.data = dict(payload.data, **{ 'channel': channel }) %}{% endif %}
-                {% if persist %}{% set payload.data = dict(payload.data, **{ 'persistent': persist }) %}{% endif %}
-                {% if car_ui %}{% set payload.data = dict(payload.data, **{ 'car_ui': car_ui }) %}{% endif %}
-                {% if sound|length %}{% set payload.data = dict(payload.data, **{ 'sound': sound }) %}{% endif %}
-                {% if sticky %}{% set payload.data = dict(payload.data, **{ 'sticky': sticky }) %}{% endif %}
-                {% if vibration_pattern|length %}{% set payload.data = dict(payload.data, **{ 'vibration_pattern': vibration_pattern }) %}{% endif %}
-                {% if led_color|length %}{% set payload.data = dict(payload.data, **{ 'led_color': led_color }) %}{% endif %}
-                {% if alert_once %}{% set payload.data = dict(payload.data, **{ 'alert_once': alert_once }) %}{% endif %}
-                {% if image_url|length %}{% set payload.data = dict(payload.data, **{ 'image': image_url }) %}{% endif %}
-                {% if video_url|length %}{% set payload.data = dict(payload.data, **{ 'video': video_url }) %}{% endif %}
+                {% set result.data = dict(result.data, **{'actions': android_actions}) %}
+                {% set result.data = dict(result.data, **{'subject': subtitle}) %}
+                {% set result.data = dict(result.data, **{'visibility': visibility}) %}
+                {% set result.data = dict(result.data, **{'importance': importance}) %}
+                {% if android_high_priority %}{% set result.data = dict(result.data, **{'priority': 'high', 'ttl': 0}) %}{% endif %}
+                {% if notification_link|length %}{% set result.data = dict(result.data, **{'clickAction': notification_link}) %}{% endif %}
+                {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set result.data = dict(result.data, **{'image': media_url}) %}{% endif %}
+                {% if notification_icon|length %}{% set result.data = dict(result.data, **{'notification_icon': notification_icon}) %}{% endif %}
+                {% if enable_icon_color %}{% set result.data = dict(result.data, **{'color': icon_color_hex}) %}{% endif %}
+                {% if enable_timeout and clear_behavior_on_timeout == 'clear_this' %}{% set result.data = dict(result.data, **{'timeout': timeout_seconds}) %}{% endif %}
+                {% if channel|length %}{% set result.data = dict(result.data, **{'channel': channel}) %}{% endif %}
+                {% if persist %}{% set result.data = dict(result.data, **{'persistent': persist}) %}{% endif %}
+                {% if car_ui %}{% set result.data = dict(result.data, **{'car_ui': car_ui}) %}{% endif %}
+                {% if sound|length %}{% set result.data = dict(result.data, **{'sound': sound}) %}{% endif %}
+                {% if sticky %}{% set result.data = dict(result.data, **{'sticky': sticky}) %}{% endif %}
+                {% if vibration_pattern|length %}{% set result.data = dict(result.data, **{'vibration_pattern': vibration_pattern}) %}{% endif %}
+                {% if led_color|length %}{% set result.data = dict(result.data, **{'led_color': led_color}) %}{% endif %}
+                {% if alert_once %}{% set result.data = dict(result.data, **{'alert_once': alert_once}) %}{% endif %}
+                {% if image_url|length %}{% set result.data = dict(result.data, **{'image': image_url}) %}{% endif %}
+                {% if video_url|length %}{% set result.data = dict(result.data, **{'video': video_url}) %}{% endif %}
               {% endif %}
-              {{ payload.data }}
+              {{ result.data }}
         - alias: "Send notification to {{ repeat.item.device_name }}"
 
           service: "{{ service_name }}"
