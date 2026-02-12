@@ -316,7 +316,7 @@ blueprint:
 
             Examples:
             - Static: `Motion detected at front door`
-             - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`
+            - Template: `{{ trigger.to_state.attributes.friendly_name }} is {{ trigger.to_state.state }}`
             - Conditional: `{% if is_state('binary_sensor.front_door', 'on') %}Door is open{% else %}Door is closed{% endif %}`
 
             📖 [Notification Basics](https://companion.home-assistant.io/docs/notifications/notifications-basic) | Required
