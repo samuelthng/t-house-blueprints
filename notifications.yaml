@@ -2061,7 +2061,17 @@ sequence:
               {% set payload = namespace(data=common_data.copy()) %}
               {% set payload.data = dict(payload.data, **{ 'apple_device': is_apple }) %}
               {% if is_apple %}
-                {# iOS #}
+                {# iOS - Filter action fields to only include iOS-compatible fields #}
+                {% set ios_actions = [] %}
+                {% for action in payload.data.actions %}
+                  {% set ios_action = {'action': action.action, 'title': action.title} %}
+                  {% if action.icon is defined and action.icon|length %}{% set ios_action = dict(ios_action, **{'icon': action.icon}) %}{% endif %}
+                  {% if action.destructive is defined %}{% set ios_action = dict(ios_action, **{'destructive': action.destructive}) %}{% endif %}
+                  {% if action.authenticationRequired is defined %}{% set ios_action = dict(ios_action, **{'authenticationRequired': action.authenticationRequired}) %}{% endif %}
+                  {% if action.uri is defined and action.uri|length %}{% set ios_action = dict(ios_action, **{'uri': action.uri}) %}{% endif %}
+                  {% set ios_actions = ios_actions + [ios_action] %}
+                {% endfor %}
+                {% set payload.data = dict(payload.data, **{ 'actions': ios_actions }) %}
                 {% set push = namespace(d={}) %}
                 {% set payload.data = dict(payload.data, **{ 'subtitle': subtitle }) %}
                 {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
