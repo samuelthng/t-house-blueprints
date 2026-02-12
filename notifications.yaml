@@ -833,7 +833,8 @@ blueprint:
           selector:
             text:
               multiline: true
-        notify_other_devices_on_timeout:
+
+    advanced_settings:
       name: "Advanced Settings"
       icon: mdi:cog-outline
       collapsed: true
