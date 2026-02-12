@@ -1161,7 +1161,7 @@ blueprint:
 
       input:
         on_manual_clear_action:
-          name: "🤖 When notification swiped away (Android)"
+          name: "🧹 When notification swiped away"
           selector:
             select:
               options:
@@ -1181,7 +1181,7 @@ blueprint:
             
             🤖 Android Only
         clear_notification_actions:
-          name: "🤖 Actions on manual clear"
+          name: "⚙️ Actions on manual clear"
           selector:
             action:
           default: []
