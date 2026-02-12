@@ -400,20 +400,20 @@ blueprint:
               type: url
         option_one_icon:
           name: "🍎 1️⃣ Icon"
-          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | (`🍎 iOS Only`, `Optional`)"
+          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | ((`🍎 iOS Only`, `Optional`))"
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         option_one_is_destructive:
           name: "🍎 1️⃣ Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n(`🍎 iOS Only`, `Optional`)"
           default: false
           selector:
             boolean:
         option_one_authentication_required:
           name: "🍎 1️⃣ Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Require device to be unlocked to use this option.  \n\n(`🍎 iOS Only`, `Optional`)"
           default: false
           selector:
             boolean:
@@ -465,20 +465,20 @@ blueprint:
               type: url
         option_two_icon:
           name: "🍎 2️⃣ Icon"
-          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | (`🍎 iOS Only`, `Optional`)"
+          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | ((`🍎 iOS Only`, `Optional`))"
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         option_two_is_destructive:
           name: "🍎 2️⃣ Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n(`🍎 iOS Only`, `Optional`)"
           default: false
           selector:
             boolean:
         option_two_authentication_required:
           name: "🍎 2️⃣ Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Require device to be unlocked to use this option.  \n\n(`🍎 iOS Only`, `Optional`)"
           default: false
           selector:
             boolean:
@@ -530,20 +530,20 @@ blueprint:
               type: url
         option_three_icon:
           name: "🍎 3️⃣ Icon"
-          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | (`🍎 iOS Only`, `Optional`)"
+          description: "Custom SF Symbols icon. 📖 [Icon Reference](https://companion.home-assistant.io/docs/notifications/actionable-notifications#icon-values) | ((`🍎 iOS Only`, `Optional`))"
           default: ""
           selector:
             text:
               prefix: "sfsymbols:"
         option_three_is_destructive:
           name: "🍎 3️⃣ Destructive"
-          description: "Set the action's title to be red, indicating a destructive action.  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Set the action's title to be red, indicating a destructive action.  \n\n(`🍎 iOS Only`, `Optional`)"
           default: false
           selector:
             boolean:
         option_three_authentication_required:
           name: "🍎 3️⃣ Authentication Required"
-          description: "Require device to be unlocked to use this option.  \n\n`🍎 iOS Only`, `Optional`"
+          description: "Require device to be unlocked to use this option.  \n\n(`🍎 iOS Only`, `Optional`)"
           default: false
           selector:
             boolean:
