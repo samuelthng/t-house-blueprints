@@ -911,13 +911,13 @@ blueprint:
       input:
         channel:
           name: "📣 Notification Channel"
-          description: "**🤖 Android Only**<br><br>Defines the notification channel on Android. Used with importance setting to control notification behavior.<br><br>📖 [Notification Channels](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channels)<br><br>`Optional`"
+          description: "Defines the channel, to be used with Importance.  \nRelates to the importance of the notification.  \n\n`Optional`"
           default: "Home Assistant"
           selector:
             text:
         importance:
           name: "❕ Notification Channel Importance"
-          description: "**🤖 Android Only**<br><br>Controls notification priority on Android. Similar to iOS interruption_level but for Android platform.<br><br>📖 [Notification Channel Importance](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance)<br><br>`Optional`"
+          description: "See [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic/#notification-channel-importance) for more information."
           default: default
           selector:
             select:
@@ -932,13 +932,13 @@ blueprint:
                   value: min
         android_high_priority:
           name: "❕ High Priority Mode"
-          description: "**🤖 Android Only**<br><br>Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`.<br><br>`Optional`"
+          description: "Workaround to ensure notifications are delivered in timely fashion. This will override the Notification Channel Importance with `importance: high`, and set `ttl: 0`."
           default: true
           selector:
             boolean:
         visibility:
           name: "🔏 Notification Lockscreen Visibility"
-          description: "**🤖 Android Only**<br><br>Show or hide notification content on the lockscreen.<br><br>📖 [Lockscreen Visibility](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility)<br><br>Default: `Private` | `Optional`"
+          description: "Show or hide notification content on the lockscreen.  \nSee [documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic?_highlight=tag#notification-sensitivity--lock-screen-visibility) for more information.  \n\nDefault: `Private`"
           default: "private"
           selector:
             select:
@@ -953,7 +953,7 @@ blueprint:
 
         persist:
           name: "🚩 Persistent Notification"
-          description: "**🤖 Android Only**<br><br>Makes notification non-dismissible - cannot be swiped away by user at all.<br><br>**Difference from Sticky:**<br> - **Persistent**: Cannot be dismissed (this option)<br> - **Sticky**: Can be dismissed only via action buttons (below)<br><br>⚠️ **Important:** When enabled, disables `⌛️ Run timeout action(s) when notification cleared` and `🧹🤖 When notification swiped away` features.<br><br>**Use case:** System-critical alerts that must remain until resolved programmatically.<br><br>📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification)<br><br>`Optional`"
+          description: "Prevents notifications from being swiped away by accident.  \n\n❔ This option blocks `⌛️ Run timeout action(s) when notification cleared`"
           default: false
           selector:
             boolean:
@@ -962,13 +962,13 @@ blueprint:
         ##############################
         car_ui:
           name: "🚘 Show on Android Auto"
-          description: "**🤖 Android Only**<br><br>Display notification on Android Auto interface when connected to vehicle.<br><br>`Optional`"
+          description: "Display notification on Android Auto interface."
           default: false
           selector:
             boolean:
         sticky:
           name: "📌 Sticky"
-          description: "**🤖 Android Only**<br><br>Prevents notification from being dismissed until action buttons are used.<br><br>**Difference from Persistent:**<br> - **Sticky**: Can be dismissed only via action buttons (this option)<br> - **Persistent**: Cannot be dismissed at all (above)<br><br>⚠️ **Important:** When enabled, disables `⌛️ Run timeout action(s) when notification cleared` and `🧹🤖 When notification swiped away` features.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment via action buttons.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`Optional`"
+          description: "Prevents notification from being dismissed until action buttons are used. Similar to persistent but stricter.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`Optional`"
           default: false
           selector:
             boolean:
