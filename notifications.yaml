@@ -1422,7 +1422,7 @@ sequence:
       script_option_three_enabled: !input option_three_enabled
       option_three_enabled: "{{ iif(field_option_three_enabled is defined, field_option_three_enabled, script_option_three_enabled) }}"
       option_three_title: !input option_three_text
-      option_three_mode: !input option_three_option_mode
+      option_three_mode: !input option_three_mode
       script_option_three_actions: !input option_three_action
       option_three_actions: "{{ iif(field_option_three_action is defined, field_option_three_action, script_option_three_actions) }}"
       option_three_uri: !input option_three_uri
