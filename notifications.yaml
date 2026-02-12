@@ -231,7 +231,7 @@ blueprint:
       collapsed: false
       description: >-
         <br>
-        **Essential configuration** - Device selection and notification message (🍎 iOS | 🤖 Android).
+        **Essential configuration** - Device selection and notification message.
         <br><br>
 
       input:
@@ -275,7 +275,7 @@ blueprint:
       input:
         title:
           name: "🏷️ Title"
-          description: "Headline text at the top of notification. Supports Jinja2 templates.<br><br>Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`<br><br>🍎 iOS | 🤖 Android | `Optional`"
+          description: "Headline text at the top of notification. Supports Jinja2 templates.<br><br>Example: `Front Door Alert` or `{{ trigger.to_state.attributes.friendly_name }}`<br><br>`Optional`"
           default: ""
           selector:
             text:
@@ -287,7 +287,7 @@ blueprint:
             text:
         sound:
           name: "🔊 Sound"
-          description: "Custom sound file when notification arrives. Supports templates.<br><br>Examples: `alarm.mp3` (🤖 Android in `/local/`), `default` (🍎 iOS)<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | 🍎 iOS | 🤖 Android | `Optional`"
+          description: "Custom sound file when notification arrives. Supports templates.<br><br>Examples: `alarm.mp3` (Android in `/local/`), `default` (iOS)<br><br>📖 [Docs](https://companion.home-assistant.io/docs/notifications/notification-sounds) | `Optional`"
           default: ""
           selector:
             text:
@@ -1159,7 +1159,7 @@ blueprint:
 
       input:
         on_manual_clear_action:
-          name: "🧹🤖 When notification swiped away (Android)"
+          name: "🤖 When notification swiped away (Android)"
           selector:
             select:
               options:
@@ -1179,7 +1179,7 @@ blueprint:
             
             🤖 Android Only
         clear_notification_actions:
-          name: "⚙️🤖 Actions on manual clear"
+          name: "🤖 Actions on manual clear"
           selector:
             action:
           default: []
