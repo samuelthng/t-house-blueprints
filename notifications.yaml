@@ -2031,7 +2031,7 @@ sequence:
 
     variables:
       options: >-
-        {{ [option_one, option_two, option_three] | selectattr('enabled') | list }}
+        {{ [option_one, option_two, option_three] | selectattr('enabled', 'equalto', true) | list }}
       expect_response: "{{ enable_timeout or option_one_enabled or option_two_enabled or option_three_enabled }}" # If there's no timeout nor options, then no point waiting. Stop script.
       # Build common notification data (will be customized per device platform)
       common_data: >-
