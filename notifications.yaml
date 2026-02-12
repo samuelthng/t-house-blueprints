@@ -64,7 +64,27 @@ blueprint:
       <details>
       <summary>Expand/collapse changelog</summary>
 
-      ### Version 3.0.0-beta Phase 5 - Clear Options Consolidation - *Current*
+      ### Version 3.0.0-beta - Blueprint v3.0 Complete Refactoring - *Current*
+      
+      **⚠️ BREAKING CHANGES - Migration Required:**
+      
+      **Phase 1-3: Action Button Refactoring**
+      - **BREAKING**: Renamed `confirm_*` fields → `option_one_*` (all confirm button settings)
+      - **BREAKING**: Renamed `dismiss_*` fields → `option_two_*` (all dismiss button settings)
+      - **BREAKING**: Removed standalone `fields` section - no longer supported
+      - **NEW**: Three configurable action buttons (Option 1, Option 2, Option 3)
+      - **IMPROVED**: All action button configs consolidated into single "Action Buttons" section
+      - **MIGRATION**: Update automations/scripts referencing old field names
+      
+      **Phase 4: Section Reorganization**
+      - **IMPROVED**: Reduced 13 sections → 10 sections for better UX
+      - **IMPROVED**: Created "Required Settings" section (devices, message at top)
+      - **IMPROVED**: Created "Notification Appearance" section (all visual settings)
+      - **IMPROVED**: Created "What to Send" section (attachments consolidated)
+      - **IMPROVED**: Merged timeout_settings + timeout_response_config → "Timeout Configuration"
+      - **IMPROVED**: Renamed "Links & Behavior" → "Advanced Settings"
+      
+      **Phase 5: Clear Options Consolidation**
       - **BREAKING**: Consolidated 3 clear-on-timeout booleans into single dropdown `clear_behavior_on_timeout`
       - **BREAKING**: Removed: `clear_on_timeout`, `clear_other_notifications_on_timeout`, `clear_all_notifications_on_timeout`
       - **NEW**: `clear_behavior_on_timeout` dropdown with 4 options: keep_all, clear_this, clear_others, clear_all
@@ -72,11 +92,21 @@ blueprint:
       - **BREAKING**: Removed: `treat_clear_as_timeout`, `run_clear_notification_actions` booleans
       - **NEW**: `on_manual_clear_action` dropdown with 3 options: do_nothing, treat_as_timeout, run_custom
       - **IMPROVED**: Clear logic now uses choose-based branching instead of if/then precedence
-      - **FIXED**: Issue #4 - Three separate clear-on-timeout options causing confusion
-      - **FIXED**: Issue #5 - Android clear option conflicts with overlapping behavior
-      - **FIXED**: Issue #15 - Timeout actions scattered across multiple sections
-      - **FIXED**: Issue #16 - Backwards "when disabled" logic in clear handling
-      - **FIXED**: Issue #17 - Three-way clear precedence undocumented
+      
+      **Issues Fixed:**
+      - Issue #4 - Three separate clear-on-timeout options causing confusion
+      - Issue #5 - Android clear option conflicts with overlapping behavior
+      - Issue #15 - Timeout actions scattered across multiple sections
+      - Issue #16 - Backwards "when disabled" logic in clear handling
+      - Issue #17 - Three-way clear precedence undocumented
+      - Issue #29 - No validation preventing invalid configs (documentation improved)
+      - Issue #30 - Template variables scattered (now consolidated in field descriptions)
+      
+      **Migration Guide:**
+      1. **Action Buttons**: Rename `confirm_*` → `option_one_*`, `dismiss_*` → `option_two_*`
+      2. **Clear on Timeout**: Replace boolean flags with `clear_behavior_on_timeout` dropdown
+      3. **Android Clear**: Replace `treat_clear_as_timeout` + `run_clear_notification_actions` with `on_manual_clear_action`
+      4. **Remove Fields**: Delete any `fields:` section usage (no longer supported)
 
       ### Version 2.4.1 - UX Improvements - *11 Feb 2026*
       - **UX**: Reorganized sections for better user experience - merged related settings, created 'What to Send' section for required fields, reduced from 13 to 10 sections
@@ -411,6 +441,7 @@ blueprint:
           description: >-
             Choose Action(s) or Link mode. See Android Note above.<br><br>
             To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
+            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
             (`🤖 Android Only`, `Optional`)
           default: ""
           selector:
@@ -476,6 +507,7 @@ blueprint:
           description: >-
             Choose Action(s) or Link mode. See Android Note above.<br><br>
             To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
+            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
             (`🤖 Android Only`, `Optional`)
           default: ""
           selector:
@@ -541,6 +573,7 @@ blueprint:
           description: >-
             Choose Action(s) or Link mode. See Android Note above.<br><br>
             To do nothing: Pick `Action(s)` and leave Action(s) empty.<br><br>
+            **⚙️ Validation**: When set to "Link", only the URI field matters. When set to "Action(s)", only the Action(s) field matters.<br><br>
             (`🤖 Android Only`, `Optional`)
           default: ""
           selector:
@@ -591,6 +624,72 @@ blueprint:
           selector:
             boolean:
     
+    ##############################
+    # Template Variables Reference
+    ##############################
+    # 
+    # The following template variables are available in various fields throughout this blueprint.
+    # Use them in Jinja2 templates to create dynamic, context-aware notifications.
+    #
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    # RESPONSE HANDLING CONTEXT (when another device responds first):
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    #   • responding_device_name - Name of the device that responded (e.g., "John's iPhone")
+    #   • selected_action - Which action was selected ("option_one", "option_two", "option_three")
+    #   • action_label - Human-readable label of selected action (e.g., "Confirm", "Dismiss")
+    #   • original_message - The original notification message text
+    #   • notified_devices - List of all device names that were notified
+    #   • non_responding_device - Current device in loop (for actions iterating over devices)
+    #
+    #   Available in fields:
+    #     - other_devices_message_template (Response Handling section)
+    #     - other_devices_actions (Response Handling section)
+    #
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    # TIMEOUT CONTEXT (when no response received within timeout duration):
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    #   • original_message - The original notification message text
+    #   • timeout_seconds - Duration of timeout in seconds
+    #   • notified_devices - List of all device names that were notified
+    #
+    #   Available in fields:
+    #     - other_devices_timeout_message (Timeout Configuration section)
+    #
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    # MANUAL CLEAR CONTEXT (when Android user swipes notification away):
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    #   • user_response - Contains response data including 'result': 'notification_cleared'
+    #   • device_id - ID of device that cleared the notification (if available)
+    #
+    #   Available in fields:
+    #     - clear_notification_actions (Android Settings section)
+    #
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    # GENERAL TEMPLATE VARIABLES (available everywhere):
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    #   Standard Home Assistant template variables:
+    #     - now() - Current datetime
+    #     - states('entity.id') - Get entity state
+    #     - state_attr('entity.id', 'attribute') - Get entity attribute
+    #     - trigger.* - Access automation trigger data
+    #     - And all other Jinja2 template functions
+    #
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    # EXAMPLE TEMPLATES:
+    # ═══════════════════════════════════════════════════════════════════════════════════
+    #
+    #   Response notification:
+    #     "{{ responding_device_name }} pressed '{{ action_label }}' at {{ now().strftime('%H:%M') }}"
+    #
+    #   Timeout notification:
+    #     "{{ original_message }} - Timed out after {{ timeout_seconds // 60 }} minutes"
+    #
+    #   Clear action logging:
+    #     service: logbook.log
+    #     data:
+    #       message: "Notification cleared from {{ device_id }}"
+    #
+    # ═══════════════════════════════════════════════════════════════════════════════════
 
     # Input: Response Handling
     ##############################
@@ -623,6 +722,7 @@ blueprint:
              - ✅ All responses are processed separately<br>
              - ✅ Best when each person needs to take action (confirm attendance, rate service)<br>
              - ⚠️ Options below are ignored in this mode<br><br>
+            **⚙️ Validation**: When set to "Multi Response", all single-device response options below (Auto-Clear, Notify Other Devices, Run Actions) are ignored.<br><br>
             💡 **Single device notifications**: Both modes behave identically.<br><br>
             Default: Single Response
           default: "single"
@@ -953,7 +1053,7 @@ blueprint:
 
         persist:
           name: "🚩 Persistent Notification"
-          description: "**🤖 Android Only**<br><br>Makes notification non-dismissible - cannot be swiped away by user at all.<br><br>**Difference from Sticky:**<br> - **Persistent**: Cannot be dismissed (this option)<br> - **Sticky**: Can be dismissed only via action buttons (below)<br><br>⚠️ **Important:** When enabled, disables `⌛️ Run timeout action(s) when notification cleared` and `🧹🤖 When notification swiped away` features.<br><br>**Use case:** System-critical alerts that must remain until resolved programmatically.<br><br>📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification)<br><br>`Optional`"
+          description: "**🤖 Android Only**<br><br>Makes notification non-dismissible - cannot be swiped away by user at all.<br><br>**Difference from Sticky:**<br> - **Persistent**: Cannot be dismissed (this option)<br> - **Sticky**: Can be dismissed only via action buttons (below)<br><br>**⚙️ Validation**: When enabled, manual clear action handling is disabled. The `🧹🤖 When notification swiped away` setting is ignored.<br><br>**Use case:** System-critical alerts that must remain until resolved programmatically.<br><br>📖 [Persistent Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic/#persistent-notification)<br><br>`Optional`"
           default: false
           selector:
             boolean:
@@ -968,7 +1068,7 @@ blueprint:
             boolean:
         sticky:
           name: "📌 Sticky"
-          description: "**🤖 Android Only**<br><br>Prevents notification from being dismissed until action buttons are used.<br><br>**Difference from Persistent:**<br> - **Sticky**: Can be dismissed only via action buttons (this option)<br> - **Persistent**: Cannot be dismissed at all (above)<br><br>⚠️ **Important:** When enabled, disables `⌛️ Run timeout action(s) when notification cleared` and `🧹🤖 When notification swiped away` features.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment via action buttons.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`Optional`"
+          description: "**🤖 Android Only**<br><br>Prevents notification from being dismissed until action buttons are used.<br><br>**Difference from Persistent:**<br> - **Sticky**: Can be dismissed only via action buttons (this option)<br> - **Persistent**: Cannot be dismissed at all (above)<br><br>**⚙️ Validation**: When enabled, manual clear action handling is disabled. The `🧹🤖 When notification swiped away` setting is ignored.<br><br>**Use case:** \"Water Leak Detected\" or \"Smoke Alarm\" notifications that require explicit acknowledgment via action buttons.<br><br>📖 [Sticky Notifications](https://companion.home-assistant.io/docs/notifications/notifications-basic#sticky)<br><br>`Optional`"
           default: false
           selector:
             boolean:
@@ -998,7 +1098,7 @@ blueprint:
           default: "do_nothing"
           description: >-
             **Android only** - What happens when user swipes notification away.<br><br>
-            **Note**: Disabled if notification is persistent or sticky.<br><br>
+            **⚙️ Validation**: This setting is ignored (disabled) when notification is persistent OR sticky.<br><br>
             **Multi-device note**: In mixed iOS/Android setups, "treat as timeout" applies globally to all clear events.<br><br>
             `🤖 Android Only`
         clear_notification_actions:
@@ -1007,7 +1107,7 @@ blueprint:
             action:
           default: []
           description: >-
-            **Requires "Run separate actions" selected above** - Actions to run when notification is cleared.<br><br>
+            **⚙️ Validation**: Only used when "When notification swiped away" is set to "Run separate actions". Ignored for all other values.<br><br>
             **Available variables:**<br>
              - `user_response`: Contains response data including 'result': 'notification_cleared'<br>
              - `device_id`: ID of device that cleared the notification (if available)<br><br>
