@@ -1025,7 +1025,7 @@ fields:
   field_option_three_enabled:
     name: "3️⃣ Option 3"
     description: "Override showing or hiding this option."
-    example: !input option_two_enabled
+    example: !input option_three_enabled
     selector:
       boolean:
   # [Unsupported due to `choose.sequence`] - Can't pass variables to choose.sequence.
