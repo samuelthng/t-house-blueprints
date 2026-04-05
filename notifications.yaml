@@ -1231,11 +1231,11 @@ sequence:
         {% set response.data = dict(response.data, **{ 'result': "timeout" }) %}
         {% elif run_timeout_actions and swipe_away_as_timeout and wait.trigger.event.event_type == 'mobile_app_notification_cleared' %}
         {% set response.data = dict(response.data, **{ 'result': "notification_cleared" }) %}
-        {% elif wait.trigger.event.data.action == option_one['action'] %}
+        {% elif wait.trigger != none and wait.trigger.event.data.action == option_one['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_one" }) %}
-        {% elif wait.trigger.event.data.action == option_two['action'] %}
+        {% elif wait.trigger != none and wait.trigger.event.data.action == option_two['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_two" }) %}
-        {% elif wait.trigger.event.data.action == option_three['action'] %}
+        {% elif wait.trigger != none and wait.trigger.event.data.action == option_three['action'] %}
         {% set response.data = dict(response.data, **{ 'result': "option_three" }) %}
         {%- endif %}
         {{ response.data }}
