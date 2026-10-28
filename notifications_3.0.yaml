@@ -41,7 +41,7 @@ blueprint:
 
     ## 📣 Multi-device behavior
 
-    The first button response resolves the wait. The caller receives a structured result. Optional follow-up actions and notifications can run after a response, timeout, or dismissal.
+    The first button response resolves the wait. The caller receives a structured result. Optional follow-up actions can run after a response, timeout, or dismissal. The optional follow-up notification is sent after a button response: the phone that responded gets one message and every other selected phone gets another.
 
     ## 🧩 Reuse this instance safely
 
@@ -512,27 +512,43 @@ blueprint:
     broadcast:
       name: 📣 Follow-up notification
       icon: mdi:account-check
-      description: "Optional notification sent to all selected devices after a waited Send finishes by button response, timeout, or dismissal. It is skipped for no-wait, Clear, and superseded runs."
+      description: "Optional follow-up sent after a waited Send is answered with a button. The phone that responded gets the responder message; every other selected phone gets the non-responder message. Skipped for timeout, dismissal, no-wait, Clear, and superseded runs."
       collapsed: true
       input:
         broadcast_enabled:
           name: ✅ Enable follow-up broadcast
-          description: Send a follow-up notification to every selected device after a button response, timeout, or dismissal. Not sent for superseded, Clear, or no-wait runs.
+          description: Send the responder and non-responder follow-ups after a button response. Not sent for timeout, dismissal, superseded, Clear, or no-wait runs.
           default: false
           selector:
             boolean: {}
-        broadcast_title:
-          name: 📣 Broadcast title
-          description: "Optional title template. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`. Responder/button values are empty when not applicable."
+        broadcast_responder_title:
+          name: 🙋 Responder title
+          description: "Title shown on the phone that responded. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`. Leave title and message both blank to skip the responder follow-up."
+          default: "You handled it"
+          selector:
+            text:
+              multiline: false
+              multiple: false
+        broadcast_responder_message:
+          name: 🙋 Responder message
+          description: "Message shown on the phone that responded. Same placeholders as the title. Leave title and message both blank to skip the responder follow-up."
+          default: "You chose {{ button_title }}."
+          selector:
+            text:
+              multiline: false
+              multiple: false
+        broadcast_non_responder_title:
+          name: 👥 Non-responder title
+          description: "Title shown on every other selected phone. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`. Leave title and message both blank to skip the non-responder follow-up."
           default: "Notification handled"
           selector:
             text:
               multiline: false
               multiple: false
-        broadcast_message:
-          name: 📣 Broadcast message
-          description: "Optional message template. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`. Responder/button values are empty when not applicable."
-          default: "The notification was handled."
+        broadcast_non_responder_message:
+          name: 👥 Non-responder message
+          description: "Message shown on every other selected phone. Same placeholders as the title. Leave title and message both blank to skip the non-responder follow-up."
+          default: "{{ responder_name }} chose {{ button_title }}."
           selector:
             text:
               multiline: false
@@ -869,22 +885,38 @@ fields:
         multiple: false
   field_broadcast_enabled:
     name: ✅ Enable follow-up broadcast (runtime)
-    description: Override whether to send the follow-up notification after the Send-mode wait finishes.
+    description: Override whether to send the responder and non-responder follow-up notifications after a button response.
     default: !input broadcast_enabled
     selector:
       boolean:
-  field_broadcast_title:
-    name: 📣 Broadcast title (runtime)
-    description: "Override the follow-up title. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`; responder/button values may be empty."
-    default: !input broadcast_title
+  field_broadcast_responder_title:
+    name: 🙋 Responder title (runtime)
+    description: "Override the title shown on the phone that responded. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`. Pass blank title and message to skip."
+    default: !input broadcast_responder_title
     selector:
       text:
         multiline: false
         multiple: false
-  field_broadcast_message:
-    name: 📣 Broadcast message (runtime)
-    description: "Override the follow-up message. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`; responder/button values may be empty."
-    default: !input broadcast_message
+  field_broadcast_responder_message:
+    name: 🙋 Responder message (runtime)
+    description: "Override the message shown on the phone that responded. Same placeholders as the title."
+    default: !input broadcast_responder_message
+    selector:
+      text:
+        multiline: false
+        multiple: false
+  field_broadcast_non_responder_title:
+    name: 👥 Non-responder title (runtime)
+    description: "Override the title shown on every other selected phone. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`. Pass blank title and message to skip."
+    default: !input broadcast_non_responder_title
+    selector:
+      text:
+        multiline: false
+        multiple: false
+  field_broadcast_non_responder_message:
+    name: 👥 Non-responder message (runtime)
+    description: "Override the message shown on every other selected phone. Same placeholders as the title."
+    default: !input broadcast_non_responder_message
     selector:
       text:
         multiline: false
@@ -921,8 +953,10 @@ sequence:
     notification_run_id: "{{ context.id ~ '-' ~ now().strftime('%H%M%S%f') ~ '-' ~ (range(100000) | random) }}"
     saved_config: {}
     swipe_action_set: false
-    saved_broadcast_title: ""
-    saved_broadcast_message: ""
+    saved_broadcast_responder_title: ""
+    saved_broadcast_responder_message: ""
+    saved_broadcast_non_responder_title: ""
+    saved_broadcast_non_responder_message: ""
 - alias: Only evaluate saved inputs when the caller has not reset them
   if:
     - condition: template
@@ -973,8 +1007,10 @@ sequence:
           persist: !input persist
           bind_swipe_to_timeout: !input bind_swipe_to_timeout
           broadcast_enabled: !input broadcast_enabled
-          broadcast_title: ""
-          broadcast_message: ""
+          broadcast_responder_title: ""
+          broadcast_responder_message: ""
+          broadcast_non_responder_title: ""
+          broadcast_non_responder_message: ""
           broadcast_clear_delay: !input broadcast_clear_delay
           attachment_type: !input attachment_type
           attachment_camera_entity: !input attachment_camera_entity
@@ -1012,8 +1048,10 @@ sequence:
         car_ui=false, enable_timeout=true, wait_for_response=true,
         timeout={'hours': 0, 'minutes': 15, 'seconds': 0}, run_timeout_actions=false,
         clear_on_timeout=false, persist=false, bind_swipe_to_timeout=false,
-        broadcast_enabled=false, broadcast_title='Notification handled',
-        broadcast_message='The notification was handled.',
+        broadcast_enabled=false, broadcast_responder_title='You handled it',
+        broadcast_responder_message='You chose {{ button_title }}.',
+        broadcast_non_responder_title='Notification handled',
+        broadcast_non_responder_message='{{ responder_name }} chose {{ button_title }}.',
         broadcast_clear_delay={'hours': 0, 'minutes': 0, 'seconds': 0},
         attachment_type='none', attachment_camera_entity='', attachment_media={},
         attachment_image_entity='', map_pin_one_entity='', map_pin_one_location={},
@@ -1463,28 +1501,47 @@ sequence:
     notification_id: '{{ custom_tag if custom_tag|length else tag }}'
     response_with_responder: >-
       {{ dict(user_response, **{'response': dict(user_response.response, **{'responder_name': responder_name, 'responder_device_id': responder_device_id, 'responder_device': responder_device, 'device_platform': responder_platform, 'device_is_ios': responder_is_ios, 'non_responder_devices': non_responder_devices, 'non_responder_device_ids': non_responder_device_ids, 'non_responder_device_names': non_responder_device_names})}) }}
-- alias: Evaluate saved broadcast title only after response variables exist
+- alias: Evaluate saved responder title only after response variables exist
   if:
     - condition: template
-      value_template: "{{ not reset_config and field_broadcast_title is not defined and 'broadcast_title' not in (field_configuration | default({})) }}"
+      value_template: "{{ not reset_config and field_broadcast_responder_title is not defined and 'broadcast_responder_title' not in (field_configuration | default({})) }}"
   then:
     - variables:
-        saved_broadcast_title: !input broadcast_title
-- alias: Evaluate saved broadcast message only after response variables exist
+        saved_broadcast_responder_title: !input broadcast_responder_title
+- alias: Evaluate saved responder message only after response variables exist
   if:
     - condition: template
-      value_template: "{{ not reset_config and field_broadcast_message is not defined and 'broadcast_message' not in (field_configuration | default({})) }}"
+      value_template: "{{ not reset_config and field_broadcast_responder_message is not defined and 'broadcast_responder_message' not in (field_configuration | default({})) }}"
   then:
     - variables:
-        saved_broadcast_message: !input broadcast_message
+        saved_broadcast_responder_message: !input broadcast_responder_message
+- alias: Evaluate saved non-responder title only after response variables exist
+  if:
+    - condition: template
+      value_template: "{{ not reset_config and field_broadcast_non_responder_title is not defined and 'broadcast_non_responder_title' not in (field_configuration | default({})) }}"
+  then:
+    - variables:
+        saved_broadcast_non_responder_title: !input broadcast_non_responder_title
+- alias: Evaluate saved non-responder message only after response variables exist
+  if:
+    - condition: template
+      value_template: "{{ not reset_config and field_broadcast_non_responder_message is not defined and 'broadcast_non_responder_message' not in (field_configuration | default({})) }}"
+  then:
+    - variables:
+        saved_broadcast_non_responder_message: !input broadcast_non_responder_message
 - alias: Broadcast configuration
   variables:
     script_broadcast_enabled: "{{ runtime_config.broadcast_enabled }}"
     broadcast_enabled: "{{ field_broadcast_enabled if field_broadcast_enabled is defined else script_broadcast_enabled }}"
-    script_broadcast_title: "{{ runtime_config.broadcast_title if reset_config or 'broadcast_title' in (field_configuration | default({})) else saved_broadcast_title }}"
-    broadcast_title: "{{ field_broadcast_title if field_broadcast_title is defined else script_broadcast_title }}"
-    script_broadcast_message: "{{ runtime_config.broadcast_message if reset_config or 'broadcast_message' in (field_configuration | default({})) else saved_broadcast_message }}"
-    broadcast_message: "{{ field_broadcast_message if field_broadcast_message is defined else script_broadcast_message }}"
+    script_broadcast_responder_title: "{{ runtime_config.broadcast_responder_title if reset_config or 'broadcast_responder_title' in (field_configuration | default({})) else saved_broadcast_responder_title }}"
+    broadcast_responder_title: "{{ field_broadcast_responder_title if field_broadcast_responder_title is defined else script_broadcast_responder_title }}"
+    script_broadcast_responder_message: "{{ runtime_config.broadcast_responder_message if reset_config or 'broadcast_responder_message' in (field_configuration | default({})) else saved_broadcast_responder_message }}"
+    broadcast_responder_message: "{{ field_broadcast_responder_message if field_broadcast_responder_message is defined else script_broadcast_responder_message }}"
+    script_broadcast_non_responder_title: "{{ runtime_config.broadcast_non_responder_title if reset_config or 'broadcast_non_responder_title' in (field_configuration | default({})) else saved_broadcast_non_responder_title }}"
+    broadcast_non_responder_title: "{{ field_broadcast_non_responder_title if field_broadcast_non_responder_title is defined else script_broadcast_non_responder_title }}"
+    script_broadcast_non_responder_message: "{{ runtime_config.broadcast_non_responder_message if reset_config or 'broadcast_non_responder_message' in (field_configuration | default({})) else saved_broadcast_non_responder_message }}"
+    broadcast_non_responder_message: "{{ field_broadcast_non_responder_message if field_broadcast_non_responder_message is defined else script_broadcast_non_responder_message }}"
+    android_delivery_extras: "{{ {'priority': 'high', 'ttl': 0} if android_high_priority else {} }}"
     script_broadcast_clear_delay: "{{ runtime_config.broadcast_clear_delay }}"
     broadcast_clear_delay_seconds: >-
       {% set d = field_broadcast_clear_delay if field_broadcast_clear_delay is defined else script_broadcast_clear_delay %}
@@ -1511,24 +1568,36 @@ sequence:
           continue_on_error: true
           data:
             message: clear_notification
-            data:
-              tag: "{{ repeat.item.notify_tag }}"
+            data: >-
+              {{ {'tag': repeat.item.notify_tag} | combine(android_delivery_extras if repeat.item.platform == 'android' else {}) }}
   - if:
     - condition: template
-      value_template: "{{ broadcast_enabled and user_response.outcome != 'superseded' }}"
+      value_template: "{{ broadcast_enabled and user_response.outcome == 'button' }}"
     then:
-    - alias: Broadcast handled status to all devices
+    - alias: Send responder and non-responder follow-ups
       repeat:
         for_each: "{{ devices }}"
         sequence:
-        - alias: Send handled-by follow-up
-          service: "{{ repeat.item.notify_service }}"
-          continue_on_error: true
-          data:
-            title: "{{ broadcast_title | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) }}"
-            message: "{{ broadcast_message | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) }}"
+        - alias: Pick the wording for this device
+          variables:
+            is_responder: "{{ responder_device_id | length > 0 and repeat.item.id == responder_device_id }}"
+            followup_title_template: "{{ broadcast_responder_title if is_responder else broadcast_non_responder_title }}"
+            followup_message_template: "{{ broadcast_responder_message if is_responder else broadcast_non_responder_message }}"
+            followup_title: "{{ followup_title_template | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) }}"
+            followup_message: "{{ followup_message_template | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) }}"
+        - alias: Skip this device when its title and message are both blank
+          if:
+          - condition: template
+            value_template: "{{ (followup_title | string | length) + (followup_message | string | length) > 0 }}"
+          then:
+          - alias: Send follow-up to this device
+            service: "{{ repeat.item.notify_service }}"
+            continue_on_error: true
             data:
-              tag: "{{ repeat.item.handled_tag }}"
+              title: "{{ followup_title }}"
+              message: "{{ followup_message }}"
+              data: >-
+                {{ {'tag': repeat.item.handled_tag} | combine(android_delivery_extras if repeat.item.platform == 'android' else {}) }}
     - if:
       - condition: template
         value_template: "{{ broadcast_clear_delay_seconds | int > 0 }}"
@@ -1545,7 +1614,7 @@ sequence:
             continue_on_error: true
             data:
               message: clear_notification
-              data:
-                tag: "{{ repeat.item.handled_tag }}"
+              data: >-
+                {{ {'tag': repeat.item.handled_tag} | combine(android_delivery_extras if repeat.item.platform == 'android' else {}) }}
 - stop: Script stopped.
   response_variable: response_with_responder
