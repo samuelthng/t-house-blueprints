@@ -1,0 +1,571 @@
+blueprint:
+  name: "✂️ 📄 🪨 Scissors, Paper, Stone — The Showdown"
+  description: |
+    ## Two players. Three moves. One winner. 🏆
+
+    Challenge each other with private phone prompts and a light-show countdown.
+    A draw? Flash the lights and go again!
+
+    **Can't decide between two things?** Add any two choices — dinner, a movie,
+    a destination, or who gets the last slice. Each player gets one at random.
+    Both phones show the assignments, and the winner's choice settles it.
+    Assignments stay fixed through draws. Leave both choices blank for just a game.
+
+    **Quick setup:** choose your V3 notification script and two phones.
+    Lights and decision choices are optional. Then save and run your script.
+
+    **Lights:** select any number per player, without overlapping selections.
+    Three pulses run alongside every round's prompts; the winner's lights
+    celebrate alongside the results. Selected lights return to their pre-game
+    on/off, brightness, and colour settings when the game finishes, including
+    timeouts and the draw limit. Restoration checks reported states and retries
+    up to three times; a failure is reported instead of silently finishing.
+    A forced stop, reload, or unexpected error can interrupt restoration.
+    Avoid this feature if flashing lights could cause discomfort.
+
+    **For automation builders:** call this instance directly with
+    `response_variable: game_result`. The result includes players, rounds,
+    full V3 responses, assignments, and `decided_choice`. A timeout, dismissal,
+    missing response, or supersession ends the game without deciding a choice.
+  domain: script
+  homeassistant:
+    min_version: "2024.6.0"
+  input:
+    players:
+      name: "🎮 Meet the players"
+      icon: mdi:account-multiple
+      collapsed: false
+      input:
+        notification_script:
+          name: "🔔 V3 notification engine"
+          description: >
+            Choose an instance of the updated Notifications V3 blueprint.
+            The game resets its saved notification settings and disables its saved
+            actions for every game call. The instance must use Parallel mode;
+            a saved Restart/Single/Queued override cannot be changed by a call.
+            Do not select scripts made from other blueprints.
+          selector:
+            entity:
+              filter:
+                - domain: script
+        player_one_device:
+          name: "📱 Player 1 phone"
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+        player_one_display_name:
+          name: "🙂 Player 1 name"
+          description: "Optional nickname for messages. Blank uses the phone's name."
+          default: ""
+          selector:
+            text:
+        player_two_device:
+          name: "📱 Player 2 phone"
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+        player_two_display_name:
+          name: "🙂 Player 2 name"
+          description: "Optional nickname for messages. Blank uses the phone's name."
+          default: ""
+          selector:
+            text:
+    decision:
+      name: "🎲 Let the winner decide — optional"
+      icon: mdi:shuffle-variant
+      description: >
+        Any two choices, not just food! Fill in both to enable decision mode.
+        Random assignments are shown to both players and stay fixed through draws.
+        If either field is blank, this is a regular game with no decision attached.
+      collapsed: true
+      input:
+        choice_one:
+          name: "🅰️ First choice"
+          description: "For example: Pizza, a movie, the beach, or board games."
+          default: ""
+          selector:
+            text:
+        choice_two:
+          name: "🅱️ Second choice"
+          description: "The alternative. The winner's assigned choice is announced to both phones."
+          default: ""
+          selector:
+            text:
+    lights:
+      name: "✨ Set the stage — optional"
+      icon: mdi:spotlight-beam
+      description: >
+        Choose one or more lights per player, or leave either selection empty.
+        The two selections must not share lights, including members of light groups.
+        Explicit on/off pulses use zero transition and a one-second beat by default.
+        Response speed still depends on your bulbs and network.
+      collapsed: true
+      input:
+        player_one_light:
+          name: "💡 Player 1 spotlight(s)"
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+        player_two_light:
+          name: "💡 Player 2 spotlight(s)"
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: light
+        light_beat_seconds:
+          name: "🥁 Light-show beat"
+          description: "Seconds for each on/off phase. Increase if your bulbs respond slowly."
+          default: 1
+          selector:
+            number:
+              min: 0.5
+              max: 3
+              step: 0.1
+              unit_of_measurement: "s"
+              mode: slider
+    rules:
+      name: "⏱️ House rules"
+      icon: mdi:timer-outline
+      collapsed: true
+      input:
+        response_timeout:
+          name: "⏳ Time to pick a move"
+          default:
+            hours: 0
+            minutes: 2
+            seconds: 0
+          selector:
+            duration:
+              enable_day: false
+              enable_second: true
+        max_rounds:
+          name: "🔁 Maximum rounds"
+          description: "Draws replay automatically. Zero means keep going until someone wins."
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 100
+              step: 1
+              mode: box
+        round_pause_seconds:
+          name: "😮‍💨 Breather after a draw"
+          default: 2
+          selector:
+            number:
+              min: 0
+              max: 30
+              step: 1
+              unit_of_measurement: "s"
+              mode: slider
+mode: single
+max_exceeded: warning
+fields:
+  field_choice_one:
+    name: "🅰️ First choice for this game"
+    description: "Optional runtime override. Supply both choices, or blank values for a regular game."
+    selector:
+      text:
+  field_choice_two:
+    name: "🅱️ Second choice for this game"
+    description: "Optional runtime override for the second decision choice."
+    selector:
+      text:
+sequence:
+  - alias: "Prepare the arena"
+    variables:
+      notification_script: !input notification_script
+      player_one_device: !input player_one_device
+      player_two_device: !input player_two_device
+      player_one_light: !input player_one_light
+      player_two_light: !input player_two_light
+      player_one_lights: "{{ ([player_one_light] if player_one_light is string else player_one_light) | reject('equalto', '') | unique | list }}"
+      player_two_lights: "{{ ([player_two_light] if player_two_light is string else player_two_light) | reject('equalto', '') | unique | list }}"
+      player_one_display_name: !input player_one_display_name
+      player_two_display_name: !input player_two_display_name
+      response_timeout: !input response_timeout
+      max_rounds: !input max_rounds
+      round_pause_seconds: !input round_pause_seconds
+      light_beat_seconds: !input light_beat_seconds
+      configured_choice_one: !input choice_one
+      configured_choice_two: !input choice_two
+      decision_one: "{{ (field_choice_one if field_choice_one is defined else configured_choice_one) | string | trim }}"
+      decision_two: "{{ (field_choice_two if field_choice_two is defined else configured_choice_two) | string | trim }}"
+      decision_enabled: "{{ decision_one | length > 0 and decision_two | length > 0 }}"
+      assignment_flip: "{{ range(2) | random }}"
+      player_one_assignment: "{{ (decision_one if assignment_flip == 0 else decision_two) if decision_enabled else '' }}"
+      player_two_assignment: "{{ (decision_two if assignment_flip == 0 else decision_one) if decision_enabled else '' }}"
+      player_one_name: "{{ player_one_display_name | trim or device_attr(player_one_device, 'name') or 'Player 1' }}"
+      player_two_name: "{{ player_two_display_name | trim or device_attr(player_two_device, 'name') or 'Player 2' }}"
+      game_id: "{{ context.id ~ '-' ~ now().strftime('%H%M%S%f') }}"
+      game_round: 0
+      game_status: playing
+      game_result:
+      round_history: []
+      player_one_response:
+      player_two_response:
+      players: []
+      round_winner: "none"
+      move_labels:
+        option_one: "✂️ Scissors"
+        option_two: "📄 Paper"
+        option_three: "🪨 Stone"
+      selected_lights: "{{ (player_one_lights + player_two_lights) | unique | list }}"
+      expanded_one_lights: "{{ expand(player_one_lights) | map(attribute='entity_id') | list }}"
+      expanded_two_lights: "{{ expand(player_two_lights) | map(attribute='entity_id') | list }}"
+      overlapping_lights: "{{ expanded_one_lights | select('in', expanded_two_lights) | list }}"
+      timeout_seconds: "{{ response_timeout.get('hours', 0) * 3600 + response_timeout.get('minutes', 0) * 60 + response_timeout.get('seconds', 0) }}"
+      assignment_message: >-
+        {{ (player_one_name ~ ' is playing for ' ~ player_one_assignment ~ '. '
+          ~ player_two_name ~ ' is playing for ' ~ player_two_assignment
+          ~ '. Winner decides! ') if decision_enabled else '' }}
+      notification_defaults:
+        field_reset_config: true
+        field_operation_mode: send
+        field_run_button_actions: false
+        field_run_followup_actions: false
+        field_run_timeout_actions: false
+        field_bind_swipe_to_timeout: false
+        field_swipe_away_action: []
+        field_broadcast_enabled: false
+        field_notification_link: ""
+        field_persist: false
+        field_subtitle: "✂️ Scissors · 📄 Paper · 🪨 Stone"
+        field_configuration:
+          channel: "Scissors Paper Stone"
+          group: "Scissors Paper Stone"
+          icon: mdi:gamepad-variant
+          interruption_level: active
+          visibility: private
+          attachment_type: none
+          clear_on_timeout: true
+  - alias: "Check setup before touching lights or sending anything"
+    if:
+      - condition: template
+        value_template: >-
+          {{ player_one_device == player_two_device
+            or notification_script == this.entity_id
+            or states(notification_script) in ['unknown', 'unavailable']
+            or state_attr(notification_script, 'mode') != 'parallel'
+            or overlapping_lights | length > 0
+            or expand(selected_lights) | rejectattr('state', 'in', ['on', 'off']) | list | length > 0
+            or timeout_seconds <= 0 }}
+    then:
+      - stop: >
+          Game setup is not ready. Select two different phones, non-overlapping
+          available optional lights, a positive response timeout, and an updated V3
+          notification instance using Parallel mode. Do not select this game as its
+          own notification engine.
+        error: true
+  - alias: "Save explicit restoration commands before the show"
+    variables:
+      light_snapshot: >-
+        {% set ns = namespace(items=[]) %}
+        {% set color_keys = {'color_temp': 'color_temp_kelvin', 'hs': 'hs_color',
+          'rgb': 'rgb_color', 'rgbw': 'rgbw_color', 'rgbww': 'rgbww_color', 'xy': 'xy_color'} %}
+        {% for light in expand(selected_lights) %}
+          {% set data = namespace(value={'transition': 0}) %}
+          {% if light.state == 'on' %}
+            {% for key in ['brightness', 'effect'] %}
+              {% if light.attributes.get(key) is not none %}
+                {% set data.value = data.value | combine({key: light.attributes[key]}) %}
+              {% endif %}
+            {% endfor %}
+            {% set color_key = color_keys.get(light.attributes.get('color_mode', ''), '') %}
+            {% if color_key and light.attributes.get(color_key) is not none %}
+              {% set data.value = data.value | combine({color_key: light.attributes[color_key]}) %}
+            {% endif %}
+          {% endif %}
+          {% set ns.items = ns.items + [{'entity_id': light.entity_id, 'state': light.state, 'data': data.value}] %}
+        {% endfor %}
+        {{ ns.items }}
+      lights_restored: "{{ light_snapshot | length == 0 }}"
+  - alias: "Play until a winner, an incomplete round, or the draw limit"
+    repeat:
+      while:
+        - condition: template
+          value_template: "{{ game_status == 'playing' }}"
+      sequence:
+        - variables:
+            game_round: "{{ game_round + 1 }}"
+            player_one_response:
+            player_two_response:
+            players: []
+        - variables:
+            prompt_title: "{{ ('🤝 Same move! Rematch · ' if game_round > 1 else '🎮 The showdown · ') ~ 'Round ' ~ game_round }}"
+            prompt_message: >-
+              {{ ('Last round: both picked ' ~ move_labels.get(round_history[-1].players[0].choice, 'the same move')
+                ~ '. Let’s break the tie! ') if game_round > 1 else '' }}
+              {{ assignment_message }}Pick your secret move below. No peeking! 👀
+            prompt_data: >-
+              {{ notification_defaults | combine({'field_title': prompt_title,
+                'field_message': prompt_message, 'field_option_one_text': '✂️ Scissors',
+                'field_option_two_text': '📄 Paper', 'field_option_three_text': '🪨 Stone',
+                'field_option_one_enabled': true, 'field_option_two_enabled': true,
+                'field_option_three_enabled': true, 'field_enable_timeout': true,
+                'field_timeout': response_timeout, 'field_wait_for_response': true}) }}
+        - alias: "Both players choose privately alongside the countdown"
+          parallel:
+            - sequence:
+                - action: "{{ notification_script }}"
+                  data: >-
+                    {{ prompt_data | combine({'field_notify_devices': [player_one_device],
+                      'field_tag': game_id ~ '_r' ~ game_round ~ '_p1',
+                      'field_caller_context': {'game_id': game_id, 'round': game_round,
+                        'player': 1, 'device_id': player_one_device,
+                        'assigned_choice': player_one_assignment}}) }}
+                  response_variable: player_one_response
+            - sequence:
+                - action: "{{ notification_script }}"
+                  data: >-
+                    {{ prompt_data | combine({'field_notify_devices': [player_two_device],
+                      'field_tag': game_id ~ '_r' ~ game_round ~ '_p2',
+                      'field_caller_context': {'game_id': game_id, 'round': game_round,
+                        'player': 2, 'device_id': player_two_device,
+                        'assigned_choice': player_two_assignment}}) }}
+                  response_variable: player_two_response
+            - sequence:
+                - alias: "Lights down — start from a visible off state"
+                  if:
+                    - condition: template
+                      value_template: "{{ selected_lights | length > 0 }}"
+                  then:
+                    - action: light.turn_off
+                      continue_on_error: true
+                      target:
+                        entity_id: "{{ selected_lights }}"
+                      data:
+                        transition: 0
+                    - delay:
+                        seconds: "{{ light_beat_seconds }}"
+                    - alias: "Three game-show pulses on all selected lights"
+                      repeat:
+                        count: 3
+                        sequence:
+                          - action: light.turn_on
+                            continue_on_error: true
+                            target:
+                              entity_id: "{{ selected_lights }}"
+                            data:
+                              transition: 0
+                              brightness_pct: 100
+                          - delay:
+                              seconds: "{{ light_beat_seconds }}"
+                          - action: light.turn_off
+                            continue_on_error: true
+                            target:
+                              entity_id: "{{ selected_lights }}"
+                            data:
+                              transition: 0
+                          - delay:
+                              seconds: "{{ light_beat_seconds }}"
+        - alias: "Normalize absent responses instead of accessing undefined values"
+          variables:
+            player_one_response: "{{ player_one_response if player_one_response is mapping else {'result': 'no_response', 'outcome': 'missing_response'} }}"
+            player_two_response: "{{ player_two_response if player_two_response is mapping else {'result': 'no_response', 'outcome': 'missing_response'} }}"
+            player_one_choice: "{{ player_one_response.get('result', 'unknown') }}"
+            player_two_choice: "{{ player_two_response.get('result', 'unknown') }}"
+            valid_round: >-
+              {{ player_one_response.get('outcome') == 'button'
+                and player_two_response.get('outcome') == 'button'
+                and player_one_choice in move_labels and player_two_choice in move_labels }}
+            round_winner: >-
+              {% set beats = {'option_one': 'option_two', 'option_two': 'option_three', 'option_three': 'option_one'} %}
+              {{ 'none' if not valid_round else 'draw' if player_one_choice == player_two_choice
+                else 'player_one' if beats[player_one_choice] == player_two_choice else 'player_two' }}
+            game_status: >-
+              {{ 'ended_incomplete' if not valid_round else 'won' if round_winner != 'draw'
+                else 'max_rounds_reached' if max_rounds | int > 0 and game_round >= max_rounds | int
+                else 'playing' }}
+        - alias: "Keep player identity, assignment, and full notification evidence"
+          repeat:
+            for_each:
+              - number: 1
+                name: "{{ player_one_name }}"
+                device_id: "{{ player_one_device }}"
+                choice: "{{ player_one_choice }}"
+                assigned_choice: "{{ player_one_assignment }}"
+                notification_response: "{{ player_one_response }}"
+              - number: 2
+                name: "{{ player_two_name }}"
+                device_id: "{{ player_two_device }}"
+                choice: "{{ player_two_choice }}"
+                assigned_choice: "{{ player_two_assignment }}"
+                notification_response: "{{ player_two_response }}"
+            sequence:
+              - variables:
+                  manufacturer: "{{ device_attr(repeat.item.device_id, 'manufacturer') or '' }}"
+                  model: "{{ device_attr(repeat.item.device_id, 'model') or '' }}"
+                  platform: "{{ 'ios' if 'apple' in manufacturer | lower else 'android' if manufacturer else 'unknown' }}"
+                  players: >-
+                    {{ players + [dict(repeat.item, outcome=repeat.item.notification_response.get('outcome', 'unknown'),
+                      manufacturer=manufacturer, model=model, device_platform=platform,
+                      is_ios=(platform == 'ios' if platform != 'unknown' else none),
+                      platform_evidence={'manufacturer': manufacturer, 'model': model})] }}
+        - variables:
+            decided_choice: "{{ (player_one_assignment if round_winner == 'player_one' else player_two_assignment) if decision_enabled and game_status == 'won' else '' }}"
+            game_result:
+              game_id: "{{ game_id }}"
+              round: "{{ game_round }}"
+              rounds_played: "{{ game_round }}"
+              status: "{{ game_status }}"
+              winner: "{{ round_winner }}"
+              decision_enabled: "{{ decision_enabled }}"
+              decided_choice: "{{ decided_choice }}"
+              players: "{{ players }}"
+            round_history: "{{ round_history + [game_result] }}"
+        - alias: "Announce results alongside the winner's celebration"
+          parallel:
+            - sequence:
+                - alias: "Celebrate the winner's spotlights"
+                  if:
+                    - condition: template
+                      value_template: "{{ game_status == 'won' }}"
+                  then:
+                    - variables:
+                        winner_lights: "{{ player_one_lights if round_winner == 'player_one' else player_two_lights }}"
+                    - if:
+                        - condition: template
+                          value_template: "{{ winner_lights | length > 0 }}"
+                      then:
+                        - repeat:
+                            count: 3
+                            sequence:
+                              - action: light.turn_on
+                                continue_on_error: true
+                                target:
+                                  entity_id: "{{ winner_lights }}"
+                                data:
+                                  transition: 0
+                                  brightness_pct: 100
+                              - delay:
+                                  seconds: "{{ light_beat_seconds }}"
+                              - action: light.turn_off
+                                continue_on_error: true
+                                target:
+                                  entity_id: "{{ winner_lights }}"
+                                data:
+                                  transition: 0
+                              - delay:
+                                  seconds: "{{ light_beat_seconds }}"
+            - sequence:
+                - alias: "Tell both players how the match ended"
+                  if:
+                    - condition: template
+                      value_template: "{{ game_status != 'playing' }}"
+                  then:
+                    - repeat:
+                        for_each: "{{ players }}"
+                        sequence:
+                          - variables:
+                              this_player_won: "{{ round_winner == ('player_one' if repeat.item.number == 1 else 'player_two') }}"
+                              announcement_title: >-
+                                {{ '🏆 You win! Decision made!' if game_status == 'won' and this_player_won and decision_enabled
+                                  else '🏆 You win! Champion!' if game_status == 'won' and this_player_won
+                                  else '👏 You lose — well played!' if game_status == 'won'
+                                  else '🤝 A tie to the very end!' if game_status == 'max_rounds_reached'
+                                  else '⏳ Match incomplete' }}
+                              announcement_message: >-
+                                {% if game_status == 'won' %}
+                                  {{ player_one_name }}: {{ move_labels[player_one_choice] }}.
+                                  {{ player_two_name }}: {{ move_labels[player_two_choice] }}.
+                                  {{ 'Victory is yours! 🎉' if this_player_won else 'Your opponent takes this one. Rematch next time? 🎮' }}
+                                  {{ ('The decision: ' ~ decided_choice ~ '. ✅') if decision_enabled else '' }}
+                                {% elif game_status == 'max_rounds_reached' %}
+                                  {{ game_round }} rounds and still tied! Both picked {{ move_labels[player_one_choice] }}.
+                                  {{ 'No choice was decided. ' if decision_enabled else '' }}Call it a draw, or play again! 🎮
+                                {% else %}
+                                  A player timed out, dismissed their prompt, or had their notification replaced.
+                                  No winner{{ ' and no choice decided' if decision_enabled else '' }}. Ready for another try? 🎮
+                                {% endif %}
+                          - action: "{{ notification_script }}"
+                            data: >-
+                              {{ notification_defaults | combine({'field_notify_devices': [repeat.item.device_id],
+                                'field_title': announcement_title, 'field_message': announcement_message,
+                                'field_option_one_enabled': false, 'field_option_two_enabled': false,
+                                'field_option_three_enabled': false, 'field_enable_timeout': false,
+                                'field_wait_for_response': false,
+                                'field_tag': game_id ~ '_result_p' ~ repeat.item.number}) }}
+        - if:
+            - condition: template
+              value_template: "{{ game_status == 'playing' }}"
+          then:
+            - delay:
+                seconds: "{{ round_pause_seconds | int }}"
+  - alias: "Explicitly restore and confirm every saved light"
+    repeat:
+      count: 3
+      sequence:
+        - if:
+            - condition: template
+              value_template: "{{ not lights_restored }}"
+          then:
+            - repeat:
+                for_each: "{{ light_snapshot }}"
+                sequence:
+                  - action: "{{ 'light.turn_on' if repeat.item.state == 'on' else 'light.turn_off' }}"
+                    continue_on_error: true
+                    target:
+                      entity_id: "{{ repeat.item.entity_id }}"
+                    data: "{{ repeat.item.data }}"
+            - alias: "Let outstanding bulb reports settle before confirmation"
+              delay:
+                seconds: 1
+            - alias: "Confirm original power, brightness, and active colour settings"
+              wait_template: >-
+                {% set ns = namespace(matches=true) %}
+                {% for saved in light_snapshot %}
+                  {% if not is_state(saved.entity_id, saved.state) %}
+                    {% set ns.matches = false %}
+                  {% endif %}
+                  {% if saved.state == 'on' %}
+                    {% for key, expected in saved.data.items() if key != 'transition' %}
+                      {% set actual = state_attr(saved.entity_id, key) %}
+                      {% set tolerance = 10 if key == 'color_temp_kelvin' else 0.005 if key == 'xy_color' else 1 if key == 'hs_color' else 2 %}
+                      {% if expected is number %}
+                        {% if actual is not number or (actual - expected) | abs > tolerance %}
+                          {% set ns.matches = false %}
+                        {% endif %}
+                      {% elif expected is sequence and expected is not string %}
+                        {% if actual is not sequence or actual is string or actual | length != expected | length %}
+                          {% set ns.matches = false %}
+                        {% else %}
+                          {% for component in expected %}
+                            {% if actual[loop.index0] is not number or (actual[loop.index0] - component) | abs > tolerance %}
+                              {% set ns.matches = false %}
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      {% elif actual != expected %}
+                        {% set ns.matches = false %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+                {{ ns.matches }}
+              timeout:
+                seconds: 5
+              continue_on_timeout: true
+            - variables:
+                lights_restored: "{{ wait.completed }}"
+  - alias: "Do not silently finish when light restoration is unconfirmed"
+    if:
+      - condition: template
+        value_template: "{{ not lights_restored }}"
+    then:
+      - stop: >
+          The match ended, but one or more lights did not report their pre-game
+          settings after three restoration attempts. Check the restoration steps
+          in this script's trace.
+        error: true
+  - variables:
+      game_result: "{{ dict(game_result, round_history=round_history, lights_restored=lights_restored) }}"
+  - stop: "The showdown is over!"
+    response_variable: game_result
