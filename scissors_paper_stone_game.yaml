@@ -28,6 +28,7 @@ blueprint:
     full V3 responses, assignments, and `decided_choice`. A timeout, dismissal,
     missing response, or supersession ends the game without deciding a choice.
   domain: script
+  source_url: https://raw.githubusercontent.com/samuelthng/t-house-blueprints/refs/heads/v3.0.0-beta-1/scissors_paper_stone_game.yaml
   homeassistant:
     min_version: "2024.6.0"
   input:
