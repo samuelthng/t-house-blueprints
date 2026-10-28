@@ -59,6 +59,7 @@ blueprint:
     - 🔁 **Reminders** send the notification again until someone answers, always before the timeout and never more than the maximum.
     - 😴 **Snooze** (a button mode) clears every phone, waits, then sends again. The timeout restarts after each snooze. The button disappears after the last allowed snooze.
     - 💬 **Text reply** (a button mode) returns the typed text as `reply_text`.
+    - 👆 **Swipe-away as snooze** (Android) makes a swipe behave like Snooze. Without it, a swipe counts as an answer and stops reminders.
     - 🚨 **Alarm volume** (Android) and **Critical** (iOS) take priority over Quiet delivery. iOS critical alerts cannot be replaced or cleared, so reminders stack and snooze cannot clear them.
 
     ## 📱 Platform guide
@@ -562,12 +563,13 @@ blueprint:
         - 🔁 **Reminders** send the notification again every interval until someone answers, up to the maximum, and always before the timeout.
         - 😴 **Snooze** is a button mode. Tapping it clears the notification on every phone, waits, then sends it again. The timeout starts over after each snooze, and the Snooze button disappears after the last allowed snooze.
         - 💬 **Text reply** is a button mode. The typed text comes back as `reply_text`.
+        - 👆 **Swipe-away as snooze** (Android, in the Android dismissal section) makes a swipe behave like Snooze.
         - 🍎 iOS critical alerts cannot be replaced, so reminders stack and snooze cannot clear them.
       collapsed: true
       input:
         reminder_enabled:
           name: 🔁 Send reminders until answered
-          description: "While waiting, send the notification again every interval until someone responds. Ignored when Wait for a response is off. Android dismissal counts as an answer and stops reminders; use Persistent notification to keep it."
+          description: "While waiting, send the notification again every interval until someone responds. Ignored when Wait for a response is off. An Android swipe-away counts as an answer and stops reminders, unless you turn on Treat swipe-away as snooze (Android dismissal section)."
           default: false
           selector:
             boolean: {}
@@ -658,6 +660,12 @@ blueprint:
         bind_swipe_to_timeout:
           name: 🔗 Also run timeout actions on swipe (Android)
           description: "Android only. Also run Timeout actions after a recognized non-persistent dismissal. Requires Run timeout actions to be enabled. If swipe actions are configured, they run first."
+          default: false
+          selector:
+            boolean: {}
+        swipe_as_snooze:
+          name: 😴 Treat swipe-away as snooze (Android)
+          description: "Android only. A swipe-away clears every phone and sends the notification again after the snooze time, like a Snooze button. It uses Snooze for and Maximum snoozes from Reminders, snooze and reply. Swipe actions and timeout-on-swipe are skipped while it snoozes. After the last snooze, a swipe counts as a real dismissal. Needs Wait for a response; no effect on persistent notifications."
           default: false
           selector:
             boolean: {}
@@ -1222,6 +1230,7 @@ sequence:
           reply_placeholder: !input reply_placeholder
           reply_submit_label: !input reply_submit_label
           attachment_camera_snapshot: !input attachment_camera_snapshot
+          swipe_as_snooze: !input swipe_as_snooze
     - variables:
         script_swipe_away_action: !input swipe_away_action
         swipe_away_action: "{{ field_swipe_away_action if field_swipe_away_action is defined else script_swipe_away_action }}"
@@ -1258,7 +1267,7 @@ sequence:
         reminder_interval={'hours': 0, 'minutes': 5, 'seconds': 0}, reminder_max_count=3,
         reminder_title_prefix='🔁', snooze_duration={'hours': 0, 'minutes': 10, 'seconds': 0},
         snooze_max_count=3, reply_placeholder='Type your reply', reply_submit_label='Send',
-        attachment_camera_snapshot=false) }}
+        attachment_camera_snapshot=false, swipe_as_snooze=false) }}
     runtime_config: >-
       {{ (clean_config if reset_config else saved_config)
         | combine(field_configuration | default({})) }}
@@ -1359,6 +1368,7 @@ sequence:
     snooze_max_count: "{{ [[runtime_config.get('snooze_max_count', 3) | int(3), 1] | max, 10] | min }}"
     reply_placeholder: "{{ runtime_config.get('reply_placeholder', '') | string }}"
     reply_submit_label: "{{ runtime_config.get('reply_submit_label', 'Send') | string }}"
+    swipe_as_snooze: "{{ runtime_config.get('swipe_as_snooze', false) | bool(false) }}"
 - alias: Take a camera snapshot to attach
   variables:
     snapshot_ready: false
@@ -1578,6 +1588,13 @@ sequence:
         wait_finished: false
         wait_event: null
         is_reminder: false
+        first_option: "{{ 'FIRST_' ~ notification_run_id ~ '_' ~ snooze_count }}"
+        second_option: "{{ 'SECOND_' ~ notification_run_id ~ '_' ~ snooze_count }}"
+        third_option: "{{ 'THIRD_' ~ notification_run_id ~ '_' ~ snooze_count }}"
+        option_one: "{{ option_one if option_one.action == 'URI' else dict(option_one, action=first_option) }}"
+        option_two: "{{ option_two if option_two.action == 'URI' else dict(option_two, action=second_option) }}"
+        option_three: "{{ option_three if option_three.action == 'URI' else dict(option_three, action=third_option) }}"
+        options: "{{ [option_one, option_two, option_three] | selectattr('enabled') | list }}"
         snoozes_left: "{{ [snooze_max_count - snooze_count, 0] | max }}"
         send_options: >-
           {% set ns = namespace(items=[]) %}
@@ -1749,7 +1766,8 @@ sequence:
         snooze_pressed: >-
           {% set e = wait_event if wait_event else none %}
           {% set a = e.data.action if e is not none and e.event_type == 'mobile_app_notification_action' and e.data.action is defined else '' %}
-          {{ expect_response and snoozes_left | int > 0 and a | length > 0 and ((a == first_option and option_one_mode == 'snooze' and option_one_enabled) or (a == second_option and option_two_mode == 'snooze' and option_two_enabled) or (a == third_option and option_three_mode == 'snooze' and option_three_enabled)) }}
+          {% set swiped = e is not none and e.event_type == 'mobile_app_notification_cleared' and swipe_as_snooze and not (persist | bool(false)) %}
+          {{ expect_response and snoozes_left | int > 0 and (swiped or (a | length > 0 and ((a == first_option and option_one_mode == 'snooze' and option_one_enabled) or (a == second_option and option_two_mode == 'snooze' and option_two_enabled) or (a == third_option and option_three_mode == 'snooze' and option_three_enabled)))) }}
     - if:
       - condition: template
         value_template: "{{ snooze_pressed }}"
