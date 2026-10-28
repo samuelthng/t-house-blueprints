@@ -31,6 +31,26 @@ blueprint:
 
     ⌛ **Wait** · A button, Android dismissal, timeout, or matching replacement can end the wait. iOS critical notifications do not support normal replacement or clearing.
 
+    ## 🚀 Quick start
+
+    1. 📱 **Pick your phones** under **Who to notify** (each needs the Companion app and notifications allowed).
+    2. 📝 **Add a title and message**, then run the script. A first test with no buttons or timeout is the easiest check.
+    3. 🔘 **Add buttons and a timeout** only after the plain notification arrives.
+    4. 🍎 **iOS:** press and hold (or swipe and tap **View**) a notification to see its buttons.
+
+    <details>
+    <summary>🛠️ No notification, or no buttons? Check this first</summary>
+    <ul>
+      <li>📲 Open the Companion app → <strong>Settings → Companion app → Notifications</strong> and confirm push works (try <strong>Send test notification</strong>).</li>
+      <li>🔔 Allow notifications for the app in your phone's system settings. Disable battery optimisation for the app on Android.</li>
+      <li>🎯 Make sure the selected device is the phone you are holding. Re-select it after reinstalling the app or changing phones.</li>
+      <li>🌙 Focus / Do Not Disturb can hide notifications. On Android, an existing channel keeps its old sound and importance; try a new channel name.</li>
+      <li>🔘 Buttons on iOS only show after press-and-hold or expanding the notification.</li>
+      <li>🖼️ Attachments missing? The phone must be able to fetch the URL. Set <strong>Base URL for attachments</strong> to your external URL (for example <code>https://ha.example.com</code>) and check the camera or image entity is available.</li>
+      <li>🔍 Still stuck? Look in <strong>Settings → System → Logs</strong> for errors from this script, and in <strong>Developer tools → Actions</strong> test the phone's <code>notify.mobile_app_…</code> action directly.</li>
+    </ul>
+    </details>
+
     ## 📱 Platform guide
 
     - 🍎 **iOS:** SF Symbol, destructive styling, and unlock controls live inside each button's own iOS section. Interruption level has its own section.
@@ -637,6 +657,14 @@ blueprint:
                 - camera
               multiple: false
               reorder: false
+        attachment_base_url:
+          name: 🌐 Base URL for attachments
+          description: "Optional. Prefixed to relative attachment URLs (those starting with `/`, like camera or image previews and local media) so the phone can fetch them even when away from home. Use your external URL, for example `https://ha.example.com`. Leave blank to send relative URLs as-is. Full `https://…` URLs are never changed."
+          default: ""
+          selector:
+            text:
+              type: url
+              multiple: false
         attachment_media:
           name: 🗂️ Browse media
           description: "Choose an image, video, or audio file. Companion needs a fetchable URL; Home Assistant local media is the most reliable source. Audio is iOS-only. See [attachment documentation](https://companion.home-assistant.io/docs/notifications/notification-attachments)."
@@ -1032,6 +1060,7 @@ sequence:
           broadcast_clear_delay: !input broadcast_clear_delay
           attachment_type: !input attachment_type
           attachment_camera_entity: !input attachment_camera_entity
+          attachment_base_url: !input attachment_base_url
           attachment_media: !input attachment_media
           attachment_image_entity: !input attachment_image_entity
           map_pin_one_entity: !input map_pin_one_entity
@@ -1072,7 +1101,7 @@ sequence:
         broadcast_non_responder_title='Notification handled',
         broadcast_non_responder_message='{{ responder_name }} chose {{ button_title }}.',
         broadcast_clear_delay={'hours': 0, 'minutes': 0, 'seconds': 0},
-        attachment_type='none', attachment_camera_entity='', attachment_media={},
+        attachment_type='none', attachment_camera_entity='', attachment_base_url='', attachment_media={},
         attachment_image_entity='', map_pin_one_entity='', map_pin_one_location={},
         map_second_pin_enabled=false, map_pin_two_entity='', map_pin_two_location={},
         map_shows_line=false, operation_mode='send', tag='', group='', silent_update=false) }}
@@ -1138,8 +1167,15 @@ sequence:
       {% set mime = media_content_type | lower %}
       {% set source = media_content_id | lower %}
       {{ ('image' if mime.startswith('image/') or source.endswith(('.jpg', '.jpeg', '.png', '.gif')) else 'video' if mime.startswith('video/') or source.endswith(('.mp4', '.mpeg', '.mpg', '.avi')) else 'audio' if mime.startswith('audio/') or source.endswith(('.mp3', '.wav', '.aiff', '.m4a')) else '') | trim }}
-    camera_image_url: "{% if (attachment_camera_entity|length) %}\n  {% if (state_attr(attachment_camera_entity,'entity_picture')|length) %}\n    {{state_attr(attachment_camera_entity,'entity_picture')}}\n  {% else %}\n    {{\"/api/camera_proxy/{id}\".format(id=attachment_camera_entity)}}\n  {%- endif %}\n{%- endif %}"
-    media_url: "{{ camera_image_url if attachment_type == 'camera_entity' else '/api/image_proxy/' ~ attachment_image_entity if attachment_type == 'image_entity' else selected_media_url }}"
+    attachment_base_url: "{{ (runtime_config.get('attachment_base_url', '') or '') | string | trim }}"
+    camera_picture: >-
+      {{ (state_attr(attachment_camera_entity, 'entity_picture') or '') | string | trim if attachment_camera_entity | length else '' }}
+    camera_image_url: >-
+      {{ (camera_picture if camera_picture | length else '/api/camera_proxy/' ~ attachment_camera_entity) if attachment_camera_entity | length else '' }}
+    relative_media_url: >-
+      {{ (camera_image_url if attachment_type == 'camera_entity' else '/api/image_proxy/' ~ attachment_image_entity if attachment_type == 'image_entity' and attachment_image_entity | length else selected_media_url) | trim }}
+    media_url: >-
+      {{ (attachment_base_url.rstrip('/') ~ relative_media_url) if attachment_base_url | length and relative_media_url.startswith('/') else relative_media_url }}
     map_pin_one_entity: "{{ runtime_config.map_pin_one_entity }}"
     map_pin_one_location: "{{ runtime_config.map_pin_one_location }}"
     map_pin_one_latitude: >-
