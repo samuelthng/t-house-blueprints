@@ -5,7 +5,7 @@ mode: parallel
 max: 20
 blueprint:
   name: "🔔 Notifications (Version 3.0.0 Beta - Multi-Device)"
-  source_url: https://raw.githubusercontent.com/samuelthng/t-house-blueprints/refs/heads/main/notifications_3.0.yaml
+  source_url: https://raw.githubusercontent.com/samuelthng/t-house-blueprints/refs/heads/v3.0.0-beta-1/notifications_3.0.yaml
   homeassistant:
     min_version: 2024.6.0
   domain: script
