@@ -19,7 +19,7 @@ blueprint:
 
     ## ✨ Features
 
-    📱 Companion phones · 🔘 Up to 3 buttons · ⌛ Response wait and timeout · 📣 Follow-up · 📎 Camera, image, video, audio, and iOS map content
+    📱 Companion phones · 🔘 Up to 3 buttons (action, link, text reply, snooze) · ⌛ Response wait and timeout · 🔁 Reminders · 📣 Follow-up · 🚨 Alarm volume and iOS critical alerts · 📎 Camera (with snapshot), image, video, audio, and iOS map content
 
     ## 🔄 What happens
 
@@ -47,9 +47,19 @@ blueprint:
       <li>🌙 Focus / Do Not Disturb can hide notifications. On Android, an existing channel keeps its old sound and importance; try a new channel name.</li>
       <li>🔘 Buttons on iOS only show after press-and-hold or expanding the notification.</li>
       <li>🖼️ Attachments missing? The phone must be able to fetch the URL. Set <strong>Base URL for attachments</strong> to your external URL (for example <code>https://ha.example.com</code>) and check the camera or image entity is available.</li>
+      <li>💬 Reply or Snooze button missing? Turn on <strong>Wait for a response</strong>; they are hidden when the script does not wait.</li>
       <li>🔍 Still stuck? Look in <strong>Settings → System → Logs</strong> for errors from this script, and in <strong>Developer tools → Actions</strong> test the phone's <code>notify.mobile_app_…</code> action directly.</li>
     </ul>
     </details>
+
+    ## 🔁 Reminders, snooze and reply
+
+    These only work while the script waits for a response. With waiting off, Text reply and Snooze buttons are hidden (link buttons stay) and reminders are skipped.
+
+    - 🔁 **Reminders** send the notification again until someone answers, always before the timeout and never more than the maximum.
+    - 😴 **Snooze** (a button mode) clears every phone, waits, then sends again. The timeout restarts after each snooze. The button disappears after the last allowed snooze.
+    - 💬 **Text reply** (a button mode) returns the typed text as `reply_text`.
+    - 🚨 **Alarm volume** (Android) and **Critical** (iOS) take priority over Quiet delivery. iOS critical alerts cannot be replaced or cleared, so reminders stack and snooze cannot clear them.
 
     ## 📱 Platform guide
 
@@ -80,6 +90,7 @@ blueprint:
     <ul>
       <li><strong>Complete result:</strong> <code>user_response</code>, <code>response_with_responder</code></li>
       <li><strong>Offered choices:</strong> <code>response_options</code></li>
+      <li><strong>Typed reply:</strong> <code>reply_text</code>, <code>response_reply_text</code></li>
       <li><strong>Outcome:</strong> <code>response_action</code>, <code>response_outcome</code>, <code>response_action_id</code>, <code>response_button_index</code>, <code>response_button_title</code></li>
       <li><strong>Event details:</strong> <code>response_event_data</code></li>
       <li><strong>Responder:</strong> <code>responder_name</code>, <code>responder_device_id</code>, <code>responder_device</code>, <code>response_device_platform</code>, <code>response_device_is_ios</code></li>
@@ -165,7 +176,7 @@ blueprint:
               multiple: false
         confirm_option_mode:
           name: Button 1 mode
-          description: "Android can run either Home Assistant action(s) or open a link from a button, not both. Choose Actions and leave its action list empty for a button that only returns a response. iOS can run configured actions and a link. See [actionable notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)."
+          description: "Action(s) return the tap as a response; leave the action list empty to only return it. Link opens a link (Android runs a link or actions, not both; iOS can do both). Text reply asks for typed text and returns it as `reply_text`. Snooze dismisses the notification for now and sends it again later. Reply and Snooze need Wait for a response and are hidden otherwise. See the Reminders, snooze and reply section and [actionable notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)."
           default: ''
           selector:
             select:
@@ -177,9 +188,13 @@ blueprint:
                   value: action
                 - label: "Link (Android only)"
                   value: uri
+                - label: "Text reply (type an answer)"
+                  value: reply
+                - label: "Snooze (send again later)"
+                  value: snooze
         confirm_action:
           name: Button 1 actions
-          description: "Actions to run after this button responds. Leave empty to return the selected button without running actions."
+          description: "Actions to run after this button responds. Leave empty to return the selected button without running actions. Not run for Snooze buttons."
           default: []
           selector:
             action: {}
@@ -235,7 +250,7 @@ blueprint:
               multiple: false
         dismiss_option_mode:
           name: Button 2 mode
-          description: "Android can run either Home Assistant action(s) or open a link from a button, not both. Choose Actions and leave its action list empty for a button that only returns a response. iOS can run configured actions and a link. See [actionable notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)."
+          description: "Action(s) return the tap as a response; leave the action list empty to only return it. Link opens a link (Android runs a link or actions, not both; iOS can do both). Text reply asks for typed text and returns it as `reply_text`. Snooze dismisses the notification for now and sends it again later. Reply and Snooze need Wait for a response and are hidden otherwise. See the Reminders, snooze and reply section and [actionable notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)."
           default: ''
           selector:
             select:
@@ -247,9 +262,13 @@ blueprint:
                   value: action
                 - label: "Link (Android only)"
                   value: uri
+                - label: "Text reply (type an answer)"
+                  value: reply
+                - label: "Snooze (send again later)"
+                  value: snooze
         dismiss_action:
           name: Button 2 actions
-          description: "Actions to run after this button responds. Leave empty to return the selected button without running actions."
+          description: "Actions to run after this button responds. Leave empty to return the selected button without running actions. Not run for Snooze buttons."
           default: []
           selector:
             action: {}
@@ -305,7 +324,7 @@ blueprint:
               multiple: false
         option_three_option_mode:
           name: Button 3 mode
-          description: "Android can run either Home Assistant action(s) or open a link from a button, not both. Choose Actions and leave its action list empty for a button that only returns a response. iOS can run configured actions and a link. See [actionable notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)."
+          description: "Action(s) return the tap as a response; leave the action list empty to only return it. Link opens a link (Android runs a link or actions, not both; iOS can do both). Text reply asks for typed text and returns it as `reply_text`. Snooze dismisses the notification for now and sends it again later. Reply and Snooze need Wait for a response and are hidden otherwise. See the Reminders, snooze and reply section and [actionable notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications)."
           default: ''
           selector:
             select:
@@ -317,9 +336,13 @@ blueprint:
                   value: action
                 - label: "Link (Android only)"
                   value: uri
+                - label: "Text reply (type an answer)"
+                  value: reply
+                - label: "Snooze (send again later)"
+                  value: snooze
         option_three_action:
           name: Button 3 actions
-          description: "Actions to run after this button responds. Leave empty to return the selected button without running actions."
+          description: "Actions to run after this button responds. Leave empty to return the selected button without running actions. Not run for Snooze buttons."
           default: []
           selector:
             action: {}
@@ -361,7 +384,7 @@ blueprint:
       input:
         interruption_level:
           name: 🔕 Interruption level
-          description: "iOS only. Choose how prominently iOS presents the notification. Time-sensitive and critical levels depend on device settings and permissions. See [interruption level documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic#interruption-level)."
+          description: "iOS only. Choose how prominently iOS presents the notification. Time-sensitive and critical levels depend on device settings and permissions. Critical alerts cannot be replaced or cleared by iOS, so reminders stack and clearing other phones does not remove them. See [interruption level documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic#interruption-level)."
           default: active
           selector:
             select:
@@ -377,6 +400,17 @@ blueprint:
               multiple: false
               custom_value: false
               sort: false
+        ios_critical_volume:
+          name: 🔊 Critical alert volume
+          description: "iOS only. Volume for Critical interruption level, from 0 to 100%. Ignored for other levels. Critical alerts play even in Silent mode and Focus, and need the critical-alert permission. See [critical notifications](https://companion.home-assistant.io/docs/notifications/critical-notifications)."
+          default: 100
+          selector:
+            number:
+              min: 0
+              max: 100
+              step: 5
+              unit_of_measurement: "%"
+              mode: slider
     android_options:
       name: 🤖 Android options
       icon: mdi:android
@@ -406,7 +440,7 @@ blueprint:
             color_rgb: {}
         channel:
           name: 🔔 Notification channel
-          description: "Android only. Channel controls sound and importance in Android settings. Channels already created on the phone may retain their existing settings. See [channel documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-channels)."
+          description: "Android only. Channel controls sound and importance in Android settings. Ignored when Alarm volume is chosen below. Channels already created on the phone may retain their existing settings. See [channel documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-channels)."
           default: General
           selector:
             text:
@@ -432,10 +466,24 @@ blueprint:
               sort: false
         android_high_priority:
           name: ⚡ High-priority delivery (Android)
-          description: "Android only. Requests prompt delivery (`priority: high`, `ttl: 0`); network and OS conditions can still delay it."
+          description: "Android only. Requests prompt delivery (`priority: high`, `ttl: 0`); network and OS conditions can still delay it. Always on when Alarm volume is chosen."
           default: true
           selector:
             boolean: {}
+        android_sound_stream:
+          name: 🚨 Sound volume (Android)
+          description: "Android only. Normal uses the Notification channel above. Alarm plays on the alarm volume, so it can ring in vibrate or silent mode; it sets the channel to `alarm_stream` and turns on high-priority delivery. It does not override Do Not Disturb. Alarm takes priority over Quiet delivery. See [alarm stream](https://companion.home-assistant.io/docs/notifications/critical-notifications#android)."
+          default: normal
+          selector:
+            select:
+              options:
+              - label: Normal (use the channel above)
+                value: normal
+              - label: Alarm volume (rings in silent mode)
+                value: alarm
+              multiple: false
+              custom_value: false
+              sort: false
         visibility:
           name: 🔒 Lockscreen visibility
           description: "Android only. Controls lock-screen content visibility, subject to phone settings. See [notification sensitivity documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-sensitivity--lock-screen-visibility)."
@@ -500,11 +548,95 @@ blueprint:
           selector:
             action: {}
         clear_on_timeout:
-          name: 🧹 Auto-dismiss after timeout (Android)
-          description: "Android only. Ask the Companion app to dismiss the notification after the timeout. Requires Set a timeout. This is separate from running Timeout actions. See [notification timeout documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-timeout)."
+          name: 🧹 Let the phone dismiss it at the timeout (Android)
+          description: "Android only. Also asks the Companion app to dismiss the notification by itself when the timeout passes, even if Home Assistant restarts. Requires Set a timeout. When the wait ends at the timeout, all selected phones are cleared regardless of this switch. This is separate from running Timeout actions. See [notification timeout documentation](https://companion.home-assistant.io/docs/notifications/notifications-basic#notification-timeout)."
           default: false
           selector:
             boolean: {}
+    reminders:
+      name: 🔁 Reminders, snooze and reply
+      icon: mdi:bell-ring
+      description: |
+        Extras for notifications that wait for a response. Turn on **Wait for a response** first.
+
+        - 🔁 **Reminders** send the notification again every interval until someone answers, up to the maximum, and always before the timeout.
+        - 😴 **Snooze** is a button mode. Tapping it clears the notification on every phone, waits, then sends it again. The timeout starts over after each snooze, and the Snooze button disappears after the last allowed snooze.
+        - 💬 **Text reply** is a button mode. The typed text comes back as `reply_text`.
+        - 🍎 iOS critical alerts cannot be replaced, so reminders stack and snooze cannot clear them.
+      collapsed: true
+      input:
+        reminder_enabled:
+          name: 🔁 Send reminders until answered
+          description: "While waiting, send the notification again every interval until someone responds. Ignored when Wait for a response is off. Android dismissal counts as an answer and stops reminders; use Persistent notification to keep it."
+          default: false
+          selector:
+            boolean: {}
+        reminder_interval:
+          name: ⏱️ Time between reminders
+          description: "Minimum 30 seconds. Reminders only go out before the timeout, so a longer interval than the timeout means none."
+          default:
+            hours: 0
+            minutes: 5
+            seconds: 0
+          selector:
+            duration:
+              enable_day: false
+              enable_second: true
+        reminder_max_count:
+          name: 🔢 Maximum reminders
+          description: "Stop reminding after this many extra sends. Capped at 20."
+          default: 3
+          selector:
+            number:
+              min: 1
+              max: 20
+              step: 1
+              mode: box
+        reminder_title_prefix:
+          name: 🏷️ Reminder title prefix
+          description: "Added in front of the title on reminders, followed by a space. Leave blank for none."
+          default: "🔁"
+          selector:
+            text:
+              multiline: false
+              multiple: false
+        snooze_duration:
+          name: 😴 Snooze for
+          description: "How long a Snooze button waits before sending again. Minimum 10 seconds. Only used by buttons set to Snooze."
+          default:
+            hours: 0
+            minutes: 10
+            seconds: 0
+          selector:
+            duration:
+              enable_day: false
+              enable_second: true
+        snooze_max_count:
+          name: 🔢 Maximum snoozes
+          description: "After this many snoozes the Snooze button is no longer shown. Capped at 10."
+          default: 3
+          selector:
+            number:
+              min: 1
+              max: 10
+              step: 1
+              mode: box
+        reply_placeholder:
+          name: 💬 Reply box hint (iOS)
+          description: "iOS only. Placeholder text in the reply box of a Text reply button. Android uses its own reply box."
+          default: "Type your reply"
+          selector:
+            text:
+              multiline: false
+              multiple: false
+        reply_submit_label:
+          name: 💬 Reply send label (iOS)
+          description: "iOS only. Label on the send button of a Text reply button."
+          default: "Send"
+          selector:
+            text:
+              multiline: false
+              multiple: false
     devices_delivery:
       name: 🤖 Android dismissal
       icon: mdi:gesture-swipe
@@ -543,7 +675,7 @@ blueprint:
             boolean: {}
         broadcast_responder_title:
           name: 🙋 Responder title
-          description: "Title shown on the phone that responded. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`."
+          description: "Title shown on the phone that responded. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, `{{ button_title }}`, and `{{ reply_text }}`."
           default: "You handled it"
           selector:
             text:
@@ -565,7 +697,7 @@ blueprint:
             boolean: {}
         broadcast_non_responder_title:
           name: 👥 Non-responder title
-          description: "Title shown on every other selected phone. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`."
+          description: "Title shown on every other selected phone. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, `{{ button_title }}`, and `{{ reply_text }}`."
           default: "Notification handled"
           selector:
             text:
@@ -601,7 +733,7 @@ blueprint:
         <p><strong>Exit behavior:</strong> Button, timeout, and dismissal run these actions. Clear, no-wait, and superseded runs do not. A recognized non-persistent dismissal has result <code>swiped</code>; persistent dismissal has result <code>notification_cleared</code>.</p>
         <ul>
           <li><strong>Complete result:</strong> <code>user_response</code>, <code>response_with_responder</code></li>
-          <li><strong>Choices:</strong> <code>response_options</code>, <code>response_action</code>, <code>response_action_id</code>, <code>response_button_index</code>, <code>response_button_title</code></li>
+          <li><strong>Choices:</strong> <code>response_options</code>, <code>response_reply_text</code>, <code>response_action</code>, <code>response_action_id</code>, <code>response_button_index</code>, <code>response_button_title</code></li>
           <li><strong>Outcome and event:</strong> <code>response_outcome</code>, <code>response_event_data</code></li>
           <li><strong>Responder:</strong> <code>responder_name</code>, <code>responder_device_id</code>, <code>responder_device</code>, <code>response_device_platform</code>, <code>response_device_is_ios</code></li>
           <li><strong>Recipients:</strong> <code>response_devices</code>, <code>response_recipients</code>, <code>response_recipient_ids</code>, <code>non_responder_devices</code>, <code>non_responder_device_ids</code>, <code>non_responder_device_names</code></li>
@@ -657,6 +789,12 @@ blueprint:
                 - camera
               multiple: false
               reorder: false
+        attachment_camera_snapshot:
+          name: 📸 Take a snapshot when sending
+          description: "Camera only. Saves one still image to Home Assistant media (`/media/notification_snapshots/`) at send time and attaches that, so the picture shows the moment of the notification instead of whatever the camera sees when the phone loads it. The file is overwritten on each send for the same camera and served with login. On iOS this replaces the live camera view. If the camera is unavailable or saving fails, the live camera image is used. Needs the default Home Assistant media folder."
+          default: false
+          selector:
+            boolean: {}
         attachment_base_url:
           name: 🌐 Base URL for attachments
           description: "Optional. Prefixed to relative attachment URLs (those starting with `/`, like camera or image previews and local media) so the phone can fetch them even when away from home. Use your external URL, for example `https://ha.example.com`. Leave blank to send relative URLs as-is. Full `https://…` URLs are never changed."
@@ -936,7 +1074,7 @@ fields:
       boolean:
   field_broadcast_responder_title:
     name: 🙋 Responder title (runtime)
-    description: "Override the title shown on the phone that responded. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`."
+    description: "Override the title shown on the phone that responded. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, `{{ button_title }}`, and `{{ reply_text }}`."
     default: !input broadcast_responder_title
     selector:
       text:
@@ -952,7 +1090,7 @@ fields:
         multiple: false
   field_broadcast_non_responder_title:
     name: 👥 Non-responder title (runtime)
-    description: "Override the title shown on every other selected phone. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, and `{{ button_title }}`."
+    description: "Override the title shown on every other selected phone. Supports `{{ responder_name }}`, `{{ outcome }}`, `{{ result }}`, `{{ notification_id }}`, `{{ button_title }}`, and `{{ reply_text }}`."
     default: !input broadcast_non_responder_title
     selector:
       text:
@@ -1073,6 +1211,17 @@ sequence:
           tag: !input tag
           group: !input group
           silent_update: !input silent_update
+          ios_critical_volume: !input ios_critical_volume
+          android_sound_stream: !input android_sound_stream
+          reminder_enabled: !input reminder_enabled
+          reminder_interval: !input reminder_interval
+          reminder_max_count: !input reminder_max_count
+          reminder_title_prefix: !input reminder_title_prefix
+          snooze_duration: !input snooze_duration
+          snooze_max_count: !input snooze_max_count
+          reply_placeholder: !input reply_placeholder
+          reply_submit_label: !input reply_submit_label
+          attachment_camera_snapshot: !input attachment_camera_snapshot
     - variables:
         script_swipe_away_action: !input swipe_away_action
         swipe_away_action: "{{ field_swipe_away_action if field_swipe_away_action is defined else script_swipe_away_action }}"
@@ -1104,7 +1253,12 @@ sequence:
         attachment_type='none', attachment_camera_entity='', attachment_base_url='', attachment_media={},
         attachment_image_entity='', map_pin_one_entity='', map_pin_one_location={},
         map_second_pin_enabled=false, map_pin_two_entity='', map_pin_two_location={},
-        map_shows_line=false, operation_mode='send', tag='', group='', silent_update=false) }}
+        map_shows_line=false, operation_mode='send', tag='', group='', silent_update=false,
+        ios_critical_volume=100, android_sound_stream='normal', reminder_enabled=false,
+        reminder_interval={'hours': 0, 'minutes': 5, 'seconds': 0}, reminder_max_count=3,
+        reminder_title_prefix='🔁', snooze_duration={'hours': 0, 'minutes': 10, 'seconds': 0},
+        snooze_max_count=3, reply_placeholder='Type your reply', reply_submit_label='Send',
+        attachment_camera_snapshot=false) }}
     runtime_config: >-
       {{ (clean_config if reset_config else saved_config)
         | combine(field_configuration | default({})) }}
@@ -1138,9 +1292,16 @@ sequence:
     icon_color_selector: "{{ runtime_config.icon_color }}"
     icon_color_hex: '{{ "#{:02x}{:02x}{:02x}".format(icon_color_selector[0], icon_color_selector[1], icon_color_selector[2]) }}'
     android_high_priority: "{{ runtime_config.android_high_priority }}"
+    android_sound_stream: "{{ runtime_config.get('android_sound_stream', 'normal') }}"
+    alarm_stream_active: "{{ android_sound_stream == 'alarm' }}"
+    android_priority_high: "{{ android_high_priority | bool(false) or alarm_stream_active }}"
+    android_channel: "{{ 'alarm_stream' if alarm_stream_active else channel }}"
+    android_delivery_extras: "{{ {'priority': 'high', 'ttl': 0} if android_priority_high else {} }}"
 - alias: iOS Configuration Options
   variables:
     interruption_level: "{{ runtime_config.interruption_level }}"
+    ios_critical_volume: "{{ ([[runtime_config.get('ios_critical_volume', 100) | float(100), 0] | max, 100] | min) / 100 }}"
+    ios_critical_sound: "{{ {'name': 'default', 'critical': 1, 'volume': ios_critical_volume | round(2)} if interruption_level == 'critical' else {} }}"
 - alias: Timeout
   variables:
     script_enable_timeout: "{{ runtime_config.enable_timeout }}"
@@ -1153,43 +1314,15 @@ sequence:
     run_timeout_actions: '{{ iif(field_run_timeout_actions is defined, field_run_timeout_actions, script_run_timeout_actions) }}'
     script_bind_swipe_to_timeout: "{{ runtime_config.bind_swipe_to_timeout }}"
     bind_swipe_to_timeout: '{{ iif(field_bind_swipe_to_timeout is defined, field_bind_swipe_to_timeout, script_bind_swipe_to_timeout) }}'
-- alias: Attachments
+- alias: Resolve operation mode
   variables:
-    attachment_type: "{{ runtime_config.attachment_type }}"
-    attachment_camera_entity: "{{ runtime_config.attachment_camera_entity }}"
-    attachment_image_entity: "{{ runtime_config.attachment_image_entity }}"
-    attachment_media: "{{ runtime_config.attachment_media }}"
-    media_content_id: "{{ attachment_media.get('media_content_id', '') }}"
-    media_content_type: "{{ attachment_media.get('media_content_type', '') }}"
-    selected_media_url: >-
-      {{ (media_content_id | replace('media-source://media_source/local/', '/media/local/') if media_content_id.startswith('media-source://media_source/local/') else media_content_id if media_content_id.startswith(('http://', 'https://', '/media/local/', '/local/')) else '') | trim }}
-    media_kind: >-
-      {% set mime = media_content_type | lower %}
-      {% set source = media_content_id | lower %}
-      {{ ('image' if mime.startswith('image/') or source.endswith(('.jpg', '.jpeg', '.png', '.gif')) else 'video' if mime.startswith('video/') or source.endswith(('.mp4', '.mpeg', '.mpg', '.avi')) else 'audio' if mime.startswith('audio/') or source.endswith(('.mp3', '.wav', '.aiff', '.m4a')) else '') | trim }}
-    attachment_base_url: "{{ (runtime_config.get('attachment_base_url', '') or '') | string | trim }}"
-    camera_picture: >-
-      {{ (state_attr(attachment_camera_entity, 'entity_picture') or '') | string | trim if attachment_camera_entity | length else '' }}
-    camera_image_url: >-
-      {{ (camera_picture if camera_picture | length else '/api/camera_proxy/' ~ attachment_camera_entity) if attachment_camera_entity | length else '' }}
-    relative_media_url: >-
-      {{ (camera_image_url if attachment_type == 'camera_entity' else '/api/image_proxy/' ~ attachment_image_entity if attachment_type == 'image_entity' and attachment_image_entity | length else selected_media_url) | trim }}
-    media_url: >-
-      {{ (attachment_base_url.rstrip('/') ~ relative_media_url) if attachment_base_url | length and relative_media_url.startswith('/') else relative_media_url }}
-    map_pin_one_entity: "{{ runtime_config.map_pin_one_entity }}"
-    map_pin_one_location: "{{ runtime_config.map_pin_one_location }}"
-    map_pin_one_latitude: >-
-      {{ (state_attr(map_pin_one_entity, 'latitude') if map_pin_one_entity and state_attr(map_pin_one_entity, 'latitude') is not none else map_pin_one_location.get('latitude', '')) | string | trim }}
-    map_pin_one_longitude: >-
-      {{ (state_attr(map_pin_one_entity, 'longitude') if map_pin_one_entity and state_attr(map_pin_one_entity, 'longitude') is not none else map_pin_one_location.get('longitude', '')) | string | trim }}
-    map_second_pin_enabled: "{{ runtime_config.map_second_pin_enabled }}"
-    map_pin_two_entity: "{{ runtime_config.map_pin_two_entity }}"
-    map_pin_two_location: "{{ runtime_config.map_pin_two_location }}"
-    map_pin_two_latitude: >-
-      {{ (state_attr(map_pin_two_entity, 'latitude') if map_pin_two_entity and state_attr(map_pin_two_entity, 'latitude') is not none else map_pin_two_location.get('latitude', '')) | string | trim }}
-    map_pin_two_longitude: >-
-      {{ (state_attr(map_pin_two_entity, 'longitude') if map_pin_two_entity and state_attr(map_pin_two_entity, 'longitude') is not none else map_pin_two_location.get('longitude', '')) | string | trim }}
-    map_shows_line: "{{ runtime_config.map_shows_line }}"
+    script_operation_mode: "{{ runtime_config.operation_mode }}"
+    operation_mode: '{{ iif(field_operation_mode is defined, field_operation_mode, script_operation_mode) }}'
+    script_wait_for_response: "{{ runtime_config.wait_for_response }}"
+    wait_for_response: '{{ iif(field_wait_for_response is defined, field_wait_for_response, script_wait_for_response) }}'
+    caller_context: '{{ field_caller_context if field_caller_context is defined else {} }}'
+    expect_response: >-
+      {{ wait_for_response and operation_mode == "send" }}
 - alias: Device Configuration
   variables:
     devices: >
@@ -1212,6 +1345,80 @@ sequence:
   then:
   - stop: "No devices selected."
     error: false
+- alias: Reminders, snooze and reply
+  variables:
+    reminder_enabled: "{{ runtime_config.get('reminder_enabled', false) | bool(false) }}"
+    reminder_interval_config: "{{ runtime_config.get('reminder_interval', {}) }}"
+    reminder_interval_seconds: "{{ [reminder_interval_config.get('days', 0) * 86400 + reminder_interval_config.get('hours', 0) * 3600 + reminder_interval_config.get('minutes', 0) * 60 + reminder_interval_config.get('seconds', 0), 30] | max }}"
+    reminder_max_count: "{{ [[runtime_config.get('reminder_max_count', 3) | int(3), 1] | max, 20] | min }}"
+    reminder_title_prefix: "{{ runtime_config.get('reminder_title_prefix', '') | string | trim }}"
+    reminders_allowed: >-
+      {% if not expect_response or not reminder_enabled %}0{% elif enable_timeout %}{{ [[reminder_max_count, (timeout_seconds - 1) // reminder_interval_seconds] | min, 0] | max }}{% else %}{{ reminder_max_count }}{% endif %}
+    snooze_config: "{{ runtime_config.get('snooze_duration', {}) }}"
+    snooze_seconds: "{{ [snooze_config.get('days', 0) * 86400 + snooze_config.get('hours', 0) * 3600 + snooze_config.get('minutes', 0) * 60 + snooze_config.get('seconds', 0), 10] | max }}"
+    snooze_max_count: "{{ [[runtime_config.get('snooze_max_count', 3) | int(3), 1] | max, 10] | min }}"
+    reply_placeholder: "{{ runtime_config.get('reply_placeholder', '') | string }}"
+    reply_submit_label: "{{ runtime_config.get('reply_submit_label', 'Send') | string }}"
+- alias: Take a camera snapshot to attach
+  variables:
+    snapshot_ready: false
+    snapshot_version: ""
+    snapshot_camera: "{{ runtime_config.get('attachment_camera_entity', '') or '' }}"
+    snapshot_name: "{{ snapshot_camera | replace('.', '_') ~ '.jpg' }}"
+    snapshot_wanted: >-
+      {{ operation_mode == 'send' and runtime_config.get('attachment_type', 'none') == 'camera_entity' and (runtime_config.get('attachment_camera_snapshot', false) | bool(false)) and snapshot_camera | length > 0 and states(snapshot_camera) not in ['unavailable', 'unknown'] }}
+- if:
+  - condition: template
+    value_template: "{{ snapshot_wanted }}"
+  then:
+  - alias: Save a snapshot to Home Assistant media
+    service: camera.snapshot
+    continue_on_error: true
+    target:
+      entity_id: "{{ snapshot_camera }}"
+    data:
+      filename: "/media/notification_snapshots/{{ snapshot_name }}"
+  - alias: Use the snapshot as the attachment
+    variables:
+      snapshot_ready: true
+      snapshot_version: "{{ now().timestamp() | int }}"
+- alias: Attachments
+  variables:
+    attachment_type: "{{ runtime_config.attachment_type }}"
+    attachment_camera_entity: "{{ runtime_config.attachment_camera_entity }}"
+    attachment_image_entity: "{{ runtime_config.attachment_image_entity }}"
+    attachment_media: "{{ runtime_config.attachment_media }}"
+    media_content_id: "{{ attachment_media.get('media_content_id', '') }}"
+    media_content_type: "{{ attachment_media.get('media_content_type', '') }}"
+    selected_media_url: >-
+      {{ (media_content_id | replace('media-source://media_source/local/', '/media/local/') if media_content_id.startswith('media-source://media_source/local/') else media_content_id if media_content_id.startswith(('http://', 'https://', '/media/local/', '/local/')) else '') | trim }}
+    media_kind: >-
+      {% set mime = media_content_type | lower %}
+      {% set source = media_content_id | lower %}
+      {{ ('image' if mime.startswith('image/') or source.endswith(('.jpg', '.jpeg', '.png', '.gif')) else 'video' if mime.startswith('video/') or source.endswith(('.mp4', '.mpeg', '.mpg', '.avi')) else 'audio' if mime.startswith('audio/') or source.endswith(('.mp3', '.wav', '.aiff', '.m4a')) else '') | trim }}
+    attachment_base_url: "{{ (runtime_config.get('attachment_base_url', '') or '') | string | trim }}"
+    camera_picture: >-
+      {{ (state_attr(attachment_camera_entity, 'entity_picture') or '') | string | trim if attachment_camera_entity | length else '' }}
+    camera_image_url: >-
+      {{ ('/media/local/notification_snapshots/' ~ snapshot_name ~ '?v=' ~ snapshot_version) if snapshot_ready else ((camera_picture if camera_picture | length else '/api/camera_proxy/' ~ attachment_camera_entity) if attachment_camera_entity | length else '') }}
+    relative_media_url: >-
+      {{ (camera_image_url if attachment_type == 'camera_entity' else '/api/image_proxy/' ~ attachment_image_entity if attachment_type == 'image_entity' and attachment_image_entity | length else selected_media_url) | trim }}
+    media_url: >-
+      {{ (attachment_base_url.rstrip('/') ~ relative_media_url) if attachment_base_url | length and relative_media_url.startswith('/') else relative_media_url }}
+    map_pin_one_entity: "{{ runtime_config.map_pin_one_entity }}"
+    map_pin_one_location: "{{ runtime_config.map_pin_one_location }}"
+    map_pin_one_latitude: >-
+      {{ (state_attr(map_pin_one_entity, 'latitude') if map_pin_one_entity and state_attr(map_pin_one_entity, 'latitude') is not none else map_pin_one_location.get('latitude', '')) | string | trim }}
+    map_pin_one_longitude: >-
+      {{ (state_attr(map_pin_one_entity, 'longitude') if map_pin_one_entity and state_attr(map_pin_one_entity, 'longitude') is not none else map_pin_one_location.get('longitude', '')) | string | trim }}
+    map_second_pin_enabled: "{{ runtime_config.map_second_pin_enabled }}"
+    map_pin_two_entity: "{{ runtime_config.map_pin_two_entity }}"
+    map_pin_two_location: "{{ runtime_config.map_pin_two_location }}"
+    map_pin_two_latitude: >-
+      {{ (state_attr(map_pin_two_entity, 'latitude') if map_pin_two_entity and state_attr(map_pin_two_entity, 'latitude') is not none else map_pin_two_location.get('latitude', '')) | string | trim }}
+    map_pin_two_longitude: >-
+      {{ (state_attr(map_pin_two_entity, 'longitude') if map_pin_two_entity and state_attr(map_pin_two_entity, 'longitude') is not none else map_pin_two_location.get('longitude', '')) | string | trim }}
+    map_shows_line: "{{ runtime_config.map_shows_line }}"
 - alias: Option 1
   variables:
     first_option: "{{ 'FIRST_' ~ notification_run_id }}"
@@ -1226,7 +1433,10 @@ sequence:
     option_one_is_destructive: "{{ runtime_config.confirm_is_destructive }}"
     option_one_auth_required: "{{ runtime_config.confirm_authentication_required }}"
     option_one_action: '{% if option_one_mode == ''uri'' %} {{ ''URI'' }} {% else %} {{ first_option }} {% endif %}'
-    option_one: "{{ {\n  'enabled': option_one_enabled,\n  'action': option_one_action,\n  'title': option_one_title,\n  'icon': option_one_icon,\n  'destructive': option_one_is_destructive,\n  'authenticationRequired': option_one_auth_required,\n  \"{}\".format('uri' if option_one_uri|length else ''): option_one_uri,\n} }}"
+    option_one: >-
+      {% set o = {'enabled': option_one_enabled, 'action': option_one_action, 'title': option_one_title, 'icon': option_one_icon, 'destructive': option_one_is_destructive, 'authenticationRequired': option_one_auth_required} %}
+      {% if option_one_mode == 'reply' %}{% set o = dict(o, behavior='textInput', textInputButtonTitle=reply_submit_label, textInputPlaceholder=reply_placeholder) %}{% elif option_one_uri | length and option_one_mode != 'snooze' %}{% set o = dict(o, uri=option_one_uri) %}{% endif %}
+      {{ o }}
 - alias: Option 2
   variables:
     second_option: "{{ 'SECOND_' ~ notification_run_id }}"
@@ -1241,7 +1451,10 @@ sequence:
     option_two_is_destructive: "{{ runtime_config.dismiss_is_destructive }}"
     option_two_auth_required: "{{ runtime_config.dismiss_authentication_required }}"
     option_two_action: '{% if option_two_mode == ''uri'' %} {{ ''URI'' }} {% else %} {{ second_option }} {% endif %}'
-    option_two: "{{{\n  'enabled': option_two_enabled,\n  'action': option_two_action,\n  'title': option_two_title,\n  'icon': option_two_icon,\n  'destructive': option_two_is_destructive,\n  'authenticationRequired': option_two_auth_required,\n  \"{}\".format('uri' if option_two_uri|length else ''): option_two_uri,\n}}}"
+    option_two: >-
+      {% set o = {'enabled': option_two_enabled, 'action': option_two_action, 'title': option_two_title, 'icon': option_two_icon, 'destructive': option_two_is_destructive, 'authenticationRequired': option_two_auth_required} %}
+      {% if option_two_mode == 'reply' %}{% set o = dict(o, behavior='textInput', textInputButtonTitle=reply_submit_label, textInputPlaceholder=reply_placeholder) %}{% elif option_two_uri | length and option_two_mode != 'snooze' %}{% set o = dict(o, uri=option_two_uri) %}{% endif %}
+      {{ o }}
 - alias: Option 3
   variables:
     third_option: "{{ 'THIRD_' ~ notification_run_id }}"
@@ -1256,7 +1469,10 @@ sequence:
     option_three_is_destructive: "{{ runtime_config.option_three_is_destructive }}"
     option_three_auth_required: "{{ runtime_config.option_three_authentication_required }}"
     option_three_action: '{% if option_three_mode == ''uri'' %} {{ ''URI'' }} {% else %} {{ third_option }} {% endif %}'
-    option_three: "{{{\n  'enabled': option_three_enabled,\n  'action': option_three_action,\n  'title': option_three_title,\n  'icon': option_three_icon,\n  'destructive': option_three_is_destructive,\n  'authenticationRequired': option_three_auth_required,\n  \"{}\".format('uri' if option_three_uri|length else ''): option_three_uri,\n}}}"
+    option_three: >-
+      {% set o = {'enabled': option_three_enabled, 'action': option_three_action, 'title': option_three_title, 'icon': option_three_icon, 'destructive': option_three_is_destructive, 'authenticationRequired': option_three_auth_required} %}
+      {% if option_three_mode == 'reply' %}{% set o = dict(o, behavior='textInput', textInputButtonTitle=reply_submit_label, textInputPlaceholder=reply_placeholder) %}{% elif option_three_uri | length and option_three_mode != 'snooze' %}{% set o = dict(o, uri=option_three_uri) %}{% endif %}
+      {{ o }}
 - alias: Setup Payload
   variables:
     options: "{{ [option_one, option_two, option_three] | selectattr('enabled') | list }}"
@@ -1271,8 +1487,10 @@ sequence:
       {% set extras.data = dict(extras.data, **{ 'subtitle': subtitle }) %}
       {% set push = namespace(d={}) %}
       {% set push.d = dict(push.d, **{ 'interruption-level': interruption_level }) %}
+      {% if interruption_level == 'critical' %}{% set push.d = dict(push.d, **{ 'sound': ios_critical_sound }) %}{% endif %}
       {% if notification_link|length %}{% set extras.data = dict(extras.data, **{ 'url': notification_link }) %}{% endif %}
-      {% if attachment_type == 'camera_entity' %}{% set extras.data = dict(extras.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
+      {% if attachment_type == 'camera_entity' and not snapshot_ready %}{% set extras.data = dict(extras.data, **{ 'entity_id': attachment_camera_entity }) %}{% endif %}
+      {% if attachment_type == 'camera_entity' and snapshot_ready and media_url|length %}{% set extras.data = dict(extras.data, **{ 'image': media_url }) %}{% endif %}
       {% if attachment_type == 'map' and map_pin_one_latitude|length and map_pin_one_longitude|length %}
         {% set map_data = namespace(value={'latitude': map_pin_one_latitude, 'longitude': map_pin_one_longitude}) %}
         {% if map_second_pin_enabled and map_pin_two_latitude|length and map_pin_two_longitude|length %}{% set map_data.value = dict(map_data.value, **{'second_latitude': map_pin_two_latitude, 'second_longitude': map_pin_two_longitude, 'shows_line_between_points': map_shows_line}) %}{% endif %}
@@ -1289,7 +1507,7 @@ sequence:
       {% set extras.data = dict(extras.data, **{ 'subject': subtitle }) %}
       {% set extras.data = dict(extras.data, **{ 'visibility': visibility }) %}
       {% set extras.data = dict(extras.data, **{ 'importance': importance }) %}
-      {% if android_high_priority %}{% set extras.data = dict(extras.data, **{ 'priority': 'high', 'ttl': 0 }) %}{% endif %}
+      {% if android_priority_high %}{% set extras.data = dict(extras.data, **{ 'priority': 'high', 'ttl': 0 }) %}{% endif %}
       {% if notification_link|length %}{% set extras.data = dict(extras.data, **{ 'clickAction': notification_link }) %}{% endif %}
       {% if attachment_type == 'camera_entity' and (media_url|length) %}{% set extras.data = dict(extras.data, **{ 'image': media_url }) %}{% endif %}
       {% if attachment_type == 'image_entity' and media_url|length %}{% set extras.data = dict(extras.data, **{ 'image': media_url }) %}{% endif %}
@@ -1297,19 +1515,10 @@ sequence:
       {% if notification_icon|length %}{% set extras.data = dict(extras.data, **{ 'notification_icon': notification_icon }) %}{% endif %}
       {% if enable_icon_color %}{% set extras.data = dict(extras.data, **{ 'color': icon_color_hex }) %}{% endif %}
       {% if enable_timeout and clear_on_timeout %}{% set extras.data = dict(extras.data, **{ 'timeout': timeout_seconds }) %}{% endif %}
-      {% if channel|length %}{% set extras.data = dict(extras.data, **{ 'channel': channel }) %}{% endif %}
+      {% if android_channel|length %}{% set extras.data = dict(extras.data, **{ 'channel': android_channel }) %}{% endif %}
       {% if persist %}{% set extras.data = dict(extras.data, **{ 'persistent': persist }) %}{% endif %}
       {% if car_ui %}{% set extras.data = dict(extras.data, **{ 'car_ui': car_ui }) %}{% endif %}
       {{ extras.data }}
-- alias: Resolve operation mode
-  variables:
-    script_operation_mode: "{{ runtime_config.operation_mode }}"
-    operation_mode: '{{ iif(field_operation_mode is defined, field_operation_mode, script_operation_mode) }}'
-    script_wait_for_response: "{{ runtime_config.wait_for_response }}"
-    wait_for_response: '{{ iif(field_wait_for_response is defined, field_wait_for_response, script_wait_for_response) }}'
-    caller_context: '{{ field_caller_context if field_caller_context is defined else {} }}'
-    expect_response: >-
-      {{ wait_for_response and operation_mode == "send" }}
 - if:
   - condition: template
     value_template: '{{ operation_mode == "clear" and custom_tag | length == 0 }}'
@@ -1343,133 +1552,256 @@ sequence:
     event_data:
       notification_id: '{{ custom_tag }}'
       recipients: '{{ devices | map(attribute="id") | list }}'
-- alias: Send notification to all devices (first responder wins)
+- alias: Delivery state
+  variables:
+    snooze_count: 0
+    sends_total: 0
+    reminders_total: 0
+    delivery_finished: false
+    wait_finished: false
+    wait_event: null
+    window_started: 0
+    window_sends: 0
+    snoozes_left: 0
+    is_reminder: false
+    remaining_seconds: 0
+    send_title: "{{ title }}"
+    send_options: []
+- alias: Send, wait, remind and snooze
   repeat:
-    for_each: "{{ devices }}"
+    until: "{{ delivery_finished }}"
     sequence:
-    - alias: Resolve per-device payload
+    - alias: Start a new wait window
       variables:
-        device_tag: '{{ repeat.item.notify_tag }}'
-        device_is_apple: "{{ 'APPLE' in (device_attr(repeat.item.id, 'manufacturer')|upper) }}"
-        device_payload: >-
-          {% set extras = apple_payload_extras if device_is_apple else android_payload_extras %}
-          {% set d = (notification_data | combine(extras) | combine({'tag': device_tag})) %}
-          {% if device_is_apple %}
-            {% set action_data = d.get('action_data', {}) | combine({'responder_device_id': repeat.item.id}) %}
-            {% set d = d | combine({'action_data': action_data}) %}
-          {% endif %}
-          {% if not expect_response and silent_update %}
-            {% set d = (d | combine({'silent': true, 'alert_once': true})) %}
-          {% endif %}
-          {{ d }}
-    - choose:
-      - alias: Clear tagged notification (operation_mode=clear)
-        conditions: '{{ operation_mode == ''clear'' }}'
+        window_started: "{{ now().timestamp() }}"
+        window_sends: 0
+        wait_finished: false
+        wait_event: null
+        is_reminder: false
+        snoozes_left: "{{ [snooze_max_count - snooze_count, 0] | max }}"
+        send_options: >-
+          {% set ns = namespace(items=[]) %}
+          {% for o, m in [(option_one, option_one_mode), (option_two, option_two_mode), (option_three, option_three_mode)] %}
+            {% if o.enabled and (expect_response or o.get('uri')) and (m != 'snooze' or snoozes_left | int > 0) %}{% set ns.items = ns.items + [o] %}{% endif %}
+          {% endfor %}
+          {{ ns.items }}
+    - alias: Wait for a response while sending and reminding
+      parallel:
+      - alias: Wait for a response
         sequence:
-        - alias: Send clear command to device
-          service: '{{ repeat.item.notify_service }}'
-          continue_on_error: true
-          data:
-            message: clear_notification
+        - if:
+          - condition: template
+            value_template: "{{ expect_response }}"
+          then:
+          - choose:
+            - alias: Should await response with timeout?
+              conditions: '{{ enable_timeout }}'
+              sequence:
+              - alias: Awaiting response with timeout…
+                wait_for_trigger:
+                - platform: event
+                  event_type: mobile_app_notification_action
+                  event_data:
+                    action: '{{ first_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_action
+                  event_data:
+                    action: '{{ second_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_action
+                  event_data:
+                    action: '{{ third_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_cleared
+                  event_data:
+                    action_1_key: '{{ first_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_cleared
+                  event_data:
+                    action_2_key: '{{ second_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_cleared
+                  event_data:
+                    action_3_key: '{{ third_option }}'
+                - platform: event
+                  event_type: blueprint_notification_superseded
+                  event_data:
+                    notification_id: '{{ custom_tag }}'
+                timeout: '{{ timeout }}'
+                continue_on_timeout: true
+            - alias: Should await response indefinitely?
+              conditions: '{{ enable_timeout == false }}'
+              sequence:
+              - alias: Awaiting response indefinitely…
+                wait_for_trigger:
+                - platform: event
+                  event_type: mobile_app_notification_action
+                  event_data:
+                    action: '{{ first_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_action
+                  event_data:
+                    action: '{{ second_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_action
+                  event_data:
+                    action: '{{ third_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_cleared
+                  event_data:
+                    action_1_key: '{{ first_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_cleared
+                  event_data:
+                    action_2_key: '{{ second_option }}'
+                - platform: event
+                  event_type: mobile_app_notification_cleared
+                  event_data:
+                    action_3_key: '{{ third_option }}'
+                - platform: event
+                  event_type: blueprint_notification_superseded
+                  event_data:
+                    notification_id: '{{ custom_tag }}'
+          - alias: Remember how the wait ended
+            variables:
+              wait_event: >-
+                {% set e = wait.trigger.event if wait is defined and wait.trigger is defined and wait.trigger else none %}
+                {{ {'event_type': e.event_type, 'data': (e.data | to_json | from_json)} if e is not none else none }}
+              wait_finished: true
+          - alias: Tell the reminder loop to stop
+            event: blueprint_notification_wait_over
+            event_data:
+              run_id: "{{ notification_run_id }}"
+      - alias: Send now and remind later
+        sequence:
+        - repeat:
+            while: "{{ not wait_finished and window_sends <= reminders_allowed }}"
+            sequence:
+            - if:
+              - condition: template
+                value_template: "{{ window_sends > 0 }}"
+              then:
+              - alias: Wait for the next reminder
+                wait_for_trigger:
+                - platform: event
+                  event_type: blueprint_notification_wait_over
+                  event_data:
+                    run_id: "{{ notification_run_id }}"
+                timeout:
+                  seconds: "{{ reminder_interval_seconds }}"
+                continue_on_timeout: true
+            - if:
+              - condition: template
+                value_template: "{{ not wait_finished }}"
+              then:
+              - alias: Prepare this send
+                variables:
+                  is_reminder: "{{ window_sends > 0 }}"
+                  window_sends: "{{ window_sends + 1 }}"
+                  sends_total: "{{ sends_total + 1 }}"
+                  reminders_total: "{{ reminders_total + (1 if is_reminder else 0) }}"
+                  remaining_seconds: "{{ [timeout_seconds - ((now().timestamp() - window_started) | int), 1] | max }}"
+                  send_title: "{{ ((reminder_title_prefix ~ ' ' ~ title) | trim) if is_reminder and reminder_title_prefix | length else title }}"
+              - alias: Send notification to all devices (first responder wins)
+                repeat:
+                  for_each: "{{ devices }}"
+                  sequence:
+                  - alias: Resolve per-device payload
+                    variables:
+                      device_tag: '{{ repeat.item.notify_tag }}'
+                      device_is_apple: "{{ 'APPLE' in (device_attr(repeat.item.id, 'manufacturer')|upper) }}"
+                      device_payload: >-
+                        {% set extras = apple_payload_extras if device_is_apple else android_payload_extras %}
+                        {% set d = (notification_data | combine(extras) | combine({'tag': device_tag, 'actions': send_options})) %}
+                        {% if not device_is_apple and enable_timeout and clear_on_timeout %}
+                          {% set d = d | combine({'timeout': remaining_seconds}) %}
+                        {% endif %}
+                        {% if device_is_apple %}
+                          {% set action_data = d.get('action_data', {}) | combine({'responder_device_id': repeat.item.id}) %}
+                          {% set d = d | combine({'action_data': action_data}) %}
+                        {% endif %}
+                        {% set device_loud = (interruption_level == 'critical') if device_is_apple else alarm_stream_active %}
+                        {% if not expect_response and silent_update and not device_loud %}
+                          {% set d = (d | combine({'silent': true, 'alert_once': true})) %}
+                        {% endif %}
+                        {{ d }}
+                  - choose:
+                    - alias: Clear tagged notification (operation_mode=clear)
+                      conditions: '{{ operation_mode == ''clear'' }}'
+                      sequence:
+                      - alias: Send clear command to device
+                        service: '{{ repeat.item.notify_service }}'
+                        continue_on_error: true
+                        data:
+                          message: clear_notification
+                          data:
+                            tag: '{{ device_tag }}'
+                    default:
+                    - alias: Send standard or status notification
+                      service: '{{ repeat.item.notify_service }}'
+                      continue_on_error: true
+                      data:
+                        title: '{{ send_title }}'
+                        message: '{{ message }}'
+                        data: '{{ device_payload }}'
+    - alias: Work out whether a snooze button ended the wait
+      variables:
+        snooze_pressed: >-
+          {% set e = wait_event if wait_event else none %}
+          {% set a = e.data.action if e is not none and e.event_type == 'mobile_app_notification_action' and e.data.action is defined else '' %}
+          {{ expect_response and snoozes_left | int > 0 and a | length > 0 and ((a == first_option and option_one_mode == 'snooze' and option_one_enabled) or (a == second_option and option_two_mode == 'snooze' and option_two_enabled) or (a == third_option and option_three_mode == 'snooze' and option_three_enabled)) }}
+    - if:
+      - condition: template
+        value_template: "{{ snooze_pressed }}"
+      then:
+      - alias: Clear the notification on every phone while snoozed
+        repeat:
+          for_each: "{{ devices }}"
+          sequence:
+          - alias: Clear on this phone
+            service: "{{ repeat.item.notify_service }}"
+            continue_on_error: true
             data:
-              tag: '{{ device_tag }}'
-      default:
-      - alias: Send standard or status notification
-        service: '{{ repeat.item.notify_service }}'
-        continue_on_error: true
-        data:
-          title: '{{ title }}'
-          message: '{{ message }}'
-          data: '{{ device_payload }}'
-- alias: Determine if script has to wait for response?
-  choose:
-  - alias: No need for response
-    conditions: '{{ expect_response == false }}'
-    sequence: []
-  - alias: Should await response with timeout?
-    conditions: '{{ enable_timeout }}'
-    sequence:
-    - alias: Awaiting response with timeout…
-      wait_for_trigger:
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: '{{ first_option }}'
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: '{{ second_option }}'
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: '{{ third_option }}'
-      - platform: event
-        event_type: mobile_app_notification_cleared
-        event_data:
-          action_1_key: '{{ first_option }}'
-      - platform: event
-        event_type: mobile_app_notification_cleared
-        event_data:
-          action_2_key: '{{ second_option }}'
-      - platform: event
-        event_type: mobile_app_notification_cleared
-        event_data:
-          action_3_key: '{{ third_option }}'
-      - platform: event
-        event_type: blueprint_notification_superseded
-        event_data:
-          notification_id: '{{ custom_tag }}'
-      timeout: '{{ timeout }}'
-      continue_on_timeout: true
-  - alias: Should await response indefinitely?
-    conditions: '{{ enable_timeout == false }}'
-    sequence:
-    - alias: Awaiting response indefinitely…
-      wait_for_trigger:
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: '{{ first_option }}'
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: '{{ second_option }}'
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: '{{ third_option }}'
-      - platform: event
-        event_type: mobile_app_notification_cleared
-        event_data:
-          action_1_key: '{{ first_option }}'
-      - platform: event
-        event_type: mobile_app_notification_cleared
-        event_data:
-          action_2_key: '{{ second_option }}'
-      - platform: event
-        event_type: mobile_app_notification_cleared
-        event_data:
-          action_3_key: '{{ third_option }}'
-      - platform: event
-        event_type: blueprint_notification_superseded
-        event_data:
-          notification_id: '{{ custom_tag }}'
+              message: clear_notification
+              data: >-
+                {{ {'tag': repeat.item.notify_tag} | combine(android_delivery_extras if repeat.item.platform == 'android' else {}) }}
+      - alias: Snoozed (a new send with the same ID ends the snooze)
+        wait_for_trigger:
+        - platform: event
+          event_type: blueprint_notification_superseded
+          event_data:
+            notification_id: '{{ custom_tag }}'
+        timeout:
+          seconds: "{{ snooze_seconds }}"
+        continue_on_timeout: true
+      - alias: Count the snooze and decide what happens next
+        variables:
+          snooze_count: "{{ snooze_count + 1 }}"
+          wait_event: >-
+            {% set e = wait.trigger.event if wait is defined and wait.trigger is defined and wait.trigger else none %}
+            {{ {'event_type': e.event_type, 'data': (e.data | to_json | from_json)} if e is not none else none }}
+          delivery_finished: "{{ wait_event is not none }}"
+      else:
+      - alias: Nothing to snooze, finish
+        variables:
+          delivery_finished: true
 - alias: Parse response into variable
   variables:
     user_response: >-
-      {% set event = wait.trigger.event if wait is defined and wait.trigger is defined and wait.trigger else none %}
+      {% set event = wait_event if wait_event else none %}
       {% set outcome = 'cleared' if operation_mode == 'clear' else 'not_waited' if not expect_response else 'timeout' if event is none else 'superseded' if event.event_type == 'blueprint_notification_superseded' else 'dismissed' if event.event_type == 'mobile_app_notification_cleared' else 'button' %}
       {% set result = 'no_response' if outcome == 'not_waited' else 'cleared' if outcome == 'cleared' else 'superseded' if outcome == 'superseded' else 'timeout' if outcome == 'timeout' else 'swiped' if outcome == 'dismissed' and not persist|bool else 'notification_cleared' if outcome == 'dismissed' else 'option_one' if event.data.action == option_one['action'] else 'option_two' if event.data.action == option_two['action'] else 'option_three' if event.data.action == option_three['action'] else 'unknown' %}
-       {% set response = namespace(data={'schema_version': 2, 'result': result, 'outcome': outcome, 'payload': notification_data, 'options': options, 'devices': devices, 'notification': {'id': custom_tag if custom_tag|length else tag, 'run_id': notification_run_id, 'context_id': context.id, 'group': group, 'recipients': devices | map(attribute='name') | list, 'recipient_ids': devices | map(attribute='id') | list}, 'response': {}, 'caller_context': caller_context}) %}
+       {% set response = namespace(data={'schema_version': 2, 'result': result, 'outcome': outcome, 'payload': notification_data, 'options': options, 'devices': devices, 'notification': {'id': custom_tag if custom_tag|length else tag, 'run_id': notification_run_id, 'context_id': context.id, 'group': group, 'recipients': devices | map(attribute='name') | list, 'recipient_ids': devices | map(attribute='id') | list}, 'response': {}, 'caller_context': caller_context, 'delivery': {'sends': sends_total, 'reminders': reminders_total, 'snoozes': snooze_count}}) %}
       {% if event is not none %}
         {% set response.data = dict(response.data, **{'response': {'event_type': event.event_type, 'event_data': event.data}}) %}
       {% endif %}
       {% if outcome == 'button' %}
         {% set button = option_one if result == 'option_one' else option_two if result == 'option_two' else option_three %}
         {% set button_index = 1 if result == 'option_one' else 2 if result == 'option_two' else 3 %}
-        {% set response.data = dict(response.data, **{'response': dict(response.data.response, **{'button_index': button_index, 'button_title': button.title, 'action_id': event.data.action})}) %}
+        {% set response.data = dict(response.data, **{'response': dict(response.data.response, **{'button_index': button_index, 'button_title': button.title, 'action_id': event.data.action, 'reply_text': event.data.get('reply_text', '') | string})}) %}
       {% endif %}
       {{ response.data }}
+    reply_text: "{{ user_response.response.get('reply_text', '') }}"
 - alias: Run response actions
   default: []
   choose:
@@ -1506,7 +1838,7 @@ sequence:
 - alias: Resolve responder name
   variables:
     responder_device_id: >-
-      {% set event = wait.trigger.event if wait is defined and wait.trigger is defined and wait.trigger is not none else none %}
+      {% set event = wait_event if wait_event else none %}
       {% set event_id = event.data.device_id if event is not none and event.data is defined and event.data.device_id is defined else '' %}
       {% set action_data = event.data.action_data if event is not none and event.data is defined and event.data.action_data is defined else {} %}
       {% set action_id = action_data.get('responder_device_id', '') %}
@@ -1528,6 +1860,7 @@ sequence:
     response_button_index: "{{ user_response.response.get('button_index', 0) }}"
     response_button_title: "{{ user_response.response.get('button_title', '') }}"
     response_event_data: "{{ user_response.response.get('event_data', {}) }}"
+    response_reply_text: "{{ reply_text }}"
     response_options: "{{ user_response.options }}"
     response_devices: "{{ user_response.devices }}"
     response_recipients: "{{ user_response.notification.recipients }}"
@@ -1598,7 +1931,6 @@ sequence:
     broadcast_non_responder_title: "{{ field_broadcast_non_responder_title if field_broadcast_non_responder_title is defined else script_broadcast_non_responder_title }}"
     script_broadcast_non_responder_message: "{{ runtime_config.broadcast_non_responder_message if reset_config or 'broadcast_non_responder_message' in (field_configuration | default({})) else saved_broadcast_non_responder_message }}"
     broadcast_non_responder_message: "{{ field_broadcast_non_responder_message if field_broadcast_non_responder_message is defined else script_broadcast_non_responder_message }}"
-    android_delivery_extras: "{{ {'priority': 'high', 'ttl': 0} if android_high_priority else {} }}"
     script_broadcast_clear_delay: "{{ runtime_config.broadcast_clear_delay }}"
     broadcast_clear_delay_seconds: >-
       {% set d = field_broadcast_clear_delay if field_broadcast_clear_delay is defined else script_broadcast_clear_delay %}
@@ -1640,8 +1972,8 @@ sequence:
             is_responder: "{{ responder_device_id | length > 0 and repeat.item.id == responder_device_id }}"
             followup_title_template: "{{ broadcast_responder_title if is_responder else broadcast_non_responder_title }}"
             followup_message_template: "{{ broadcast_responder_message if is_responder else broadcast_non_responder_message }}"
-            followup_title: "{{ followup_title_template | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) }}"
-            followup_message: "{{ followup_message_template | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) }}"
+            followup_title: "{{ followup_title_template | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) | replace('{{ reply_text }}', reply_text) }}"
+            followup_message: "{{ followup_message_template | replace('{{ responder_name }}', responder_name) | replace('{{ outcome }}', user_response.outcome) | replace('{{ result }}', user_response.result) | replace('{{ notification_id }}', notification_id) | replace('{{ button_title }}', button_title) | replace('{{ reply_text }}', reply_text) }}"
         - alias: Skip this device when its follow-up is off or has no text
           if:
           - condition: template
